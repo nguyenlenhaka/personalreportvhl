@@ -182,6 +182,44 @@
       .section-title{ position: sticky; top: calc(var(--header-h) + var(--toc-h) + 6px); z-index: 20; background: #fff; }
       .section{ scroll-margin-top: calc(var(--header-h) + var(--toc-h) + 10px); }
     }
+/* ===== FIX: DESKTOP logo ngang chữ ===== */
+.header-grid{ align-items: center !important; }       /* căn giữa chiều cao hàng */
+.logo-cell{ display:flex; align-items:center; }        /* logo canh giữa theo trục dọc */
+.title-d{
+  display:flex; align-items:center;                    /* chữ căn giữa theo trục dọc với logo */
+  height:56px; line-height:1.1;                        /* bỏ hack line-height cao quá */
+}
+
+/* ===== FIX: MOBILE login không tràn khung ===== */
+@media (max-width:640px){
+  #pageHeader .header-grid{ padding-left:8px; padding-right:8px; }
+
+  /* form chiếm đúng bề ngang container, không overflow */
+  #loginForm{
+    width:100% !important;
+    max-width:100%;
+    justify-self:stretch;
+    padding:0;                 /* tránh cộng padding làm tràn */
+    box-sizing:border-box;
+  }
+
+  /* 2 input cùng hàng, co giãn an toàn */
+  .login-inputs{
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+  }
+  .login-inputs input{
+    width:100%;
+    min-width:0;               /* chống vỡ grid khi placeholder dài */
+  }
+
+  /* nút ở dòng riêng & full width */
+  .login-btn{
+    justify-self:stretch;
+    width:100%;
+  }
+}
+
   </style>
 </head>
 <body class="min-h-screen font-sans">
