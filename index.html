@@ -2,187 +2,802 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Tra cứu báo cáo Vùng Hằng Lâm</title>
+  <title>Báo cáo Kinh doanh Đại lý</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-      background-color: #f1f1f1;
-      max-width: 600px;
-      margin: auto;
+    :root{
+      --sidebar-width: 260px;  /* chiều rộng danh mục trái (desktop) */
+      --header-h: 64px;        /* sẽ cập nhật bằng JS theo thực tế */
+      --fixed-top: 64px;       /* vị trí dính của sidebar = chiều cao header */
+      --toc-h: 52px;           /* chiều cao dropdown mobile (ước lượng, cập nhật bằng JS) */
     }
-    h1 {
-      color: #007A33;
-      font-size: 22px;
-      text-align: center;
+    body { background: #f3f4f6; }
+    .sticky-header { position: sticky; top: 0; z-index: 40; background: #fff; }
+
+    /* Cỡ chữ tổng thể */
+    html, body { font-size: 17px; }
+
+    /* Màu/đậm */
+    b, strong, .val, .hl { color: #10b981; }
+    .label { font-weight: 700; color: #0b3d2c; }
+    .val   { font-weight: 900; }
+    .thin  { font-weight: 700; color: #0b3d2c; }
+    .hide{ display:none; }
+
+    /* ====== HEADER ====== */
+    /* Header chia grid: [cột trùng bề rộng sidebar cho logo] [tiêu đề] [login] */
+    .header-grid{
+      display: grid;
+      grid-template-columns: var(--sidebar-width) 1fr max-content;
+      align-items: center;
+      gap: .75rem;
     }
-    input, button {
-      padding: 14px;
-      margin: 12px 0;
-      width: 100%;
-      font-size: 16px;
-      box-sizing: border-box;
-      border: 1px solid #ccc;
-      border-radius: 4px;
+    /* Logo desktop: bám sát mép trái, có khoảng đệm nhỏ bên trong */
+    .logo-d{
+      height: 56px; /* logo cao 56px */
+      margin-left: 8px; /* cách mép trái 1 khoảng nhỏ */
     }
-    button {
-      background-color: #007A33;
-      color: white;
-      border: none;
-      cursor: pointer;
+    /* Tiêu đề desktop: bắt đầu đúng mép trái của nội dung (sau cột sidebar) */
+    .title-d{
+      /* Chiều cao chữ = chiều cao logo: dùng line-height khớp logo, font-size lớn */
+      line-height: 56px;
+      font-size: 2rem; /* to và nổi bật */
+      font-weight: 800;
+      color: #065f46; /* xanh đậm */
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
-    button:hover {
-      background-color: #005c26;
+
+    /* ====== SIDEBAR (DESKTOP) CỐ ĐỊNH ====== */
+    #sidebar{
+      width: var(--sidebar-width);
+      position: fixed;
+      top: var(--fixed-top);
+      left: 0;
+      bottom: 0;
+      overflow: auto;
+      z-index: 35;
+      background: #ffffff;
+      border-right: 1px solid #e5e7eb;
+      border-top-right-radius: 12px;
     }
-    #result {
-      margin-top: 20px;
-      text-align: center;
+    .sidebar-inner{ padding: 12px; }
+    .menu-item{ display:flex; align-items:center; gap:.5rem; padding:.5rem .75rem; border-radius:.5rem; font-weight:700; color:#0b3d2c; }
+    .menu-item:hover{ background:#e5f7ee; }
+    .menu-item.active{ background:#0ea35b; color:#ffffff; }
+    .menu-head{ padding:.5rem .75rem; font-weight:800; color:#0b3d2c; }
+    .submenu{ margin:.25rem 0 .5rem .75rem; }
+    .submenu a{ display:block; padding:.35rem .5rem; border-radius:.375rem; color:#0b3d2c; font-weight:700; }
+    .submenu a:hover{ background:#edfdf6; }
+    .submenu a.active{ background:#0ea35b; color:#fff; }
+
+    /* ====== CONTENT WRAPPER (DESKTOP) ====== */
+    #contentWrap{
+      /* chừa chỗ cho sidebar cố định */
+      margin-left: var(--sidebar-width);
     }
-    iframe {
-      border: 1px solid #eee;
+
+    /* ====== TOC MOBILE (sticky) ====== */
+    .toc-mobile{
+      position: sticky;
+      top: calc(var(--header-h));
+      z-index: 30;
+      background: #fff;
+      padding: 8px 0;
     }
-    @media (max-width: 480px) {
-      h1 { font-size: 20px; }
+
+    /* ====== SECTION ====== */
+    .section-title {
+      font-weight: 800; color: #0b3d2c; background: #ffffff;
+      padding: 10px 16px; border-left: 6px solid #0ea35b;
+      border-radius: 0.5rem; margin: 18px 0 12px; font-size: 1.25rem;
     }
+    .subsec {
+      margin: 12px 0 10px; font-weight: 800; color: #0b3d2c;
+      padding-left: .75rem; border-left: 6px solid #0ea35b; font-size: 1.15rem;
+    }
+    /* CUỘN TỚI SÁT ĐẦU  (desktop) */
+    .section{ scroll-margin-top: calc(var(--header-h) + 8px); }
+
+    /* ====== INFO GRID ====== */
+    .info-grid{
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: .85rem;
+    }
+    .info-item{
+      display: flex; flex-direction: column; gap: .3rem;
+      background:#fff; border:1px solid #e5e7eb; border-left:4px solid #0ea35b;
+      border-radius:.6rem; padding:.7rem .85rem; min-height:auto;
+    }
+    .info-item .val{ font-size: 1.15rem; line-height: 1.25; word-break: break-word; }
+
+    /* CẢNH BÁO */
+    .pro-alert{
+      margin-top: .4rem; padding: .7rem .9rem; border: 2px solid #dc2626;
+      border-left-width: 6px; border-radius: .6rem; background: #fff;
+      color: #b91c1c; font-weight: 900; font-size: 1.15rem;
+    }
+    .info-alert{ grid-column: 1 / -1; } /* chiếm full width trong grid */
+    .pro-alert .pro-name{ font-weight: 900; }
+
+    /* LIST 2 CỘT: label | value */
+    .list-dot li, .bullet-strong li{
+      list-style: none; padding-left: 0;
+      display: grid; grid-template-columns: minmax(170px, max-content) 1fr;
+      column-gap: 1rem; align-items: start; margin: .3rem 0;
+    }
+    .bullet-strong li{ border-left: 3px solid #0ea35b; padding-left: .75rem; }
+    .hl{ grid-column: 2; font-weight: 900; font-size: 1.05rem; line-height: 1.3; }
+
+    /* THỤT DÒNG */
+    .lvl-2{ margin-left: 1.25rem; padding-left: .75rem; border-left:3px solid #a7f3d0; border-radius: .25rem; }
+    .lvl-3{ margin-left: 2.25rem; padding-left: .75rem; border-left:2px dashed #c7f9e9; border-radius: .25rem; }
+    .lvl-4{ margin-left: 3.25rem; padding-left: .75rem; border-left:2px dotted #def7ef; border-radius: .25rem; }
+
+    /* ====== MOBILE ====== */
+    @media (max-width: 1023px){
+      #sidebar{ display: none !important; }
+      #contentWrap{ margin-left: 0; }
+    }
+    @media (max-width: 640px){
+      /* header: logo trái (logo.webp), tiêu đề căn giữa */
+      .header-grid{
+        grid-template-columns: auto 1fr; /* logo + cột tiêu đề/đăng nhập stack bên dưới */
+        align-items: flex-start;
+      }
+      .logo-d{ display: none; }
+      .logo-m{ display: block; height: 44px; margin-left: 8px; } /* cách mép trái 1 khoảng nhỏ */
+      .title-d{
+        grid-column: 1 / -1;
+        text-align: center;
+        line-height: 44px; font-size: 1.5rem;
+      }
+      /* Form: 2 input cùng hàng, nút ở hàng dưới (yêu cầu cũ) */
+      .login-grid{ grid-template-columns: 1fr 1fr; }
+      /* Sticky tiêu đề section & vùng cuộn: tiêu đề dính dưới dropdown */
+      .section-title{ position: sticky; top: calc(var(--header-h) + var(--toc-h) + 6px); z-index: 20; background: #fff; }
+      .section{ scroll-margin-top: calc(var(--header-h) + var(--toc-h) + 10px); }
+    }
+    @media (min-width: 641px){
+      .logo-m{ display: none; }
+      .login-grid{ grid-template-columns: 1fr 1fr; }
+    }
+    .menu-item, .menu-head { font-weight: 800 !important; }
   </style>
 </head>
-<body>
-  <h1>TRA CỨU BÁO CÁO CÁ NHÂN</h1>
-  <p style="text-align: center; font-style: italic; color: #007A33;">
-    Chào mừng anh/chị đến với hệ thống tra cứu báo cáo cá nhân Vùng Hằng Lâm<br> 
-    Vui lòng nhập Mã số và Ngày gia nhập để tiếp tục.<br>
-    <span style="font-size: 14px; color: #444;">Ngày gia nhập được ghi nhận trên ứng dụng M-PA hoặc AWS.</span>
-  </p>
+<body class="min-h-screen font-sans">
+  <!-- ===== HEADER ===== -->
+  <header id="pageHeader" class="sticky-header shadow">
+    <div class="header-grid px-2 md:px-3 py-2">
+      <!-- Cột 1: logo (desktop) + logo mobile -->
+      <div class="flex items-center">
+        <!-- desktop: logo_text.webp, sát mép trái -->
+        <img src="logo_text.webp" alt="logo" class="logo-d">
+        <!-- mobile: logo.webp -->
+        <img src="logo.webp" alt="logo" class="logo-m">
+      </div>
 
-  <form id="reportForm">
-    <input type="text" id="code" placeholder="Mã số đại lý / quản lý (VD: A1234)" required />
-    <input type="text" id="joinDate" placeholder="Ngày gia nhập (VD: 01/01/2020 hoặc 01012020)" required />
-    <button type="submit">Xem báo cáo</button>
-  </form>
-  <div id="result"></div>
+      <!-- Cột 2: tiêu đề -->
+      <h1 class="title-d">BÁO CÁO KINH DOANH</h1>
+
+      <!-- Cột 3: đăng nhập (giữ ở bên phải trên desktop) -->
+      <form id="loginForm" class="login-grid grid gap-2">
+        <div class="grid grid-cols-2 gap-2">
+          <input id="msdlInput" class="border rounded px-3 py-2" placeholder="Nhập MSĐL" required />
+          <input id="dateInput" class="border rounded px-3 py-2" placeholder="Ngày gia nhập (dd/mm/yyyy hoặc ddmmyyyy)" required />
+        </div>
+        <button class="bg-emerald-700 text-white rounded px-4 py-2 font-semibold hover:bg-emerald-800 transition" type="submit">
+          Đăng nhập
+        </button>
+      </form>
+    </div>
+  </header>
+
+  <!-- ===== SIDEBAR (desktop fixed) ===== -->
+  <aside id="sidebar" class="hidden lg:block">
+    <div class="sidebar-inner">
+      <nav id="nav"></nav>
+    </div>
+  </aside>
+
+  <!-- ===== CONTENT WRAPPER ===== -->
+  <div id="contentWrap">
+    <main class="max-w-6xl mx-auto px-3 md:px-4 py-5">
+      <div id="errorMsg" class="hidden bg-red-50 border border-red-300 text-red-700 px-4 py-2 mb-4 rounded"></div>
+
+      <!-- TOC mobile (sticky ngay dưới header) -->
+      <div id="tocMobile" class="toc-mobile lg:hidden hidden">
+        <select id="tocSelect" class="w-full border rounded px-3 py-2">
+          <option value="" selected disabled>Danh mục báo cáo</option>
+          <option value="sectionInfo">Thông tin đại lý</option>
+          <option value="sectionA">A. Tổng quan (MTD)</option>
+          <option value="sectionB#b1">B.1 Bán hàng</option>
+          <option value="sectionB#b2">B.2 Manulife Pro</option>
+          <option value="sectionB#b3">B.3 MDRT+</option>
+          <option value="sectionB#b4">B.4 M-Star / Japan</option>
+          <option value="sectionB#b5">B.5 Thưởng năm</option>
+          <option value="sectionC#c1">C.1 Tuyển dụng</option>
+          <option value="sectionC#c2">C.2 Thăng cấp</option>
+          <option value="sectionC#c3">C.3 Duy trì chức danh</option>
+          <option value="sectionC#c4">C.4 MBA Pro</option>
+          <option value="sectionC#c5">C.5 Thưởng nhóm ưu tú</option>
+          <option value="sectionIncome">Tính thu nhập</option>
+        </select>
+      </div>
+
+      <!-- vùng nội dung báo cáo -->
+      <section id="report" class="bg-white shadow rounded-xl p-4 md:p-6 mt-0 hidden"></section>
+      <div id="hint" class="mt-6 text-center text-gray-500 text-sm">Nhập thông tin để xem báo cáo đại lý</div>
+    </main>
+  </div>
 
   <script>
-    const logURL = "https://script.google.com/macros/s/AKfycbziTV42B_E7vtYMigc8e7mgUu9ppdpOpxPEjJxy9Yn8bur02h57VVNTOhozZ6emQWEhhw/exec";
+    let dataRows = [];
+    let mapping = [];
+    let dataReady;
 
-    function formatDate(str) {
-      let cleaned = str.replace(/\D/g, "");
-      if (cleaned.length === 8) {
-        return cleaned.slice(0, 2) + '/' + cleaned.slice(2, 4) + '/' + cleaned.slice(4);
-      }
-      return str;
+    /* ====== TẢI DỮ LIỆU ====== */
+    async function loadData(){
+      const mapUrl = encodeURI('tham chieu.json');
+      const dataUrl = 'data.json';
+      const [mapS, dataS] = await Promise.allSettled([
+        fetch(mapUrl).then(r => r.ok ? r.json() : []),
+        fetch(dataUrl).then(r => r.ok ? r.json() : [])
+      ]);
+      mapping = (mapS.status === 'fulfilled' && Array.isArray(mapS.value)) ? mapS.value : [];
+      dataRows = (dataS.status === 'fulfilled' && Array.isArray(dataS.value)) ? dataS.value : [];
+    }
+    dataReady = loadData();
+
+    /* ====== DOM NODES ====== */
+    const errorEl   = document.getElementById('errorMsg');
+    const reportEl  = document.getElementById('report');
+    const hintEl    = document.getElementById('hint');
+    const tocMbEl   = document.getElementById('tocMobile');
+    const sidebarEl = document.getElementById('sidebar');
+    const navEl     = document.getElementById('nav');
+    const headerEl  = document.getElementById('pageHeader');
+
+    /* ====== UTIL ====== */
+    function normalizeDate(s){
+      if(!s) return '';
+      s = String(s).trim();
+      if (/^\d{8}$/.test(s)) { const d = s.slice(0,2), m = s.slice(2,4), y = s.slice(4,8); return `${d}/${m}/${y}`; }
+      if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(s)) { const [d,m,y] = s.split('/').map(x=>parseInt(x,10)); return `${String(d).padStart(2,'0')}/${String(m).padStart(2,'0')}/${y}`; }
+      if (/^\d{4}-\d{1,2}-\d{1,2}$/.test(s)) { const [y,m,d] = s.split('-').map(x=>parseInt(x,10)); return `${String(d).padStart(2,'0')}/${String(m).padStart(2,'0')}/${y}`; }
+      return s;
+    }
+    function normalizeMSDL(s){ return String(s || '').trim().replace(/\s+/g,'').toLowerCase(); }
+    function isDesktop(){ return window.matchMedia('(min-width: 1024px)').matches; }
+    function isMobile(){ return window.matchMedia('(max-width: 640px)').matches; }
+
+    /* ====== FORMAT F3 (FYP/FYC) ====== */
+    function parseLocaleNumber(v){
+      if (v === null || v === undefined || v === '') return NaN;
+      if (typeof v === 'number') return v;
+      let s = String(v).trim().replace(/[^0-9,.\-]/g,'');
+      if (s === '' || s === '-' || s === '.' || s === ',') return NaN;
+      const hasDot = s.includes('.'); const hasComma = s.includes(',');
+      if (hasDot && hasComma){
+        if (s.lastIndexOf(',') > s.lastIndexOf('.')) { s = s.replace(/\./g,'').replace(',', '.'); }
+        else { s = s.replace(/,/g,''); }
+      } else if (hasComma && !hasDot){ s = s.replace(',', '.'); }
+      const n = parseFloat(s);
+      return isNaN(n) ? NaN : n;
+    }
+    function formatThousand(n, decimals){
+      if (n === null || n === undefined || isNaN(n)) return "";
+      const fixed = Number(n).toFixed(decimals);
+      let [intPart, fracPart=""] = fixed.split('.');
+      const sign = intPart.startsWith('-') ? '-' : '';
+      intPart = intPart.replace('-', '');
+      intPart = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+      return sign + intPart + (decimals>0 ? ','+fracPart : '');
+    }
+    function formatF3(val){ const n = parseLocaleNumber(val); if (isNaN(n)) return val ?? ""; return formatThousand(n, 3); }
+    function formatNumber(val){ return (val ?? ""); } // mặc định: giữ nguyên
+
+    const F3_PATTERNS = [
+      "doanh thu fyp thuc cap","tong doanh thu fyp","fyp phat sinh tinh thuong",
+      "muc thuong tam dat","can them de dat muc thuong tiep theo","muc thuong tiep theo",
+      "fyp can them de thang hang","fyp thuc dat (ytd)","fyp can them de dat tien do quy hien tai",
+      "fyp can them de dat danh hieu mdrt+","fyp phat sinh trong thoi gian thi dua",
+      "tong fyp can them de dat thi dua","tong fyp phat sinh (ytd)",
+      "fyc whole team l6m sau luat 50% can them","fyp whole team l6m sau luat 50% can them",
+      "fyc ca nhan um+ va dl truc tiep l12m sau luat 50%","tong fyp phat sinh trong thang cua ban than um+ (a)",
+      "fyp cua ban than um+ (a) va nhom truc tiep sau luat 50%","fyp cua ban than um+ (b) bao cao truc tiep cho um+ (a)",
+      "tong fyp sau luat 50% dung de tinh thuong (cap um)","tong fyp wt truoc luat 50% (cap sum+)",
+      "tong fyp wt sau luat 50% de tinh thuong (cap sum+)","thuong du tinh sau khi da nhan he so tldthd"
+    ];
+    function normalizeText(s){
+      return String(s||"").toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' ').trim();
+    }
+    function shouldF3(key="", label=""){
+      const norm = normalizeText(label);
+      if (norm.includes("fyp") || norm.includes("fyc")) return true;
+      return F3_PATTERNS.some(p => norm.startsWith(p) || norm.includes(p));
+    }
+    function fmt(val, key="", label=""){ return shouldF3(key,label) ? formatF3(val) : (val ?? ""); }
+    function addPercent(val){ return (val ?? ""); }
+
+    function exists(v){ return !(v === null || v === undefined || (typeof v === 'string' && v.trim() === '')); }
+    function pick(row, keys){ for (const k of keys) if (exists(row[k])) return row[k]; return ''; }
+
+    function hideAll(){
+      errorEl.classList.add('hidden'); reportEl.classList.add('hidden');
+      hintEl.classList.add('hidden'); tocMbEl.classList.add('hidden');
+    }
+    function showError(msg){ errorEl.textContent = msg; errorEl.classList.remove('hidden'); hintEl.classList.remove('hidden'); }
+
+    function scrollToSectionStart(sectionId){
+      const section = document.getElementById(sectionId);
+      if(!section) return;
+      const y = section.getBoundingClientRect().top + window.scrollY - (isMobile() ? (getHeaderH() + getTocH() + 10) : (getHeaderH() + 8));
+      window.scrollTo({ top: y, behavior: 'smooth' });
     }
 
-    function normalizeDate(input) {
-      if (!input) return '';
-      if (typeof input === 'number') {
-        return new Date(input).toLocaleDateString('vi-VN');
-      }
-      if (typeof input === 'string') {
-        if (input.includes('-')) {
-          const d = new Date(input);
-          return d.toLocaleDateString('vi-VN');
-        }
-        return input.replace(/\-/g, '/').trim();
-      }
-      return '';
+    function getHeaderH(){ return headerEl?.offsetHeight || 64; }
+    function getTocH(){
+      const sel = document.getElementById('tocSelect');
+      return (sel && getComputedStyle(tocMbEl).display !== 'none') ? (sel.offsetHeight + 16) : 52;
+    }
+    function updateLayoutVars(){
+      const root = document.documentElement;
+      root.style.setProperty('--header-h', getHeaderH() + 'px');
+      root.style.setProperty('--fixed-top', getHeaderH() + 'px');
+      root.style.setProperty('--toc-h', getTocH() + 'px');
     }
 
-    document.getElementById("reportForm").addEventListener("submit", async function (e) {
+    function toggleNavForViewport(){
+      if (isDesktop()){
+        sidebarEl.classList.remove('hidden');
+        tocMbEl.classList.add('hidden');
+      } else {
+        sidebarEl.classList.add('hidden');
+        tocMbEl.classList.remove('hidden');
+        const sel = document.getElementById('tocSelect');
+        if (sel) sel.value = "";
+      }
+      updateLayoutVars();
+    }
+
+    /* ====== LOGIN ====== */
+    const loginForm = document.getElementById('loginForm');
+    const msdlInput = document.getElementById('msdlInput');
+    const dateInput = document.getElementById('dateInput');
+    const loginBtn  = loginForm.querySelector('button');
+
+    // chờ dữ liệu
+    loginBtn.disabled = true; loginBtn.textContent = 'Đang tải dữ liệu...';
+    dataReady.finally(()=>{ loginBtn.disabled = false; loginBtn.textContent = 'Đăng nhập'; });
+
+    // biến toàn cục để truyền qua "Tính thu nhập"
+    let lastMsdl = "", lastJoin = "";
+
+    loginForm.onsubmit = async function(e) {
       e.preventDefault();
-      const code = document.getElementById("code").value.trim().toUpperCase();
-      const rawDate = document.getElementById("joinDate").value.trim();
-      const joinDate = formatDate(rawDate);
-      const resultDiv = document.getElementById("result");
-      resultDiv.innerHTML = "⏳ Đang kiểm tra dữ liệu...";
+      hideAll();
+      await dataReady;
 
-      try {
-        const res = await fetch('data.json');
-        const rows = await res.json();
-
-        let matchedRows = rows.filter(row =>
-          row["MGR. CODE"]?.toUpperCase() === code &&
-          normalizeDate(row["JOIN DATE"]) === joinDate
-        );
-
-        if (matchedRows.length === 0) {
-          matchedRows = rows.filter(row =>
-            row["AGEN CODE"]?.toUpperCase() === code &&
-            normalizeDate(row["JOIN DATE"]) === joinDate
-          );
-        }
-
-        if (matchedRows.length === 0) {
-          resultDiv.innerHTML = "⛔ Không tìm thấy thông tin phù hợp. Vui lòng kiểm tra lại!";
-          return;
-        }
-
-        let filesHTML = matchedRows.map((row) => {
-          const file = row["FILE NAME"];
-          const fileURL = `report/${file}`;
-          const fullFileURL = window.location.origin + '/' + fileURL;
-          const googleViewerURL = `https://drive.google.com/viewerng/viewer?embedded=true&url=${encodeURIComponent(fullFileURL)}`;
-
-          return `
-            <div style="margin-top: 24px; border: 1px solid #ccc; padding: 10px; border-radius: 6px; background: #fff;">
-              <p><strong>📄 ${file}</strong></p>
-              <iframe src="${googleViewerURL}" width="100%" height="600px" style="border: none;"></iframe>
-              <a href="${fileURL}" download style="
-                display: inline-block;
-                margin-top: 10px;
-                padding: 10px 14px;
-                background-color: #007A33;
-                color: #fff;
-                text-decoration: none;
-                border-radius: 4px;
-              ">⬇️ Tải về</a>
-            </div>
-          `;
-        });
-
-        let downloadAllButton = "";
-        if (matchedRows.length >= 2) {
-          const allFiles = matchedRows.map(row => `'report/${row["FILE NAME"]}'`).join(",");
-          downloadAllButton = `
-            <button onclick="downloadAll([${allFiles}])" style="
-              background-color: #005c26;
-              color: white;
-              padding: 12px 16px;
-              margin: 20px auto;
-              display: block;
-              border: none;
-              border-radius: 6px;
-              font-size: 16px;
-              cursor: pointer;
-            ">⬇️ Tải tất cả báo cáo (${matchedRows.length})</button>
-          `;
-        }
-
-        const displayName = matchedRows[0]["AGEN NAME"] || code;
-        resultDiv.innerHTML = `<h3>✅ Xin chào ${displayName}!<br>Dưới đây là các báo cáo bạn được phân quyền xem:</h3>${downloadAllButton}${filesHTML.join("")}`;
-
-        // Gửi log bằng <img> để tránh bị CORS
-        const logImg = new Image();
-        logImg.src = `${logURL}?code=${encodeURIComponent(code)}&ts=${Date.now()}`;
-
-      } catch (err) {
-        console.error(err);
-        resultDiv.innerHTML = "❌ Có lỗi khi tải dữ liệu.";
+      if (!Array.isArray(dataRows) || dataRows.length === 0) {
+        showError("Không tải được dữ liệu. Đặt file data.json cùng thư mục và chạy qua HTTP server.");
+        return;
       }
-    });
 
-    function downloadAll(fileUrls) {
-      fileUrls.forEach((url, i) => {
-        setTimeout(() => {
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = url.split('/').pop();
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-        }, i * 800);
+      const msdlNorm = normalizeMSDL(msdlInput.value);
+      const dateNorm = normalizeDate(dateInput.value);
+
+      const msdlCols = ["MSDL","AGEN CODE","AGENT CODE","Agent Code","Mã Số Đại Lý","MÃ SỐ ĐẠI LÝ"];
+      const joinCols = ["JOIN DATE","Join Date","NGÀY GIA NHẬP","Ngày gia nhập"];
+
+      const row = dataRows.find(r => normalizeMSDL(pick(r, msdlCols)) === msdlNorm &&
+                                     normalizeDate(pick(r, joinCols)) === dateNorm);
+
+      if (!row) {
+        const rowByMsdl = dataRows.find(r => normalizeMSDL(pick(r, msdlCols)) === msdlNorm);
+        if (rowByMsdl) {
+          const expected = normalizeDate(pick(rowByMsdl, joinCols)) || (pick(rowByMsdl, joinCols) || '').trim();
+          showError(`MSĐL đúng nhưng ngày gia nhập chưa khớp. Ngày đúng là: ${expected || '(không có trong dữ liệu)'}`);
+        } else showError("Không tìm thấy đại lý phù hợp với thông tin bạn nhập!");
+        return;
+      }
+
+      // Lưu để tự điền vào mục "Tính thu nhập"
+      lastMsdl = pick(row, msdlCols);
+      lastJoin = pick(row, joinCols); // giữ nguyên văn để hiển thị trong iframe qua query (nếu site hỗ trợ)
+
+      renderReport(row);
+      buildSidebarNav();
+      activateSection('sectionInfo');
+
+      // Hiện layout phù hợp viewport
+      document.getElementById('report').classList.remove('hidden');
+      document.getElementById('hint').classList.add('hidden');
+      toggleNavForViewport();
+      window.addEventListener('resize', toggleNavForViewport);
+
+      // Tự xoá input sau đăng nhập
+      msdlInput.value = "";
+      dateInput.value = "";
+      msdlInput.blur(); dateInput.blur();
+    };
+
+    /* ====== INFO ====== */
+    function infoItem(label, value){
+      if(!exists(value)) return '';
+      return `<div class="info-item"><div class="label">${label}:</div><div class="val">${value}</div></div>`;
+    }
+    function renderInfoSection(row){
+      const p13cn = addPercent(row["TLDTHD cá nhân"]);
+      const p13nh = addPercent(row["TLDTHD toàn nhánh"]);
+      const p13c1 = addPercent(row["TLDTHD cấp 1"]);
+
+      // Cảnh báo
+      const proMoc3 = row["PRO.MOC 3 THANG"];
+      const hasAlert = exists(proMoc3) && String(proMoc3).trim() !== "-";
+      const alertHtml = hasAlert
+        ? `<div class="pro-alert ${isMobile() ? 'info-alert' : ''}">Cảnh báo: <span class="pro-name">Danh hiệu Manulife Pro</span> – ${proMoc3}</div>`
+        : "";
+
+      // Mobile: chèn cảnh báo ngay trước "Báo cáo dành cho"
+      const firstBlock = infoItem("Báo cáo dành cho", (row["TEN DAI LY"] || row["AGEN NAME"]));
+      const restBlocks = `
+        ${infoItem("KV | MS", row["KV|MS"])}
+        ${infoItem("Ngày gia nhập", row["JOIN DATE"])}
+        ${infoItem("Tháng làm việc", row["WORK MNTHS"])}
+        ${infoItem("Chức danh", row["Chức danh"])}
+        ${infoItem("Ngày hiệu lực Chức danh", row["Ngày hiệu lực Chức danh"])}
+        ${infoItem("Nhóm đại lý", row["Nhóm Đại lý"])}
+        ${infoItem("Manulife Pro (chính thức)", row["PRO.DH CHINH THUC"])}
+        ${infoItem("Chính thức từ", row["PRO.BAT DAU"])}
+        ${infoItem("P13 Cá nhân", p13cn)}
+        ${infoItem("P13 Toàn nhánh", p13nh)}
+        ${infoItem("P13 cấp 1", p13c1)}
+        ${infoItem("Số liệu cập nhật đến ngày", row["NGAY CHOT DATA"])}
+        ${infoItem("ĐVT", "Nghìn VND")}
+      `;
+
+      const gridInner = isMobile() ? `${alertHtml}${firstBlock}${restBlocks}` : `${firstBlock}${restBlocks}`;
+      const alertAfter = (!isMobile() && hasAlert) ? alertHtml : "";
+
+      return `
+        <div id="sectionInfo" class="section">
+          <div class="section-title">Thông tin đại lý</div>
+          <div class="info-grid">${gridInner}</div>
+          ${alertAfter}
+        </div>
+      `;
+    }
+
+    /* ====== RENDER REPORT ====== */
+    function renderReport(row) {
+      const Info = renderInfoSection(row);
+
+      const A = `
+        <div id="sectionA" class="section">
+          <div class="section-title">A. BÁO CÁO TỔNG QUAN – (Month to date)</div>
+          <ul class="mb-4 list-dot bullet-strong lvl-2">
+            <li>Số hợp đồng thực cấp: <span class="hl">${formatNumber(row["MTD.CC CAP"])}</span></li>
+            <li>Doanh thu FYP thực cấp: <span class="hl">${fmt(row["MTD.FYP CAP"], "MTD.FYP CAP", "Doanh thu FYP thực cấp")}</span></li>
+            <li>Số lượng Đại lý mới tuyển dụng: <span class="hl">${formatNumber(row["RECRUIT T"])}</span></li>
+          </ul>
+        </div>
+      `;
+
+      const B = `
+        <div id="sectionB" class="section">
+          <div class="section-title">B. BÁO CÁO CHI TIẾT HOẠT ĐỘNG CÁ NHÂN</div>
+
+          <div id="b1" class="sub-block">
+            <div class="subsec lvl-1">1. Hoạt động bán hàng</div>
+            <div class="thin lvl-2">Nộp mới trong tháng</div>
+            <ul class="mb-2 list-dot bullet-strong lvl-3">
+              <li>Tổng số hợp đồng: <span class="hl">${formatNumber(row["MTD.CC NOP"])}</span></li>
+              <li>Tổng doanh thu FYP: <span class="hl">${fmt(row["MTD.FYP NOP"], "MTD.FYP NOP", "Tổng doanh thu FYP")}</span></li>
+            </ul>
+            <div class="thin lvl-2">Thực cấp trong tháng</div>
+            <ul class="mb-2 list-dot bullet-strong lvl-3">
+              <li>Tổng số hợp đồng: <span class="hl">${formatNumber(row["MTD.CC CAP"])}</span></li>
+              <li>Tổng doanh thu FYP: <span class="hl">${fmt(row["MTD.FYP CAP"], "MTD.FYP CAP", "Tổng doanh thu FYP")}</span></li>
+            </ul>
+          </div>
+
+          <div id="b2" class="sub-block">
+            <div class="subsec lvl-1">2. Danh hiệu Manulife Pro</div>
+            <div class="lvl-2">Danh hiệu chính thức hiện tại: <span class="hl">${formatNumber(row["PRO.DH CHINH THUC"])}</span></div>
+            <ul class="mb-2 list-dot bullet-strong lvl-3">
+              <li>Tháng bắt đầu: <span class="hl">${formatNumber(row["PRO.BAT DAU"])}</span></li>
+              <li>Tháng kết thúc: <span class="hl">${formatNumber(row["PRO.KET THUC"])}</span></li>
+            </ul>
+            <div class="thin mb-1 lvl-2">Thưởng năng suất xuất sắc tháng hiện tại:</div>
+            <ul class="mb-2 list-dot lvl-3">
+              <li>Danh hiệu dùng để xét thưởng: <span class="hl">${formatNumber(row["PRO.DH XET THUONG"])}</span></li>
+              <li>FYP phát sinh tính thưởng: <span class="hl">${fmt(row["PRO.FYP HIEN TAI"], "PRO.FYP HIEN TAI", "FYP phát sinh tính thưởng")}</span></li>
+              <li>Mức thưởng tạm đạt: <span class="hl">${fmt(row["PRO.THUONG TAM DAT"], "PRO.THUONG TAM DAT", "Mức thưởng tạm đạt")}</span></li>
+              <li>Cần thêm để đạt mức thưởng tiếp theo: <span class="hl">${fmt(row["PRO.FYP CAN TANG THUONG"], "PRO.FYP CAN TANG THUONG", "Cần thêm để đạt mức thưởng tiếp theo")}</span></li>
+              <li>Mức thưởng tiếp theo: <span class="hl">${fmt(row["PRO.THUONG TIEP THEO"], "PRO.THUONG TIEP THEO", "Mức thưởng tiếp theo")}</span></li>
+            </ul>
+            <div class="thin mb-1 lvl-2">Theo dõi thăng hạng danh hiệu</div>
+            <ul class="mb-2 list-dot lvl-3">
+              <li>Tiến độ thăng hạng danh hiệu: <span class="hl">${addPercent(row["PRO % THANG HANG"])}</span></li>
+              <li>Kết quả tại tháng T-2: <span class="hl">${formatNumber(row["PRO.DH TAM TINH T-2"])}</span></li>
+              <li>Kết quả tại tháng T-1: <span class="hl">${formatNumber(row["PRO.DH TAM TINH T-1"])}</span></li>
+              <li>FYP cần thêm để thăng hạng: <span class="hl">${fmt(row["PRO.UP FYP CAN THEM"], "PRO.UP FYP CAN THEM", "FYP cần thêm để thăng hạng")}</span></li>
+              <li>CC cần thêm để để thăng hạng: <span class="hl">${formatNumber(row["PRO.UP CC CAN THEM"])}</span></li>
+              <li>Số tháng có hoạt động cần thêm: <span class="hl">${formatNumber(row["PRO.UP THANG CAN THEM"])}</span></li>
+              <li>Tỷ lệ P13 cần thêm để đạt danh hiệu: <span class="hl">${addPercent(row["PRO.UP P13 CAN THEM"])}</span></li>
+            </ul>
+            <div class="thin mb-1 lvl-2">Theo dõi duy trì danh hiệu</div>
+            <ul class="mb-2 list-dot lvl-3">
+              <li>Kết quả xét duy trì danh hiệu: <span class="hl">${formatNumber(row["PRO.KQ DUY TRI"])}</span></li>
+              <li>Tạm tính theo kết quả tại tháng T-2: <span class="hl">${formatNumber(row["PRO.DH TAM TINH T-2"])}</span></li>
+              <li>Tạm tính theo kết quả tại tháng T-1: <span class="hl">${formatNumber(row["PRO.DH TAM TINH T-1"])}</span></li>
+              <li>Danh hiệu tạm tính cao nhất: <span class="hl">${formatNumber(row["PRO.DH TAM TINH CAO NHAT"])}</span></li>
+              <li>Tiến độ duy trì danh hiệu: <span class="hl">${addPercent(row["PRO % MOC"])}</span></li>
+              <li>Giai đoạn đánh giá: <span class="hl">${formatNumber(row["PRO.GD MOC"])}</span></li>
+              <li>FYP đã đạt so với yêu cầu: <span class="hl">${fmt(row["PRO.MOC FYP"], "PRO.MOC FYP", "FYP đã đạt so với yêu cầu")}</span></li>
+              <li>Số tháng có hoạt động so với yêu cầu: <span class="hl">${formatNumber(row["PRO.MOC THANG HĐ"])}</span></li>
+              <li>Cảnh báo 3 tháng cuối kỳ xét: <span class="hl">${formatNumber(row["PRO.MOC 3 THANG"])}</span></li>
+            </ul>
+          </div>
+
+          <div id="b3" class="sub-block">
+            <div class="subsec lvl-1">3. Danh hiệu MDRT+</div>
+            <div class="lvl-2">Yêu cầu FYP tiến độ quý hiện tại: <span class="hl">${fmt(row["MDRT.FYP Y/C QUY HT"], "MDRT.FYP Y/C QUY HT", "FYP tiến độ quý hiện tại")}</span></div>
+            <div class="lvl-2">Tiến độ quý hiện tại đã đạt: <span class="hl">${addPercent(row["MDRT.TIEN DO QUY"])}</span></div>
+            <ul class="mb-2 list-dot lvl-3">
+              <li>FYP thực đạt (YTD): <span class="hl">${fmt(row["MDRT.FYP CAP"], "MDRT.FYP CAP", "FYP thực đạt (YTD)")}</span></li>
+              <li>FYP cần thêm để đạt tiến độ quý hiện tại: <span class="hl">${fmt(row["MDRT.FYP CAN DAT TD QUY"], "MDRT.FYP CAN DAT TD QUY", "FYP cần thêm để đạt tiến độ quý hiện tại")}</span></li>
+              <li>FYP cần thêm để đạt danh hiệu MDRT+: <span class="hl">${fmt(row["MDRT.FYP CAN DAT DH"], "MDRT.FYP CAN DAT DH", "FYP cần thêm để đạt danh hiệu MDRT+")}</span></li>
+              <li>Danh hiệu đang trong tiến độ: <span class="hl">${formatNumber(row["MDRT.DH TIEP THEO"])}</span></li>
+            </ul>
+          </div>
+
+          <div id="b4" class="sub-block">
+            <div class="subsec lvl-1">4. Hành trình M-Star, Xứ sở hoa anh đào</div>
+            <ul class="mb-2 list-dot lvl-2">
+              <li>FYP phát sinh trong thời gian thi đua: <span class="hl">${fmt(row["JPAN.FYP THI DUA"], "JPAN.FYP THI DUA", "FYP phát sinh trong thời gian thi đua")}</span></li>
+              <li>Tổng FYP cần thêm để đạt thi đua: <span class="hl">${fmt(row["JPAN.FYP CAN DAT"], "JPAN.FYP CAN DAT", "Tổng FYP cần thêm để đạt thi đua")}</span></li>
+              <li>Tỷ lệ P13 hiện tại: <span class="hl">${addPercent(row["JPAN.P13"])}</span></li>
+              <li>Số lượng vé đạt tạm tính: <span class="hl">${formatNumber(row["JPAN.Đạt vé (tạm tính)"])}</span></li>
+            </ul>
+          </div>
+
+          <div id="b5" class="sub-block">
+            <div class="subsec lvl-1">5. Khoản thưởng kinh doanh xuất sắc hàng năm</div>
+            <ul class="mb-4 list-dot lvl-2">
+              <li>Tổng số CC thực cấp (YTD): <span class="hl">${formatNumber(row["FC.FC CC YTD"])}</span></li>
+              <li>Tổng FYP phát sinh (YTD): <span class="hl">${fmt(row["FC.FC FYP YTD"], "FC.FC FYP YTD", "Tổng FYP phát sinh (YTD)")}</span></li>
+            </ul>
+          </div>
+        </div>
+      `;
+
+      const C = `
+        <div id="sectionC" class="section">
+          <div class="section-title">C. BÁO CÁO CHI TIẾT HOẠT ĐỘNG TUYỂN DỤNG VÀ HỆ THỐNG</div>
+
+          <div id="c1" class="sub-block">
+            <div class="subsec lvl-1">1. Hoạt động tuyển dụng</div>
+            <ul class="mb-2 list-dot lvl-2">
+              <li>Số lượng tuyển dụng trực tiếp tháng hiện tại: <span class="hl">${formatNumber(row["RECRUIT T"])}</span></li>
+              <li>Số lượng tuyển dụng trực tiếp active M0: <span class="hl">${formatNumber(row["RECRUIT ACT T"])}</span></li>
+            </ul>
+          </div>
+
+          <div id="c2" class="sub-block">
+            <div class="subsec lvl-1">2. Theo dõi thăng cấp</div>
+            <ul class="mb-2 list-dot lvl-2">
+              <li>Tiến độ thăng lên UM (đối với FA): <span class="hl">${addPercent(row["UP % FA TO UM"])}</span></li>
+              <li>Vị trí thăng cấp: <span class="hl">${formatNumber(row["UP.TC LEN"])}</span></li>
+              <li>Kết quả đánh giá: <span class="hl">${formatNumber(row["UP.KQ DG"])}</span></li>
+              <li>Tiềm năng thăng cấp: <span class="hl">${formatNumber(row["UP.TIEM NANG TC UM"])}</span></li>
+              <li>Theo dõi các khóa đào tạo bắt buộc (Y/N):<br>
+                SBW: <span class="hl">${formatNumber(row["UP.SBW"])}</span> &nbsp; 
+                MS: <span class="hl">${formatNumber(row["UP.MS"])}</span> &nbsp;
+                LS: <span class="hl">${formatNumber(row["UP.LS"])}</span> &nbsp;
+                COACHING: <span class="hl">${formatNumber(row["UP.COACHING"])}</span>
+              </li>
+              <li>Số lượng NRA với 1CC & 4tr FYC cần thêm: <span class="hl">${fmt(row["UP.CAN TD ACT 4TR FYC L3M"], "UP.CAN TD ACT 4TR FYC L3M", "FYC Whole team L6M sau luật 50% cần thêm")}</span></li>
+              <li>2A Số lượng đại lý còn làm việc Whole team cần thêm: <span class="hl">${formatNumber(row["UP.CAN CA WT"])}</span></li>
+              <li>2B Số lượng đại lý còn làm việc và có ≥ 15tr FYC L3M cần thêm: <span class="hl">${formatNumber(row["UP.CAN CA 15TR L3M"])}</span></li>
+              <li>Số lượng UM+ báo cáo trực tiếp cần thêm: <span class="hl">${formatNumber(row["UP.CAN UM+TT"])}</span></li>
+              <li>Nguồn sản xuất cần thêm: <span class="hl">${formatNumber(row["UP.CAN NGUON SX"])}</span></li>
+              <li>FYC Whole team L6M sau luật 50% cần thêm: <span class="hl">${fmt(row["UP.CAN FYC WT L6M"], "UP.CAN FYC WT L6M", "FYC Whole team L6M sau luật 50% cần thêm")}</span></li>
+            </ul>
+          </div>
+
+          <div id="c3" class="sub-block">
+            <div class="subsec lvl-1">3. Theo dõi duy trì chức danh</div>
+            <div class="thin lvl-2">Đánh giá từ <span class="hl">${formatNumber(row["MOC.FROM"])}</span> đến <span class="hl">${formatNumber(row["MOC.TO"])}</span> của kỳ đánh giá ngày <span class="hl">${formatNumber(row["MOC.IN"])}</span></div>
+            <ul class="mb-2 list-dot lvl-3">
+              <li>Chức danh hiện tại: <span class="hl">${formatNumber(row["MOC.RANK"])}</span></li>
+              <li>Tháng tại chức: <span class="hl">${formatNumber(row["MOC.TAI VI"])}</span></li>
+              <li>Kết quả đánh giá tạm tính (Y/N): <span class="hl">${formatNumber(row["MOC.KQ TAM TINH"])}</span></li>
+              <li>Theo dõi các khóa đào tạo bắt buộc (Y/N):<br>
+                MS: <span class="hl">${formatNumber(row["UP.MS"])}</span> &nbsp;
+                LS: <span class="hl">${formatNumber(row["UP.LS"])}</span> &nbsp;
+                COACHING: <span class="hl">${formatNumber(row["UP.COACHING"])}</span>
+              </li>
+              <li>Số lượng NRA với 1CC & 4tr FYC cần thêm: <span class="hl">${fmt(row["MOC.CAN TD ACT 4TR L6M"], "MOC.CAN TD ACT 4TR L6M", "FYC Whole team L6M sau luật 50% cần thêm")}</span></li>
+              <li>Số lượng UM+ báo cáo trực tiếp cần thêm: <span class="hl">${formatNumber(row["MOC.CAN UM+ TT"])}</span></li>
+              <li>FYP Whole team L6M sau luật 50% cần thêm: <span class="hl">${fmt(row["MOC.CAN FYC WT L6M"], "MOC.CAN FYC WT L6M", "FYP Whole team L6M sau luật 50% cần thêm")}</span></li>
+              <li>Tỷ lệ duy trì P13 cần thêm: <span class="hl">${addPercent(row["MOC.CAN P13 WT"])}</span></li>
+            </ul>
+          </div>
+
+          <div id="c4" class="sub-block">
+            <div class="subsec lvl-1">4. Danh hiệu MBA Pro</div>
+            <ul class="mb-2 list-dot lvl-2">
+              <li>Danh hiệu chính thức hiện tại: <span class="hl">${formatNumber(row["MBA.DH CT HIEN TAI"])}</span></li>
+              <li><span class="thin">Theo dõi thăng hạng:</span></li>
+            </ul>
+            <ul class="mb-2 list-dot lvl-3">
+              <li>Tiềm năng thăng hạng (FYC ≥ 80% yêu cầu hạn tiếp theo): <span class="hl">${fmt(row["MBA.TIEM NANG 80%FYC"], "MBA.TIEM NANG 80%FYC", "FYC cá nhân UM+ và ĐL trực tiếp L12M sau luật 50%")}</span></li>
+              <li>Số lượng đại lý đạt chuẩn trong quý: <span class="hl">${formatNumber(row["MBA.TH DL DAT CHUAN TRONG QUY"])}</span></li>
+              <li>Số lượng đại lý đạt chuẩn trong 2 quý: <span class="hl">${formatNumber(row["MBA.TH DL DAT CHUAN 2 QUY"])}</span></li>
+              <li>FYC cá nhân UM+ và ĐL trực tiếp L12M sau luật 50%: <span class="hl">${fmt(row["MBA.TH FYC TO TT SAU 50"], "MBA.TH FYC TO TT SAU 50", "FYC cá nhân UM+ và ĐL trực tiếp L12M sau luật 50%")}</span></li>
+              <li>Số UM+ mới thăng cấp L12M: <span class="hl">${formatNumber(row["MBA.TH UM+ MOI L12M"])}</span></li>
+              <li>P13 cấp báo cáo trực tiếp: <span class="hl">${addPercent(row["MBA.TH P13 BCTT"])}</span></li>
+              <li>Danh hiệu MBA Pro tạm tính theo kết quả xét thăng hạng: <span class="hl">${formatNumber(row["MBA.TH DH TAM TINH QUY SAU"])}</span></li>
+            </ul>
+            <ul class="mb-2 list-dot lvl-2">
+              <li><span class="thin">Theo dõi duy trì hạng:</span></li>
+            </ul>
+            <ul class="mb-2 list-dot lvl-3">
+              <li>Kết quả xét duy trì tạm tính: <span class="hl">${formatNumber(row["MBA.KQ DT DH HTAI"])}</span></li>
+              <li>Số quý liên tục giữ danh hiệu MBA Pro hiện tại: <span class="hl">${formatNumber(row["MBA.DT SO QUY LIEN TUC"])}</span></li>
+              <li>Số lượng Manulife Pro có sản xuất trong quý: <span class="hl">${formatNumber(row["MBA.SO MANPRO ACT TRONG QUY"])}</span></li>
+              <li>FYC cá nhân UM+ và ĐL trực tiếp L12M sau luật 50%: <span class="hl">${fmt(row["MBA.TH FYC TO TT SAU 50"], "MBA.TH FYC TO TT SAU 50", "FYC cá nhân UM+ và ĐL trực tiếp L12M sau luật 50%")}</span></li>
+              <li>Số UM+ mới thăng cấp L12M: <span class="hl">${formatNumber(row["MBA.TH UM+ MOI L12M"])}</span></li>
+            </ul>
+            <ul class="mb-2 list-dot lvl-2">
+              <li>Danh hiệu tạm tính quý sau (sau thăng hạng & duy trì): <span class="hl">${formatNumber(row["MBA.DH TAM TINH QUY SAU"])}</span></li>
+            </ul>
+          </div>
+
+          <div id="c5" class="sub-block">
+            <div class="subsec lvl-1">5. Thưởng năng suất nhóm ưu tú hàng tháng</div>
+            <ul class="mb-2 list-dot lvl-2">
+              <li>Tổng CC phát sinh trong tháng của bản thân UM+ (A): <span class="hl">${formatNumber(row["OTEAM.CC UM+"])}</span></li>
+              <li>Tổng FYP phát sinh trong tháng của bản thân UM+ (A): <span class="hl">${fmt(row["OTEAM.FYP UM+"], "OTEAM.FYP UM+", "Tổng FYP phát sinh trong tháng của bản thân UM+ (A)")}</span></li>
+              <li>Số NRA có ≥1CC và 15tr FYP L3M của bản thân UM+(A): <span class="hl">${formatNumber(row["OTEAM.TDTT ACT"])}</span></li>
+              <li>FYP của bản thân UM+ (A) và nhóm trực tiếp sau luật 50%: <span class="hl">${fmt(row["OTEAM.TONG FYP TT"], "OTEAM.TONG FYP TT", "FYP của bản thân UM+ (A) và nhóm trực tiếp sau luật 50%")}</span></li>
+              <li>FYP của bản thân UM+ (B) báo cáo trực tiếp cho UM+ (A): <span class="hl">${fmt(row["OTEAM.FYP UM+ MOI"], "OTEAM.FYP UM+ MOI", "FYP của bản thân UM+ (B) báo cáo trực tiếp cho UM+ (A)")}</span></li>
+              <li>Tổng FYP sau luật 50% dùng để tính thưởng (cấp UM): <span class="hl">${fmt(row["OTEAM.TONG FYP SAU LUAT XET THUONG"], "OTEAM.TONG FYP SAU LUAT XET THUONG", "Tổng FYP sau luật 50% dùng để tính thưởng (cấp UM)")}</span></li>
+              <li>Tổng FYP WT trước luật 50% (cấp SUM+): <span class="hl">${fmt(row["OTEAM.FYP WT TRUOC LUAT"], "OTEAM.FYP WT TRUOC LUAT", "Tổng FYP WT trước luật 50% (cấp SUM+)")}</span></li>
+              <li>Tổng FYP WT sau luật 50% để tính thưởng (cấp SUM+):(2): <span class="hl">${fmt(row["OTEAM.FYP WT SAU LUAT"], "OTEAM.FYP WT SAU LUAT", "Tổng FYP WT sau luật 50% để tính thưởng (cấp SUM+)")}</span></li>
+              <li>Y/c về tổng FYP: <span class="hl">${fmt(row["OTEAM.Y/C TONG FYP"], "OTEAM.Y/C TONG FYP", "Y/c về tổng FYP")}</span></li>
+              <li>Y/c về bán cá nhân: <span class="hl">${formatNumber(row["OTEAM.Y/C SX CA NHAN"])}</span></li>
+              <li>Y/c về tuyển có active: <span class="hl">${formatNumber(row["OTEAM.Y/C TDTT ACT"])}</span></li>
+              <li>Kết quả đạt thưởng thi đua (Y/N): <span class="hl">${formatNumber(row["OTEAM.DAT THUONG"])}</span></li>
+              <li>Tỷ lệ P13: <span class="hl">${addPercent(row["OTEAM.P13"])}</span></li>
+              <li>Hệ số nhân TLDTHD: <span class="hl">${formatNumber(row["OTEAM.HE SO THUONG"])}</span></li>
+              <li>Thưởng dự tính sau khi đã nhân hệ số TLDTHD: <span class="hl">${fmt(row["OTEAM.TIEN THUONG"], "OTEAM.TIEN THUONG", "Thưởng dự tính sau khi đã nhân hệ số TLDTHD")}</span></li>
+            </ul>
+          </div>
+        </div>
+      `;
+
+      /* ====== TÍNH THU NHẬP: tự gắn msdl & join qua query (nếu site hỗ trợ) ====== */
+      const ms = encodeURIComponent(lastMsdl || '');
+      const jd = encodeURIComponent(normalizeDate(lastJoin || ''));
+      const incomeURL = `https://dutinhthunhap.vunghanglam.com/?msdl=${ms}&join=${jd}`;
+      const Income = `
+        <div id="sectionIncome" class="section">
+          <div class="section-title">Tính thu nhập</div>
+          <div class="lvl-2">
+            <div class="mb-2 text-sm text-gray-600">Đã điền sẵn (truyền qua URL): <b>MSĐL</b> = <span class="val">${lastMsdl || "-"}</span>,
+              <b>Ngày gia nhập</b> = <span class="val">${lastJoin || "-"}</span></div>
+            <iframe id="incomeFrame" src="${incomeURL}" class="w-full h-[70vh] border rounded-lg"></iframe>
+          </div>
+        </div>
+      `;
+
+      reportEl.innerHTML = Info + A + B + C + Income;
+
+      // TOC mobile
+      const sel = document.getElementById('tocSelect');
+      sel.onchange = (e)=>{
+        const v = e.target.value;
+        if (!v) return;
+        if (v.includes('#')) {
+          const [parent, anchor] = v.split('#');
+          activateSection(parent, '#'+anchor);
+        } else {
+          activateSection(v);
+        }
+      };
+    }
+
+    /* ====== SIDEBAR NAV ====== */
+    function buildSidebarNav(){
+      navEl.innerHTML = `
+        <div class="font-extrabold text-emerald-800 mb-2">Danh mục</div>
+
+        <a href="#" data-type="section" data-target="sectionInfo" class="menu-item active">Thông tin đại lý</a>
+        <a href="#" data-type="section" data-target="sectionA" class="menu-item">A. Tổng quan (MTD)</a>
+
+        <div class="menu-item-group">
+          <div class="menu-head">B. Hoạt động cá nhân</div>
+          <div class="submenu">
+            <a href="#" data-type="sub" data-parent="sectionB" data-anchor="#b1">B.1 Bán hàng</a>
+            <a href="#" data-type="sub" data-parent="sectionB" data-anchor="#b2">B.2 Manulife Pro</a>
+            <a href="#" data-type="sub" data-parent="sectionB" data-anchor="#b3">B.3 MDRT+</a>
+            <a href="#" data-type="sub" data-parent="sectionB" data-anchor="#b4">B.4 M-Star / Japan</a>
+            <a href="#" data-type="sub" data-parent="sectionB" data-anchor="#b5">B.5 Thưởng năm</a>
+          </div>
+        </div>
+
+        <div class="menu-item-group">
+          <div class="menu-head">C. Tuyển dụng & Hệ thống</div>
+          <div class="submenu">
+            <a href="#" data-type="sub" data-parent="sectionC" data-anchor="#c1">C.1 Tuyển dụng</a>
+            <a href="#" data-type="sub" data-parent="sectionC" data-anchor="#c2">C.2 Thăng cấp</a>
+            <a href="#" data-type="sub" data-parent="sectionC" data-anchor="#c3">C.3 Duy trì chức danh</a>
+            <a href="#" data-type="sub" data-parent="sectionC" data-anchor="#c4">C.4 MBA Pro</a>
+            <a href="#" data-type="sub" data-parent="sectionC" data-anchor="#c5">C.5 Thưởng nhóm ưu tú</a>
+          </div>
+        </div>
+
+        <a href="#" data-type="section" data-target="sectionIncome" class="menu-item">Tính thu nhập</a>
+      `;
+
+      navEl.querySelectorAll('a').forEach(a=>{
+        a.addEventListener('click', (e)=>{
+          e.preventDefault();
+          const type   = a.getAttribute('data-type');
+          const target = a.getAttribute('data-target');
+          const parent = a.getAttribute('data-parent');
+          const anchor = a.getAttribute('data-anchor');
+          if (type === 'section') activateSection(target);
+          else if (type === 'sub') activateSection(parent, anchor);
+        });
       });
     }
+
+    /* ====== ACTIVATE SECTION ====== */
+    function activateSection(sectionId, anchor){
+      document.querySelectorAll('#report .section').forEach(sec=>sec.classList.add('hide'));
+      const section = document.getElementById(sectionId);
+      if (!section) return;
+      section.classList.remove('hide');
+
+      if (anchor) {
+        section.querySelectorAll('.sub-block').forEach(sb=>sb.classList.add('hide'));
+        const sub = section.querySelector(anchor);
+        if (sub) sub.classList.remove('hide');
+      } else {
+        section.querySelectorAll('.sub-block').forEach(sb=>sb.classList.remove('hide'));
+      }
+
+      document.querySelectorAll('#nav .menu-item, #nav .submenu a').forEach(el=>el.classList.remove('active'));
+      if (!anchor) {
+        const top = document.querySelector(`#nav .menu-item[data-target="${sectionId}"]`);
+        if (top) top.classList.add('active');
+      } else {
+        const sublink = document.querySelector(`#nav .submenu a[data-parent="${sectionId}"][data-anchor="${anchor}"]`);
+        if (sublink) sublink.classList.add('active');
+      }
+
+      // đồng bộ TOC mobile
+      const select = document.getElementById('tocSelect');
+      if (select && select.value !== "") {
+        const value = anchor ? `${sectionId}${anchor}` : sectionId;
+        const opt = Array.from(select.options).find(o => o.value === value);
+        if (opt) select.value = value;
+      }
+
+      scrollToSectionStart(sectionId);
+    }
+
+    /* ====== KHỞI TẠO ====== */
+    window.addEventListener('load', ()=>{
+      updateLayoutVars();
+      toggleNavForViewport();
+    });
+    window.addEventListener('resize', updateLayoutVars);
   </script>
 </body>
 </html>
