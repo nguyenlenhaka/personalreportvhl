@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tra cứu báo cáo Vùng Hằng Lâm</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background-color: #f1f1f1;
+      max-width: 600px;
+      margin: auto;
+    }
+    h1 {
+      color: #007A33;
+      font-size: 22px;
+      text-align: center;
+    }
+    input, button {
+      padding: 14px;
+      margin: 12px 0;
+      width: 100%;
+      font-size: 16px;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      background-color: #007A33;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #005c26;
+    }
+    #result {
+      margin-top: 20px;
+      text-align: center;
+    }
+    iframe {
+      border: 1px solid #eee;
+    }
+    @media (max-width: 480px) {
+      h1 { font-size: 20px; }
+    }
+  </style>
+</head>
+<body>
+  <h1>TRA CỨU BÁO CÁO CÁ NHÂN</h1>
+  <p style="text-align: center; font-style: italic; color: #007A33;">
+    Chào mừng anh/chị đến với hệ thống tra cứu báo cáo cá nhân Vùng Hằng Lâm<br> 
+    Vui lòng nhập Mã số và Ngày gia nhập để tiếp tục.<br>
+    <span style="font-size: 14px; color: #444;">Ngày gia nhập được ghi nhận trên ứng dụng M-PA hoặc AWS.</span>
+  </p>
+
+  <form id="reportForm">
+    <input type="text" id="code" placeholder="Mã số đại lý / quản lý (VD: A1234)" required />
+    <input type="text" id="joinDate" placeholder="Ngày gia nhập (VD: 01/01/2020 hoặc 01012020)" required />
+    <button type="submit">Xem báo cáo</button>
+  </form>
+  <div id="result"></div>
+
+  <script>
+    const logURL = "https://script.google.com/macros/s/AKfycbziTV42B_E7vtYMigc8e7mgUu9ppdpOpxPEjJxy9Yn8bur02h57VVNTOhozZ6emQWEhhw/exec";
+
+    function formatDate(str) {
+      let cleaned = str.replace(/\D/g, "");
+      if (cleaned.length === 8) {
+        return cleaned.slice(0, 2) + '/' + cleaned.slice(2, 4) + '/' + cleaned.slice(4);
+      }
+      return str;
+    }
+
+    function normalizeDate(input) {
+      if (!input) return '';
+      if (typeof input === 'number') {
+        return new Date(input).toLocaleDateString('vi-VN');
+      }
+      if (typeof input === 'string') {
+        if (input.includes('-')) {
+          const d = new Date(input);
+          return d.toLocaleDateString('vi-VN');
+        }
+        return input.replace(/\-/g, '/').trim();
+      }
+      return '';
+    }
+
+    document.getElementById("reportForm").addEventListener("submit", async function (e) {
+      e.preventDefault();
+      const code = document.getElementById("code").value.trim().toUpperCase();
+      const rawDate = document.getElementById("joinDate").value.trim();
+      const joinDate = formatDate(rawDate);
+      const resultDiv = document.getElementById("result");
+      resultDiv.innerHTML = "⏳ Đang kiểm tra dữ liệu...";
+
+      try {
+        const res = await fetch('data.json');
+        const rows = await res.json();
+
+        let matchedRows = rows.filter(row =>
+          row["MGR. CODE"]?.toUpperCase() === code &&
+          normalizeDate(row["JOIN DATE"]) === joinDate
+        );
+
+        if (matchedRows.length === 0) {
+          matchedRows = rows.filter(row =>
+            row["AGEN CODE"]?.toUpperCase() === code &&
+            normalizeDate(row["JOIN DATE"]) === joinDate
+          );
+        }
+
+        if (matchedRows.length === 0) {
+          resultDiv.innerHTML = "⛔ Không tìm thấy thông tin phù hợp. Vui lòng kiểm tra lại!";
+          return;
+        }
+
+        let filesHTML = matchedRows.map((row) => {
+          const file = row["FILE NAME"];
+          const fileURL = `report/${file}`;
+          const fullFileURL = window.location.origin + '/' + fileURL;
+          const googleViewerURL = `https://drive.google.com/viewerng/viewer?embedded=true&url=${encodeURIComponent(fullFileURL)}`;
+
+          return `
+            <div style="margin-top: 24px; border: 1px solid #ccc; padding: 10px; border-radius: 6px; background: #fff;">
+              <p><strong>📄 ${file}</strong></p>
+              <iframe src="${googleViewerURL}" width="100%" height="600px" style="border: none;"></iframe>
+              <a href="${fileURL}" download style="
+                display: inline-block;
+                margin-top: 10px;
+                padding: 10px 14px;
+                background-color: #007A33;
+                color: #fff;
+                text-decoration: none;
+                border-radius: 4px;
+              ">⬇️ Tải về</a>
+            </div>
+          `;
+        });
+
+        let downloadAllButton = "";
+        if (matchedRows.length >= 2) {
+          const allFiles = matchedRows.map(row => `'report/${row["FILE NAME"]}'`).join(",");
+          downloadAllButton = `
+            <button onclick="downloadAll([${allFiles}])" style="
+              background-color: #005c26;
+              color: white;
+              padding: 12px 16px;
+              margin: 20px auto;
+              display: block;
+              border: none;
+              border-radius: 6px;
+              font-size: 16px;
+              cursor: pointer;
+            ">⬇️ Tải tất cả báo cáo (${matchedRows.length})</button>
+          `;
+        }
+
+        const displayName = matchedRows[0]["AGEN NAME"] || code;
+        resultDiv.innerHTML = `<h3>✅ Xin chào ${displayName}!<br>Dưới đây là các báo cáo bạn được phân quyền xem:</h3>${downloadAllButton}${filesHTML.join("")}`;
+
+        // Gửi log bằng <img> để tránh bị CORS
+        const logImg = new Image();
+        logImg.src = `${logURL}?code=${encodeURIComponent(code)}&ts=${Date.now()}`;
+
+      } catch (err) {
+        console.error(err);
+        resultDiv.innerHTML = "❌ Có lỗi khi tải dữ liệu.";
+      }
+    });
+
+    function downloadAll(fileUrls) {
+      fileUrls.forEach((url, i) => {
+        setTimeout(() => {
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = url.split('/').pop();
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+        }, i * 800);
+      });
+    }
+  </script>
+</body>
+</html>
