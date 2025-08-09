@@ -7,50 +7,69 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     :root{
-      --sidebar-width: 260px;  /* chiều rộng danh mục trái (desktop) */
-      --header-h: 64px;        /* sẽ cập nhật bằng JS theo thực tế */
-      --fixed-top: 64px;       /* vị trí dính của sidebar = chiều cao header */
-      --toc-h: 52px;           /* chiều cao dropdown mobile (ước lượng, cập nhật bằng JS) */
+      --sidebar-width: 260px;  /* rộng danh mục trái (desktop) */
+      --header-h: 64px;        /* cập nhật bằng JS */
+      --fixed-top: 64px;       /* bằng header-h */
+      --toc-h: 52px;           /* dropdown mobile (cập nhật JS) */
     }
     body { background: #f3f4f6; }
     .sticky-header { position: sticky; top: 0; z-index: 40; background: #fff; }
 
-    /* Cỡ chữ tổng thể */
     html, body { font-size: 17px; }
 
-    /* Màu/đậm */
+    /* màu & nhấn */
     b, strong, .val, .hl { color: #10b981; }
     .label { font-weight: 700; color: #0b3d2c; }
     .val   { font-weight: 900; }
     .thin  { font-weight: 700; color: #0b3d2c; }
-    .hide{ display:none; }
+    .hide  { display:none; }
 
-    /* ====== HEADER ====== */
-    /* Header chia grid: [cột trùng bề rộng sidebar cho logo] [tiêu đề] [login] */
+    /* ===== HEADER 2 HÀNG ===== */
     .header-grid{
       display: grid;
-      grid-template-columns: var(--sidebar-width) 1fr max-content;
+      grid-template-columns: var(--sidebar-width) 1fr;          /* logo | title/login */
+      grid-template-areas:
+        "logo title"
+        "logo login";                                           /* login xuống dòng */
       align-items: center;
       gap: .75rem;
     }
-    /* Logo desktop: bám sát mép trái, có khoảng đệm nhỏ bên trong */
-    .logo-d{
-      height: 56px; /* logo cao 56px */
-      margin-left: 8px; /* cách mép trái 1 khoảng nhỏ */
-    }
-    /* Tiêu đề desktop: bắt đầu đúng mép trái của nội dung (sau cột sidebar) */
-    .title-d{
-      /* Chiều cao chữ = chiều cao logo: dùng line-height khớp logo, font-size lớn */
-      line-height: 56px;
-      font-size: 2rem; /* to và nổi bật */
-      font-weight: 800;
-      color: #065f46; /* xanh đậm */
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+    .logo-cell{ grid-area: logo; }
+    .logo-d{ height: 56px; margin-left: 8px; }                  /* desktop logo_text.webp */
+    .logo-m{ display:none; }                                    /* mobile logo.webp */
+
+    .title-d{                                                   /* tiêu đề = cao logo */
+      grid-area: title;
+      line-height: 56px; font-size: 2rem; font-weight: 800; color:#065f46;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
 
-    /* ====== SIDEBAR (DESKTOP) CỐ ĐỊNH ====== */
+    #loginForm{
+      grid-area: login;
+      justify-self: end;
+      align-self: start;
+      width: min(720px, 100%);
+    }
+    .login-grid{
+      display: grid;
+      grid-template-areas:
+        "inputs"
+        "button";
+      gap: .5rem;
+      width: 100%;
+    }
+    .login-inputs{
+      grid-area: inputs;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: .5rem;
+    }
+    .login-btn{
+      grid-area: button;
+      justify-self: end;     /* desktop: nút phải */
+    }
+
+    /* ===== SIDEBAR (desktop cố định) ===== */
     #sidebar{
       width: var(--sidebar-width);
       position: fixed;
@@ -64,22 +83,27 @@
       border-top-right-radius: 12px;
     }
     .sidebar-inner{ padding: 12px; }
-    .menu-item{ display:flex; align-items:center; gap:.5rem; padding:.5rem .75rem; border-radius:.5rem; font-weight:700; color:#0b3d2c; }
+
+    /* Top-level items & headings: cùng độ đậm */
+    .menu-item,
+    .menu-head{
+      display:block;
+      font-weight: 800;
+      color: #0b3d2c;
+    }
+    .menu-item{ padding:.5rem .75rem; border-radius:.5rem; }
     .menu-item:hover{ background:#e5f7ee; }
     .menu-item.active{ background:#0ea35b; color:#ffffff; }
-    .menu-head{ padding:.5rem .75rem; font-weight:800; color:#0b3d2c; }
+    .menu-head{ padding:.5rem .75rem; }
     .submenu{ margin:.25rem 0 .5rem .75rem; }
     .submenu a{ display:block; padding:.35rem .5rem; border-radius:.375rem; color:#0b3d2c; font-weight:700; }
     .submenu a:hover{ background:#edfdf6; }
     .submenu a.active{ background:#0ea35b; color:#fff; }
 
-    /* ====== CONTENT WRAPPER (DESKTOP) ====== */
-    #contentWrap{
-      /* chừa chỗ cho sidebar cố định */
-      margin-left: var(--sidebar-width);
-    }
+    /* ===== CONTENT WRAP (desktop chừa sidebar) ===== */
+    #contentWrap{ margin-left: var(--sidebar-width); }
 
-    /* ====== TOC MOBILE (sticky) ====== */
+    /* ===== TOC MOBILE (sticky) ===== */
     .toc-mobile{
       position: sticky;
       top: calc(var(--header-h));
@@ -88,7 +112,7 @@
       padding: 8px 0;
     }
 
-    /* ====== SECTION ====== */
+    /* ===== SECTION ===== */
     .section-title {
       font-weight: 800; color: #0b3d2c; background: #ffffff;
       padding: 10px 16px; border-left: 6px solid #0ea35b;
@@ -98,10 +122,9 @@
       margin: 12px 0 10px; font-weight: 800; color: #0b3d2c;
       padding-left: .75rem; border-left: 6px solid #0ea35b; font-size: 1.15rem;
     }
-    /* CUỘN TỚI SÁT ĐẦU  (desktop) */
     .section{ scroll-margin-top: calc(var(--header-h) + 8px); }
 
-    /* ====== INFO GRID ====== */
+    /* ===== INFO GRID ===== */
     .info-grid{
       display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: .85rem;
     }
@@ -112,16 +135,16 @@
     }
     .info-item .val{ font-size: 1.15rem; line-height: 1.25; word-break: break-word; }
 
-    /* CẢNH BÁO */
+    /* CẢNH BÁO PRO.MOC 3 THANG */
     .pro-alert{
       margin-top: .4rem; padding: .7rem .9rem; border: 2px solid #dc2626;
       border-left-width: 6px; border-radius: .6rem; background: #fff;
       color: #b91c1c; font-weight: 900; font-size: 1.15rem;
     }
-    .info-alert{ grid-column: 1 / -1; } /* chiếm full width trong grid */
+    .info-alert{ grid-column: 1 / -1; }
     .pro-alert .pro-name{ font-weight: 900; }
 
-    /* LIST 2 CỘT: label | value */
+    /* LIST label|value 2 cột */
     .list-dot li, .bullet-strong li{
       list-style: none; padding-left: 0;
       display: grid; grid-template-columns: minmax(170px, max-content) 1fr;
@@ -135,59 +158,52 @@
     .lvl-3{ margin-left: 2.25rem; padding-left: .75rem; border-left:2px dashed #c7f9e9; border-radius: .25rem; }
     .lvl-4{ margin-left: 3.25rem; padding-left: .75rem; border-left:2px dotted #def7ef; border-radius: .25rem; }
 
-    /* ====== MOBILE ====== */
+    /* ===== MOBILE ===== */
     @media (max-width: 1023px){
       #sidebar{ display: none !important; }
       #contentWrap{ margin-left: 0; }
     }
     @media (max-width: 640px){
-      /* header: logo trái (logo.webp), tiêu đề căn giữa */
       .header-grid{
-        grid-template-columns: auto 1fr; /* logo + cột tiêu đề/đăng nhập stack bên dưới */
+        grid-template-columns: auto 1fr;
+        grid-template-areas:
+          "logo title"
+          "login login";
         align-items: flex-start;
       }
-      .logo-d{ display: none; }
-      .logo-m{ display: block; height: 44px; margin-left: 8px; } /* cách mép trái 1 khoảng nhỏ */
-      .title-d{
-        grid-column: 1 / -1;
-        text-align: center;
-        line-height: 44px; font-size: 1.5rem;
-      }
-      /* Form: 2 input cùng hàng, nút ở hàng dưới (yêu cầu cũ) */
-      .login-grid{ grid-template-columns: 1fr 1fr; }
-      /* Sticky tiêu đề section & vùng cuộn: tiêu đề dính dưới dropdown */
+      .logo-d{ display:none; }
+      .logo-m{ display:block; height:44px; margin-left:8px; }
+      .title-d{ grid-area:title; text-align:center; line-height:44px; font-size:1.5rem; }
+
+      #loginForm{ justify-self: stretch; width: 100%; }
+      .login-inputs{ grid-template-columns: 1fr 1fr; }  /* 2 ô cùng hàng */
+      .login-btn{ justify-self: stretch; }              /* nút riêng 1 dòng */
+
       .section-title{ position: sticky; top: calc(var(--header-h) + var(--toc-h) + 6px); z-index: 20; background: #fff; }
       .section{ scroll-margin-top: calc(var(--header-h) + var(--toc-h) + 10px); }
     }
-    @media (min-width: 641px){
-      .logo-m{ display: none; }
-      .login-grid{ grid-template-columns: 1fr 1fr; }
-    }
-    .menu-item, .menu-head { font-weight: 800 !important; }
   </style>
 </head>
 <body class="min-h-screen font-sans">
   <!-- ===== HEADER ===== -->
   <header id="pageHeader" class="sticky-header shadow">
     <div class="header-grid px-2 md:px-3 py-2">
-      <!-- Cột 1: logo (desktop) + logo mobile -->
-      <div class="flex items-center">
-        <!-- desktop: logo_text.webp, sát mép trái -->
+      <!-- Logo -->
+      <div class="logo-cell flex items-center">
         <img src="logo_text.webp" alt="logo" class="logo-d">
-        <!-- mobile: logo.webp -->
         <img src="logo.webp" alt="logo" class="logo-m">
       </div>
 
-      <!-- Cột 2: tiêu đề -->
+      <!-- Tiêu đề -->
       <h1 class="title-d">BÁO CÁO KINH DOANH</h1>
 
-      <!-- Cột 3: đăng nhập (giữ ở bên phải trên desktop) -->
-      <form id="loginForm" class="login-grid grid gap-2">
-        <div class="grid grid-cols-2 gap-2">
+      <!-- Đăng nhập: 2 input cùng hàng, nút dòng dưới -->
+      <form id="loginForm" class="login-grid">
+        <div class="login-inputs">
           <input id="msdlInput" class="border rounded px-3 py-2" placeholder="Nhập MSĐL" required />
           <input id="dateInput" class="border rounded px-3 py-2" placeholder="Ngày gia nhập (dd/mm/yyyy hoặc ddmmyyyy)" required />
         </div>
-        <button class="bg-emerald-700 text-white rounded px-4 py-2 font-semibold hover:bg-emerald-800 transition" type="submit">
+        <button class="login-btn bg-emerald-700 text-white rounded px-4 py-2 font-semibold hover:bg-emerald-800 transition" type="submit">
           Đăng nhập
         </button>
       </form>
@@ -201,12 +217,12 @@
     </div>
   </aside>
 
-  <!-- ===== CONTENT WRAPPER ===== -->
+  <!-- ===== CONTENT WRAP ===== -->
   <div id="contentWrap">
     <main class="max-w-6xl mx-auto px-3 md:px-4 py-5">
       <div id="errorMsg" class="hidden bg-red-50 border border-red-300 text-red-700 px-4 py-2 mb-4 rounded"></div>
 
-      <!-- TOC mobile (sticky ngay dưới header) -->
+      <!-- TOC mobile -->
       <div id="tocMobile" class="toc-mobile lg:hidden hidden">
         <select id="tocSelect" class="w-full border rounded px-3 py-2">
           <option value="" selected disabled>Danh mục báo cáo</option>
@@ -226,7 +242,7 @@
         </select>
       </div>
 
-      <!-- vùng nội dung báo cáo -->
+      <!-- Nội dung báo cáo -->
       <section id="report" class="bg-white shadow rounded-xl p-4 md:p-6 mt-0 hidden"></section>
       <div id="hint" class="mt-6 text-center text-gray-500 text-sm">Nhập thông tin để xem báo cáo đại lý</div>
     </main>
@@ -237,7 +253,7 @@
     let mapping = [];
     let dataReady;
 
-    /* ====== TẢI DỮ LIỆU ====== */
+    /* ===== LOAD DATA ===== */
     async function loadData(){
       const mapUrl = encodeURI('tham chieu.json');
       const dataUrl = 'data.json';
@@ -250,7 +266,7 @@
     }
     dataReady = loadData();
 
-    /* ====== DOM NODES ====== */
+    /* ===== DOM ===== */
     const errorEl   = document.getElementById('errorMsg');
     const reportEl  = document.getElementById('report');
     const hintEl    = document.getElementById('hint');
@@ -259,7 +275,7 @@
     const navEl     = document.getElementById('nav');
     const headerEl  = document.getElementById('pageHeader');
 
-    /* ====== UTIL ====== */
+    /* ===== UTIL ===== */
     function normalizeDate(s){
       if(!s) return '';
       s = String(s).trim();
@@ -269,10 +285,8 @@
       return s;
     }
     function normalizeMSDL(s){ return String(s || '').trim().replace(/\s+/g,'').toLowerCase(); }
-    function isDesktop(){ return window.matchMedia('(min-width: 1024px)').matches; }
     function isMobile(){ return window.matchMedia('(max-width: 640px)').matches; }
 
-    /* ====== FORMAT F3 (FYP/FYC) ====== */
     function parseLocaleNumber(v){
       if (v === null || v === undefined || v === '') return NaN;
       if (typeof v === 'number') return v;
@@ -296,30 +310,13 @@
       return sign + intPart + (decimals>0 ? ','+fracPart : '');
     }
     function formatF3(val){ const n = parseLocaleNumber(val); if (isNaN(n)) return val ?? ""; return formatThousand(n, 3); }
-    function formatNumber(val){ return (val ?? ""); } // mặc định: giữ nguyên
-
-    const F3_PATTERNS = [
-      "doanh thu fyp thuc cap","tong doanh thu fyp","fyp phat sinh tinh thuong",
-      "muc thuong tam dat","can them de dat muc thuong tiep theo","muc thuong tiep theo",
-      "fyp can them de thang hang","fyp thuc dat (ytd)","fyp can them de dat tien do quy hien tai",
-      "fyp can them de dat danh hieu mdrt+","fyp phat sinh trong thoi gian thi dua",
-      "tong fyp can them de dat thi dua","tong fyp phat sinh (ytd)",
-      "fyc whole team l6m sau luat 50% can them","fyp whole team l6m sau luat 50% can them",
-      "fyc ca nhan um+ va dl truc tiep l12m sau luat 50%","tong fyp phat sinh trong thang cua ban than um+ (a)",
-      "fyp cua ban than um+ (a) va nhom truc tiep sau luat 50%","fyp cua ban than um+ (b) bao cao truc tiep cho um+ (a)",
-      "tong fyp sau luat 50% dung de tinh thuong (cap um)","tong fyp wt truoc luat 50% (cap sum+)",
-      "tong fyp wt sau luat 50% de tinh thuong (cap sum+)","thuong du tinh sau khi da nhan he so tldthd"
-    ];
-    function normalizeText(s){
-      return String(s||"").toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' ').trim();
+    function formatNumber(val){ return (val ?? ""); } // giữ nguyên cho các trường khác
+    function shouldF3Label(label=""){
+      const norm = String(label||"").toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+      return (norm.includes('fyp') || norm.includes('fyc'));
     }
-    function shouldF3(key="", label=""){
-      const norm = normalizeText(label);
-      if (norm.includes("fyp") || norm.includes("fyc")) return true;
-      return F3_PATTERNS.some(p => norm.startsWith(p) || norm.includes(p));
-    }
-    function fmt(val, key="", label=""){ return shouldF3(key,label) ? formatF3(val) : (val ?? ""); }
-    function addPercent(val){ return (val ?? ""); }
+    function fmt(val, key="", label=""){ return shouldF3Label(label) ? formatF3(val) : (val ?? ""); }
+    function addPercent(val){ return (val ?? ""); } // giữ nguyên %
 
     function exists(v){ return !(v === null || v === undefined || (typeof v === 'string' && v.trim() === '')); }
     function pick(row, keys){ for (const k of keys) if (exists(row[k])) return row[k]; return ''; }
@@ -329,13 +326,6 @@
       hintEl.classList.add('hidden'); tocMbEl.classList.add('hidden');
     }
     function showError(msg){ errorEl.textContent = msg; errorEl.classList.remove('hidden'); hintEl.classList.remove('hidden'); }
-
-    function scrollToSectionStart(sectionId){
-      const section = document.getElementById(sectionId);
-      if(!section) return;
-      const y = section.getBoundingClientRect().top + window.scrollY - (isMobile() ? (getHeaderH() + getTocH() + 10) : (getHeaderH() + 8));
-      window.scrollTo({ top: y, behavior: 'smooth' });
-    }
 
     function getHeaderH(){ return headerEl?.offsetHeight || 64; }
     function getTocH(){
@@ -348,9 +338,8 @@
       root.style.setProperty('--fixed-top', getHeaderH() + 'px');
       root.style.setProperty('--toc-h', getTocH() + 'px');
     }
-
     function toggleNavForViewport(){
-      if (isDesktop()){
+      if (window.matchMedia('(min-width: 1024px)').matches){
         sidebarEl.classList.remove('hidden');
         tocMbEl.classList.add('hidden');
       } else {
@@ -361,8 +350,14 @@
       }
       updateLayoutVars();
     }
+    function scrollToSectionStart(sectionId){
+      const section = document.getElementById(sectionId);
+      if(!section) return;
+      const y = section.getBoundingClientRect().top + window.scrollY - (isMobile() ? (getHeaderH() + getTocH() + 10) : (getHeaderH() + 8));
+      window.scrollTo({ top: y, behavior: 'smooth' });
+    }
 
-    /* ====== LOGIN ====== */
+    /* ===== LOGIN ===== */
     const loginForm = document.getElementById('loginForm');
     const msdlInput = document.getElementById('msdlInput');
     const dateInput = document.getElementById('dateInput');
@@ -372,7 +367,6 @@
     loginBtn.disabled = true; loginBtn.textContent = 'Đang tải dữ liệu...';
     dataReady.finally(()=>{ loginBtn.disabled = false; loginBtn.textContent = 'Đăng nhập'; });
 
-    // biến toàn cục để truyền qua "Tính thu nhập"
     let lastMsdl = "", lastJoin = "";
 
     loginForm.onsubmit = async function(e) {
@@ -403,27 +397,26 @@
         return;
       }
 
-      // Lưu để tự điền vào mục "Tính thu nhập"
+      // lưu để truyền qua "Tính thu nhập"
       lastMsdl = pick(row, msdlCols);
-      lastJoin = pick(row, joinCols); // giữ nguyên văn để hiển thị trong iframe qua query (nếu site hỗ trợ)
+      lastJoin = pick(row, joinCols);
 
       renderReport(row);
       buildSidebarNav();
       activateSection('sectionInfo');
 
-      // Hiện layout phù hợp viewport
       document.getElementById('report').classList.remove('hidden');
       document.getElementById('hint').classList.add('hidden');
       toggleNavForViewport();
       window.addEventListener('resize', toggleNavForViewport);
 
-      // Tự xoá input sau đăng nhập
+      // clear inputs
       msdlInput.value = "";
       dateInput.value = "";
       msdlInput.blur(); dateInput.blur();
     };
 
-    /* ====== INFO ====== */
+    /* ===== INFO ===== */
     function infoItem(label, value){
       if(!exists(value)) return '';
       return `<div class="info-item"><div class="label">${label}:</div><div class="val">${value}</div></div>`;
@@ -433,14 +426,12 @@
       const p13nh = addPercent(row["TLDTHD toàn nhánh"]);
       const p13c1 = addPercent(row["TLDTHD cấp 1"]);
 
-      // Cảnh báo
       const proMoc3 = row["PRO.MOC 3 THANG"];
       const hasAlert = exists(proMoc3) && String(proMoc3).trim() !== "-";
       const alertHtml = hasAlert
         ? `<div class="pro-alert ${isMobile() ? 'info-alert' : ''}">Cảnh báo: <span class="pro-name">Danh hiệu Manulife Pro</span> – ${proMoc3}</div>`
         : "";
 
-      // Mobile: chèn cảnh báo ngay trước "Báo cáo dành cho"
       const firstBlock = infoItem("Báo cáo dành cho", (row["TEN DAI LY"] || row["AGEN NAME"]));
       const restBlocks = `
         ${infoItem("KV | MS", row["KV|MS"])}
@@ -457,7 +448,6 @@
         ${infoItem("Số liệu cập nhật đến ngày", row["NGAY CHOT DATA"])}
         ${infoItem("ĐVT", "Nghìn VND")}
       `;
-
       const gridInner = isMobile() ? `${alertHtml}${firstBlock}${restBlocks}` : `${firstBlock}${restBlocks}`;
       const alertAfter = (!isMobile() && hasAlert) ? alertHtml : "";
 
@@ -470,7 +460,7 @@
       `;
     }
 
-    /* ====== RENDER REPORT ====== */
+    /* ===== RENDER REPORT ===== */
     function renderReport(row) {
       const Info = renderInfoSection(row);
 
@@ -680,7 +670,7 @@
         </div>
       `;
 
-      /* ====== TÍNH THU NHẬP: tự gắn msdl & join qua query (nếu site hỗ trợ) ====== */
+      // Tính thu nhập: pass sẵn msdl & join qua query
       const ms = encodeURIComponent(lastMsdl || '');
       const jd = encodeURIComponent(normalizeDate(lastJoin || ''));
       const incomeURL = `https://dutinhthunhap.vunghanglam.com/?msdl=${ms}&join=${jd}`;
@@ -688,7 +678,7 @@
         <div id="sectionIncome" class="section">
           <div class="section-title">Tính thu nhập</div>
           <div class="lvl-2">
-            <div class="mb-2 text-sm text-gray-600">Đã điền sẵn (truyền qua URL): <b>MSĐL</b> = <span class="val">${lastMsdl || "-"}</span>,
+            <div class="mb-2 text-sm text-gray-600">Đã điền sẵn: <b>MSĐL</b> = <span class="val">${lastMsdl || "-"}</span>,
               <b>Ngày gia nhập</b> = <span class="val">${lastJoin || "-"}</span></div>
             <iframe id="incomeFrame" src="${incomeURL}" class="w-full h-[70vh] border rounded-lg"></iframe>
           </div>
@@ -711,7 +701,7 @@
       };
     }
 
-    /* ====== SIDEBAR NAV ====== */
+    /* ===== NAV ===== */
     function buildSidebarNav(){
       navEl.innerHTML = `
         <div class="font-extrabold text-emerald-800 mb-2">Danh mục</div>
@@ -757,7 +747,7 @@
       });
     }
 
-    /* ====== ACTIVATE SECTION ====== */
+    /* ===== ACTIVATE SECTION ===== */
     function activateSection(sectionId, anchor){
       document.querySelectorAll('#report .section').forEach(sec=>sec.classList.add('hide'));
       const section = document.getElementById(sectionId);
@@ -781,7 +771,6 @@
         if (sublink) sublink.classList.add('active');
       }
 
-      // đồng bộ TOC mobile
       const select = document.getElementById('tocSelect');
       if (select && select.value !== "") {
         const value = anchor ? `${sectionId}${anchor}` : sectionId;
@@ -792,11 +781,12 @@
       scrollToSectionStart(sectionId);
     }
 
-    /* ====== KHỞI TẠO ====== */
-    window.addEventListener('load', ()=>{
+    /* ===== INIT ===== */
+    function init(){
       updateLayoutVars();
       toggleNavForViewport();
-    });
+    }
+    window.addEventListener('load', init);
     window.addEventListener('resize', updateLayoutVars);
   </script>
 </body>
