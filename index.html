@@ -429,7 +429,7 @@
         const rowByMsdl = dataRows.find(r=>normalizeMSDL(pick(r,msdlCols))===msdlNorm);
         if(rowByMsdl){
           const expected=normalizeDate(pick(rowByMsdl,joinCols)) || (pick(rowByMsdl,joinCols)||'').trim();
-          showError(`MSĐL đúng nhưng ngày gia nhập chưa khớp. Ngày đúng là: ${expected||'(không có trong dữ liệu)'}`);
+          showError(`Không tìm thấy đại lý phù hợp với thông tin bạn nhập!`);
         } else showError("Không tìm thấy đại lý phù hợp với thông tin bạn nhập!");
         return;
       }
