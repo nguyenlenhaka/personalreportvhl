@@ -162,7 +162,7 @@
       .logo-m{ display:block; height:56px; margin-left:8px; }
       .title-cell{ text-align:center; padding-top:.25rem; }
       .title-top{ font-size:1.25rem; }
-      .title-main{ font-size:2.25rem; }
+      .title-main{ font-size:2.25rem; line-height:}
 
       /* form mobile: 2 input cùng hàng, nút xuống dòng riêng */
       #loginForm{
@@ -177,12 +177,46 @@
       .section-title{ position:sticky; top:calc(var(--header-h) + var(--toc-h) + 6px); z-index:20; background:#fff; }
       .section{ scroll-margin-top: calc(var(--header-h) + var(--toc-h) + 10px); }
     }
+    /* KHÔNG cắt theo trục dọc để giữ dấu tiếng Việt */
+.title-top,
+.title-main{
+  overflow-x: hidden;   /* vẫn cho phép ellipsis ngang */
+  overflow-y: visible;  /* không cắt theo dọc -> không mất dấu */
+  white-space: nowrap;
+  text-overflow: ellipsis;
+    /* nới nhẹ cho an toàn (có thể 1.18–1.25) */
+}
+
+/* Nếu từng set chung overflow cho header, đừng để nó che dọc */
+.sticky-header{ overflow: visible; }
+/* KHÔNG cắt theo trục dọc, chỉ ẩn tràn ngang để có ellipsis */
+.title-top,
+.title-main{
+  overflow-x: hidden;
+  overflow-y: visible;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Nới line-height riêng cho dòng "CỔNG THÔNG TIN..." */
+.title-top, .title-main{
+  line-height: 1.25 !important;  /* 1.30–1.40 tùy bạn, miễn không cắt dấu */
+  padding-top: 2px;               /* nới nhẹ đầu trên */
+  padding-bottom: 2px;            /* nới nhẹ đầu dưới */
+}
+
+/* Chắc chắn cha không chặn dọc */
+.title-cell,
+.sticky-header{
+  overflow: visible !important;
+}
+
   </style>
 </head>
 <body class="min-h-screen font-sans">
   <!-- ===== HEADER ===== -->
   <header id="pageHeader" class="sticky-header shadow">
-    <div class="header-grid px-2 md:px-3 py-3">
+    <div class="header-grid px-2 md:px-3 py-10">
       <!-- Logo -->
       <div class="logo-cell flex items-center">
         <img src="logo_text.webp" alt="logo" class="logo-d">
