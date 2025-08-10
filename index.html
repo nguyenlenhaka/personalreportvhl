@@ -5,61 +5,74 @@
   <title>Báo cáo Cá nhân – Vùng Hằng Lâm</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
 
-  <!-- Font nội bộ -->
-  <link rel="stylesheet" href="./font/fonts.css" />
+  <!-- DÙNG ĐÚNG FONT TỪ THƯ MỤC fonts -->
+  <link rel="stylesheet" href="./fonts/fonts.css" />
 
-  <!-- Tailwind (CDN) -->
   <script src="https://cdn.tailwindcss.com"></script>
-
   <style>
     :root{
-      --sidebar-width: 320px;   /* menu rộng hơn */
-      --header-h: 64px;         /* cập nhật bằng JS theo kích thước thực */
-      --toc-h: 0px;             /* cao của dropdown mobile (cập nhật JS) */
+      --sidebar-width: 260px;
+      --header-h: 64px;
+      --fixed-top: 64px;
+      --toc-h: 0px;
 
-      --w-title: 700;
-      --w-section: 700;
-      --w-menu: 700;
+      /* ==== ĐIỀU CHỈNH WEIGHT CHO KHỚP fonts.css ==== */
+      --w-title: 700;   /* 700 nếu chỉ có Bold; nếu có ExtraBold/Black => 800/900 */
+      --w-section: 700; /* weight cho tiêu đề section A/B/C/Thông tin/Tính thu nhập */
+      --w-menu: 700;    /* weight cho menu & submenu */
 
-      --ml-font: 'Manulife JH Sans','ManulifeJHSans',
-                 system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+      --ml-font: 'Manulife JH Sans', 'ManulifeJHSans',
+                 system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     }
 
-    *{ box-sizing:border-box; }
-    html, body{ height:100%; }
-    body{ background:#f3f4f6; font-size:17px; padding-top:var(--header-h); } /* chừa chỗ cho header fixed */
-    .hide{ display:none !important; }
+    *{ box-sizing: border-box; }
+    body{ background:#f3f4f6; }
+    html, body{ font-size:17px; }
+    .sticky-header{ position: sticky; top: 0; z-index: 40; background:#e8fff3; overflow:hidden; }
 
-    /* ===== HEADER (FIXED – luôn sticky) ===== */
-    #pageHeader{
-      position:fixed; top:0; left:0; right:0;
-      z-index:1000; background:#e8fff3;
-      box-shadow: 0 1px 0 rgba(0,0,0,.05);
-    }
+    /* màu & nhấn */
+    b,strong,.val,.hl{ color:#10b981; }
+    .label{ font-weight:700; color:#0b3d2c; }
+    .val{ font-weight:900; }
+    .thin{ font-weight:700; color:#0b3d2c; }
+    .hide{ display:none; }
+
+    /* ===== HEADER ===== */
     .header-grid{
       display:grid;
       grid-template-columns: var(--sidebar-width) 1fr max-content; /* logo | title | login */
       grid-template-areas: "logo title login";
       align-items:center; gap:.75rem;
-      padding:18px 12px;
     }
     .logo-cell{ grid-area:logo; }
     .logo-d{ height:72px; margin-left:8px; }
     .logo-m{ display:none; }
 
-    .title-cell{ grid-area:title; min-width:0; overflow:visible; }
+    .title-cell{ grid-area:title; min-width:0; }
     .title-top, .title-main{
       font-family: var(--ml-font);
-      white-space: nowrap; overflow-x:hidden; overflow-y:visible; text-overflow:ellipsis;
+      white-space: nowrap; overflow:hidden; text-overflow: ellipsis;
     }
-    .title-top{ font-weight:var(--w-title); letter-spacing:.5px; color:#059669; font-size:1.55rem; line-height:1.35; text-transform:uppercase; }
-    .title-main{ font-weight:var(--w-title); color:#059669; font-size:3.2rem; line-height:1.18; margin-top:.25rem; }
+    .title-top{
+      font-weight: var(--w-title); letter-spacing:.5px; color:#059669;
+      font-size:1.55rem; line-height:1.1; text-transform:uppercase;
+    }
+    .title-main{
+      font-weight: var(--w-title); color:#059669;
+      font-size:3.2rem; line-height:1; margin-top:.25rem;
+    }
 
-    /* Đăng nhập – desktop: grid 2 hàng để không che tiêu đề khi hẹp */
+    /* Cụm đăng nhập – desktop */
     #loginForm{
-      grid-area:login; justify-self:end; width:440px; max-width:100%;
-      display:grid; grid-template-columns:1fr auto; grid-template-rows:auto auto;
-      grid-template-areas: "msdl msdl" "date btn";
+      grid-area:login;
+      justify-self:end;
+      width:440px; max-width:100%;
+      display:grid;
+      grid-template-columns: 1fr auto;
+      grid-template-rows: auto auto;
+      grid-template-areas:
+        "msdl msdl"
+        "date btn";
       gap:.5rem; align-items:center;
     }
     #msdlInput{ grid-area:msdl; }
@@ -69,13 +82,15 @@
     /* ===== SIDEBAR (desktop, chỉ hiện sau login) ===== */
     #sidebar{
       width:var(--sidebar-width);
-      position:fixed; top:var(--header-h); left:0; bottom:0;
+      position:fixed; top:var(--fixed-top); left:0; bottom:0;
       overflow:auto; z-index:35; background:#fff;
       border-right:1px solid #e5e7eb; border-top-right-radius:12px;
       display:none; /* ẩn đến khi đăng nhập */
     }
     .sidebar-inner{ padding:12px; }
-    .menu-item,.menu-head{ display:block; font-weight:var(--w-menu); color:#0b3d2c; font-family:var(--ml-font); }
+    .menu-item,.menu-head{
+      display:block; font-weight: var(--w-menu); color:#0b3d2c; font-family:var(--ml-font);
+    }
     .menu-item{ padding:.5rem .75rem; border-radius:.5rem; }
     .menu-item:hover{ background:#e5f7ee; }
     .menu-item.active{ background:#0ea35b; color:#fff; }
@@ -85,36 +100,26 @@
     .submenu a:hover{ background:#edfdf6; }
     .submenu a.active{ background:#0ea35b; color:#fff; }
 
-    /* ===== CONTENT ===== */
+    /* CONTENT chừa sidebar */
     #contentWrap{ margin-left: var(--sidebar-width); }
-    @media (max-width:1023px){ #contentWrap{ margin-left:0; } }
 
-    /* ===== TOC mobile (sticky dưới header) ===== */
-    .toc-mobile{
-      position:sticky; top:calc(var(--header-h) + 0px);  /* bám ngay dưới header */
-      z-index:900; background:#fff; padding:8px 0; display:none;
-      box-shadow: 0 1px 0 rgba(0,0,0,.04);
-    }
+    /* TOC mobile (ẩn đến khi login) */
+    .toc-mobile{ position:sticky; top:calc(var(--header-h)); z-index:30; background:#fff; padding:8px 0; display:none; }
 
-    /* ===== SECTION ===== */
-    .section{ scroll-margin-top: calc(var(--header-h) + var(--toc-h) + 10px); }
+    /* SECTION */
     .section-title{
-      position:sticky; top:calc(var(--header-h) + var(--toc-h) + 6px);  /* tiêu đề cũng sticky */
-      z-index:800; background:#fff;
-
       font-family: var(--ml-font);
-      font-weight: var(--w-section); color:#0b3d2c;
+      font-weight: var(--w-section); color:#0b3d2c; background:#fff;
       padding:10px 16px; border-left:6px solid #0ea35b;
       border-radius:.5rem; margin:18px 0 12px; font-size:1.25rem;
     }
-    .subsec{ margin:12px 0 10px; font-weight:var(--w-section); color:#0b3d2c;
-             padding-left:.75rem; border-left:6px solid #0ea35b; font-size:1.15rem; }
+    .subsec{
+      margin:12px 0 10px; font-weight:var(--w-section); color:#0b3d2c;
+      padding-left:.75rem; border-left:6px solid #0ea35b; font-size:1.15rem;
+    }
+    .section{ scroll-margin-top: calc(var(--header-h) + 8px); }
 
-    /* ===== INFO GRID ===== */
-    b,strong,.val,.hl{ color:#10b981; }
-    .label{ font-weight:700; color:#0b3d2c; }
-    .val{ font-weight:900; }
-
+    /* INFO GRID */
     .info-grid{ display:grid; grid-template-columns: repeat(auto-fit, minmax(240px,1fr)); gap:.85rem; }
     .info-item{
       display:flex; flex-direction:column; gap:.3rem;
@@ -122,20 +127,31 @@
       border-radius:.6rem; padding:.7rem .85rem;
     }
     .info-item .val{ font-size:1.15rem; line-height:1.25; word-break:break-word; }
-    .pro-alert{ margin-top:.4rem; padding:.7rem .9rem; border:2px solid #dc2626; border-left-width:6px;
-                border-radius:.6rem; background:#fff; color:#b91c1c; font-weight:900; font-size:1.05rem; }
+
+    /* Cảnh báo Pro */
+    .pro-alert{
+      margin-top:.4rem; padding:.7rem .9rem;
+      border:2px solid #dc2626; border-left-width:6px; border-radius:.6rem;
+      background:#fff; color:#b91c1c; font-weight:900; font-size:1.15rem;
+    }
     .info-alert{ grid-column:1 / -1; }
 
+    /* list label|value */
     .list-dot li, .bullet-strong li{
-      list-style:none; padding-left:0; display:grid; grid-template-columns:minmax(170px,max-content) 1fr;
+      list-style:none; padding-left:0;
+      display:grid; grid-template-columns:minmax(170px,max-content) 1fr;
       column-gap:1rem; align-items:start; margin:.3rem 0;
     }
     .bullet-strong li{ border-left:3px solid #0ea35b; padding-left:.75rem; }
     .hl{ grid-column:2; font-weight:900; font-size:1.05rem; line-height:1.3; }
+
+    /* thụt dòng trực quan */
     .lvl-2{ margin-left:1.25rem; padding-left:.75rem; border-left:3px solid #a7f3d0; border-radius:.25rem; }
     .lvl-3{ margin-left:2.25rem; padding-left:.75rem; border-left:2px dashed #c7f9e9; border-radius:.25rem; }
+    .lvl-4{ margin-left:3.25rem; padding-left:.75rem; border-left:2px dotted #def7ef; border-radius:.25rem; }
 
-    /* ===== MOBILE HEADER LAYOUT ===== */
+    /* ===== MOBILE ===== */
+    @media (max-width:1023px){ #contentWrap{ margin-left:0; } }
     @media (max-width:640px){
       .header-grid{
         grid-template-columns: auto 1fr;
@@ -146,73 +162,68 @@
       .logo-m{ display:block; height:56px; margin-left:8px; }
       .title-cell{ text-align:center; padding-top:.25rem; }
       .title-top{ font-size:1.25rem; }
-      .title-main{ font-size:2.25rem; }
+      .title-main{ font-size:2.25rem; line-height:}
 
       /* form mobile: 2 input cùng hàng, nút xuống dòng riêng */
       #loginForm{
         justify-self:stretch; width:100%;
         grid-template-columns: minmax(0,1fr) minmax(0,1fr);
         grid-template-rows: auto auto;
-        grid-template-areas: "msdl date" "btn btn";
+        grid-template-areas:
+          "msdl date"
+          "btn  btn";
       }
       .login-btn{ height:46px; justify-self:stretch; }
+      .section-title{ position:sticky; top:calc(var(--header-h) + var(--toc-h) + 6px); z-index:20; background:#fff; }
+      .section{ scroll-margin-top: calc(var(--header-h) + var(--toc-h) + 10px); }
     }
+    /* KHÔNG cắt theo trục dọc để giữ dấu tiếng Việt */
+.title-top,
+.title-main{
+  overflow-x: hidden;   /* vẫn cho phép ellipsis ngang */
+  overflow-y: visible;  /* không cắt theo dọc -> không mất dấu */
+  white-space: nowrap;
+  text-overflow: ellipsis;
+    /* nới nhẹ cho an toàn (có thể 1.18–1.25) */
+}
 
-    /* ===== TOOL (income) – giữ nguyên thuật toán, chỉ style ===== */
-    #incomeApp *{ box-sizing:border-box; }
-    #incomeApp{ --pad:18px; --pad-sm:12px; --radius:16px; --brand:#0051c1; --accent:#00a758; font-family:'Manulife JH Sans',Arial,sans-serif; }
-    #incomeApp .container{ max-width:100%; width:100%; background:#ffffffee; margin:0 auto; border-radius:var(--radius);
-      box-shadow:0 2px 16px #bbb8; padding:24px var(--pad) 30px var(--pad); position:relative; z-index:1; }
-    #incomeApp h2{ font-size:clamp(1.05rem,1.2rem,1.3rem); text-align:center; color:#00519c; font-weight:700; margin:14px 0 8px; }
-    #incomeApp .note-green{ color:var(--accent); font-style:italic; font-weight:700; text-align:center; margin:0 0 4px; }
-    #incomeApp .note-right{ text-align:right; font-size:.95rem; font-style:italic; margin:0 0 6px; color:#333b; font-weight:700; }
-    #incomeApp .income-mini-title, #incomeApp .income-note{ font-size:1rem; color:#0051c1; font-weight:700; margin:8px 0 6px; }
-    #incomeApp .top-fields, #incomeApp .top-fields-2{ display:grid; grid-template-columns:repeat(12,1fr); gap:16px; align-items:end; margin-bottom:10px; }
-    #incomeApp .top-fields-2{ margin-bottom:8px; }
-    #incomeApp .field{ grid-column:span 4; min-width:0; display:flex; flex-direction:column; }
-    #incomeApp .field.w-6{ grid-column:span 6; } #incomeApp .field.w-12{ grid-column:1 / -1; }
-    #incomeApp .field label{ font-size:.98rem; font-weight:600; color:#24364a; margin:0 0 6px 2px; line-height:1.2; }
-    #incomeApp .field input, #incomeApp .field select{ height:46px; padding:0 12px; font-size:16px; border:1.3px solid #c7d5e6; border-radius:8px;
-      background-color:rgba(214,255,237,0.3); font-family:inherit; font-weight:600; color:#0051c1; outline:none; transition:border-color .18s, box-shadow .18s; width:100%; text-align:center; }
-    #incomeApp .field input[readonly]{ background:#fafbfd; color:#0b8a62; font-weight:700; border-color:#bfc7d1; }
-    #incomeApp .field input:focus, #incomeApp .field select:focus{ border-color:#7fb7ff; box-shadow:0 0 0 3px rgba(0,120,255,0.12); }
-    #incomeApp button{ background:#0d72b5; color:#fff; font-weight:700; border:none; border-radius:10px; padding:12px 18px; font-size:16px; transition:background .16s, transform .04s; cursor:pointer; box-shadow:0 6px 18px rgba(13,114,181,.25); }
-    #incomeApp button:hover{ background:#085a93; } #incomeApp button:active{ transform:translateY(1px); }
-    #incomeApp .summary-row{ display:grid; grid-template-columns:repeat(12,1fr); gap:18px; align-items:end; margin:16px 0 8px; }
-    #incomeApp .summary-block{ grid-column:span 6; text-align:center; }
-    #incomeApp .summary-block label{ color:#0051c1; font-weight:800; letter-spacing:.02em; display:block; margin-bottom:6px; text-transform:uppercase; font-size:.95rem; }
-    #incomeApp .summary-block input{ background:#fff; color:#048f60; border:2px solid #00a578; border-radius:10px; font-size:16px; font-weight:900; height:56px; text-align:center; width:100%; }
-    #incomeApp hr{ border:none; border-top:1.7px solid #e3e7eb; margin:12px 0; }
-    @media (max-width: 640px){
-      #incomeApp .top-fields, #incomeApp .top-fields-2{ grid-template-columns:1fr; gap:10px; }
-      #incomeApp .field, #incomeApp .field.w-6, #incomeApp .field.w-12{ grid-column:1 / -1; }
-      #incomeApp #calc-btn{ position:fixed; left:14px; right:14px; bottom:calc(env(safe-area-inset-bottom, 0) + 12px); z-index:30; }
-      #incomeApp .container{ padding-bottom:96px; }
-    }
-    @media (min-width:901px){
-      #incomeApp .container{ max-width:100%; padding:24px 18px 30px 18px; }
-      #incomeApp .top-fields, #incomeApp .top-fields-2{ display:flex; gap:18px; margin-bottom:10px; flex-wrap:wrap; align-items:flex-end; }
-      #incomeApp .field{ display:flex; flex-direction:column; margin-bottom:0; min-width:120px; flex:1; }
-      #incomeApp .field input, #incomeApp .field select{ height:40px; font-size:.97em; border-radius:7px; text-align:center; }
-      #incomeApp button{ border-radius:8px; padding:10px 26px; font-weight:600; box-shadow:0 2px 8px #0d72b533; }
-      #incomeApp .summary-row{ display:flex; gap:28px; margin-top:18px; margin-bottom:14px; justify-content:center; align-items:flex-end; white-space:nowrap; }
-      #incomeApp .summary-block{ flex:1 1 0; text-align:center; white-space:nowrap; }
-      #incomeApp .summary-block label{ color:#0051c1; font-weight:700; font-size:1.13em; letter-spacing:0.02em; margin-bottom:3px; text-transform:uppercase; }
-      #incomeApp .summary-block input{ border-radius:8px; height:52px; width:95%; max-width:320px; margin:0 auto; }
-    }
+/* Nếu từng set chung overflow cho header, đừng để nó che dọc */
+.sticky-header{ overflow: visible; }
+/* KHÔNG cắt theo trục dọc, chỉ ẩn tràn ngang để có ellipsis */
+.title-top,
+.title-main{
+  overflow-x: hidden;
+  overflow-y: visible;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Nới line-height riêng cho dòng "CỔNG THÔNG TIN..." */
+.title-top, .title-main{
+  line-height: 1.25 !important;  /* 1.30–1.40 tùy bạn, miễn không cắt dấu */
+  padding-top: 2px;               /* nới nhẹ đầu trên */
+  padding-bottom: 2px;            /* nới nhẹ đầu dưới */
+}
+
+/* Chắc chắn cha không chặn dọc */
+.title-cell,
+.sticky-header{
+  overflow: visible !important;
+}
+
   </style>
 </head>
 <body class="min-h-screen font-sans">
-  <!-- ===== HEADER (sticky) ===== -->
-  <header id="pageHeader">
-    <div class="header-grid">
+  <!-- ===== HEADER ===== -->
+  <header id="pageHeader" class="sticky-header shadow">
+    <div class="header-grid px-2 md:px-3 py-10">
       <!-- Logo -->
       <div class="logo-cell flex items-center">
         <img src="logo_text.webp" alt="logo" class="logo-d">
         <img src="logo.webp" alt="logo" class="logo-m">
       </div>
 
-      <!-- Tiêu đề 2 dòng -->
+      <!-- Tiêu đề 2 dòng (auto-fit mobile, không xuống dòng) -->
       <div class="title-cell">
         <div id="tTop"  class="title-top">CỔNG THÔNG TIN VÙNG HẰNG LÂM</div>
         <div id="tMain" class="title-main">BÁO CÁO CÁ NHÂN</div>
@@ -239,24 +250,22 @@
 
       <!-- TOC mobile (ẩn đến khi login) -->
       <div id="tocMobile" class="toc-mobile">
-        <div class="max-w-6xl mx-auto px-3 md:px-4">
-          <select id="tocSelect" class="w-full border rounded px-3 py-2">
-            <option value="" selected disabled>Danh mục báo cáo</option>
-            <option value="sectionInfo">Thông tin đại lý</option>
-            <option value="sectionA">A. Tổng quan (MTD)</option>
-            <option value="sectionB#b1">B.1 Bán hàng</option>
-            <option value="sectionB#b2">B.2 Manulife Pro</option>
-            <option value="sectionB#b3">B.3 MDRT+</option>
-            <option value="sectionB#b4">B.4 M-Star / Japan</option>
-            <option value="sectionB#b5">B.5 Thưởng năm</option>
-            <option value="sectionC#c1">C.1 Tuyển dụng</option>
-            <option value="sectionC#c2">C.2 Thăng cấp</option>
-            <option value="sectionC#c3">C.3 Duy trì chức danh</option>
-            <option value="sectionC#c4">C.4 MBA Pro</option>
-            <option value="sectionC#c5">C.5 Thưởng nhóm ưu tú</option>
-            <option value="sectionIncome">CÔNG CỤ DỰ TÍNH THU NHẬP</option>
-          </select>
-        </div>
+        <select id="tocSelect" class="w-full border rounded px-3 py-2">
+          <option value="" selected disabled>Danh mục báo cáo</option>
+          <option value="sectionInfo">Thông tin đại lý</option>
+          <option value="sectionA">A. Tổng quan (MTD)</option>
+          <option value="sectionB#b1">B.1 Bán hàng</option>
+          <option value="sectionB#b2">B.2 Manulife Pro</option>
+          <option value="sectionB#b3">B.3 MDRT+</option>
+          <option value="sectionB#b4">B.4 M-Star / Japan</option>
+          <option value="sectionB#b5">B.5 Thưởng năm</option>
+          <option value="sectionC#c1">C.1 Tuyển dụng</option>
+          <option value="sectionC#c2">C.2 Thăng cấp</option>
+          <option value="sectionC#c3">C.3 Duy trì chức danh</option>
+          <option value="sectionC#c4">C.4 MBA Pro</option>
+          <option value="sectionC#c5">C.5 Thưởng nhóm ưu tú</option>
+          <option value="sectionIncome">Tính thu nhập</option>
+        </select>
       </div>
 
       <section id="report" class="bg-white shadow rounded-xl p-4 md:p-6 mt-0 hidden"></section>
@@ -264,37 +273,14 @@
     </main>
   </div>
 
-  <!-- html2pdf cho tool thu nhập (nếu cần trong phần Income) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
   <script>
-    /* ===== BASIC UTIL FOR LAYOUT ===== */
-    const headerEl  = document.getElementById('pageHeader');
-    const tocMbEl   = document.getElementById('tocMobile');
-    function setHeaderVars(){
-      const h = headerEl.offsetHeight || 64;
-      document.documentElement.style.setProperty('--header-h', h+'px');
-      document.body.style.paddingTop = 'var(--header-h)';
-      // đo dropdown mobile (nếu hiển)
-      const sel = document.getElementById('tocSelect');
-      const th = (sel && getComputedStyle(tocMbEl).display!=='none') ? (sel.offsetHeight+16) : 0;
-      document.documentElement.style.setProperty('--toc-h', th+'px');
-    }
-    function isMobile(){ return window.matchMedia('(max-width: 640px)').matches; }
-    function fitText(el, maxPx, minPx){
-      if(!el) return; const box=el.parentElement; el.style.whiteSpace='nowrap';
-      let size=maxPx; el.style.fontSize=size+'px';
-      const max=box.clientWidth-4; while(size>minPx && el.scrollWidth>max){ size-=1; el.style.fontSize=size+'px'; }
-    }
-    function fitTitles(){
-      const tTop=document.getElementById('tTop'); const tMain=document.getElementById('tMain');
-      if (isMobile()){ fitText(tTop,24,12); fitText(tMain,36,18); } else { tTop.style.fontSize='1.55rem'; tMain.style.fontSize='3.2rem'; }
-    }
-    window.addEventListener('load', ()=>{ fitTitles(); setHeaderVars(); });
-    window.addEventListener('resize', ()=>{ fitTitles(); setHeaderVars(); toggleNavByViewport(); });
+    /* ===== STATE ===== */
+    let dataRows = [];
+    let mapping = [];
+    let dataReady;
+    let loggedIn = false;
 
-    /* ===== ORIGINAL APP STATE / LOGIC (GIỮ NGUYÊN THUẬT TOÁN) ===== */
-    let dataRows = [], mapping = [], dataReady;
+    /* ===== LOAD DATA ===== */
     async function loadData(){
       const mapUrl = encodeURI('tham chieu.json');
       const dataUrl = 'data.json';
@@ -307,39 +293,104 @@
     }
     dataReady = loadData();
 
+    /* ===== DOM ===== */
     const errorEl   = document.getElementById('errorMsg');
     const reportEl  = document.getElementById('report');
     const hintEl    = document.getElementById('hint');
+    const tocMbEl   = document.getElementById('tocMobile');
     const sidebarEl = document.getElementById('sidebar');
     const navEl     = document.getElementById('nav');
+    const headerEl  = document.getElementById('pageHeader');
+    const tTopEl    = document.getElementById('tTop');
+    const tMainEl   = document.getElementById('tMain');
 
-    let loggedIn=false, lastRow=null;
-    function showError(msg){ errorEl.textContent=msg; errorEl.classList.remove('hidden'); }
-    function hideErrors(){ errorEl.classList.add('hidden'); }
+    function isMobile(){ return window.matchMedia('(max-width: 640px)').matches; }
+
+    /* ===== Title auto-fit (mobile không xuống dòng) ===== */
+    function fitText(el, maxPx, minPx){
+      if(!el) return;
+      const container = el.parentElement;
+      el.style.whiteSpace = 'nowrap';
+      let size = maxPx;
+      el.style.fontSize = size + 'px';
+      const maxWidth = container.clientWidth - 4;
+      while (size > minPx && el.scrollWidth > maxWidth){
+        size -= 1;
+        el.style.fontSize = size + 'px';
+      }
+    }
+    function fitTitles(){
+      if (isMobile()){
+        fitText(tTopEl, 24, 12);
+        fitText(tMainEl, 36, 18);
+      } else {
+        tTopEl.style.fontSize = '1.55rem';
+        tMainEl.style.fontSize = '3.2rem';
+      }
+    }
+
+    /* ===== UTIL ===== */
     function normalizeDate(s){
       if(!s) return '';
-      s=String(s).trim();
-      if(/^\d{8}$/.test(s)){ const d=s.slice(0,2),m=s.slice(2,4),y=s.slice(4,8); return `${d}/${m}/${y}`; }
-      if(/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(s)){ const [d,m,y]=s.split('/').map(x=>parseInt(x,10)); return `${String(d).padStart(2,'0')}/${String(m).padStart(2,'0')}/${y}`; }
-      if(/^\d{4}-\d{1,2}-\d{1,2}$/.test(s)){ const [y,m,d]=s.split('-').map(x=>parseInt(x,10)); return `${String(d).padStart(2,'0')}/${String(m).padStart(2,'0')}/${y}`; }
+      s = String(s).trim();
+      if (/^\d{8}$/.test(s)) { const d=s.slice(0,2), m=s.slice(2,4), y=s.slice(4,8); return `${d}/${m}/${y}`; }
+      if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(s)) { const [d,m,y]=s.split('/').map(x=>parseInt(x,10)); return `${String(d).padStart(2,'0')}/${String(m).padStart(2,'0')}/${y}`; }
+      if (/^\d{4}-\d{1,2}-\d{1,2}$/.test(s)) { const [y,m,d]=s.split('-').map(x=>parseInt(x,10)); return `${String(d).padStart(2,'0')}/${String(m).padStart(2,'0')}/${y}`; }
       return s;
     }
     function normalizeMSDL(s){ return String(s||'').trim().replace(/\s+/g,'').toLowerCase(); }
+
+    function parseLocaleNumber(v){
+      if (v===null||v===undefined||v==='') return NaN;
+      if (typeof v==='number') return v;
+      let s = String(v).trim().replace(/[^0-9,.\-]/g,'');
+      if (s===''||s==='-'||s==='.'||s===',') return NaN;
+      const hasDot=s.includes('.'), hasComma=s.includes(',');
+      if (hasDot&&hasComma){
+        if (s.lastIndexOf(',')>s.lastIndexOf('.')){ s=s.replace(/\./g,'').replace(',', '.'); }
+        else { s=s.replace(/,/g,''); }
+      } else if (hasComma&&!hasDot){ s=s.replace(',', '.'); }
+      const n=parseFloat(s); return isNaN(n)?NaN:n;
+    }
+    function formatThousand(n,dec){
+      if (n===null||n===undefined||isNaN(n)) return "";
+      const fixed = Number(n).toFixed(dec);
+      let [intPart, frac=""] = fixed.split('.');
+      const sign = intPart.startsWith('-')?'-':'';
+      intPart = intPart.replace('-','').replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+      return sign + intPart + (dec>0?','+frac:"");
+    }
+    function formatF3(val){ const n=parseLocaleNumber(val); if(isNaN(n)) return val??""; return formatThousand(n,3); }
+    function formatNumber(val){ return (val ?? ""); }
+    function shouldF3Label(label=""){
+      const norm=String(label||"").toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+      return (norm.includes('fyp')||norm.includes('fyc'));
+    }
+    function fmt(val,key="",label=""){ return shouldF3Label(label)?formatF3(val):(val??""); }
+    function addPercent(val){ return (val ?? ""); }
     function exists(v){ return !(v===null||v===undefined||(typeof v==='string'&&v.trim()==='')); }
-    function pick(row,keys){ for(const k of keys) if (exists(row[k])) return row[k]; return ''; }
+    function pick(row,keys){ for (const k of keys) if (exists(row[k])) return row[k]; return ''; }
+
+    function showError(msg){ errorEl.textContent=msg; errorEl.classList.remove('hidden'); }
+    function hideErrors(){ errorEl.classList.add('hidden'); }
+
+    function getHeaderH(){ return headerEl?.offsetHeight || 64; }
+    function getTocH(){ const sel=document.getElementById('tocSelect'); return (sel && getComputedStyle(tocMbEl).display!=='none') ? (sel.offsetHeight+16) : 0; }
+    function updateLayoutVars(){ const r=document.documentElement; r.style.setProperty('--header-h', getHeaderH()+'px'); r.style.setProperty('--fixed-top', getHeaderH()+'px'); r.style.setProperty('--toc-h', getTocH()+'px'); }
 
     function toggleNavByViewport(){
-      if(!loggedIn){ tocMbEl.style.display='none'; sidebarEl.style.display='none'; setHeaderVars(); return; }
+      if (!loggedIn){ tocMbEl.style.display='none'; sidebarEl.style.display='none'; return; }
       if (window.matchMedia('(min-width: 1024px)').matches){
         sidebarEl.style.display='block'; tocMbEl.style.display='none';
       } else {
         sidebarEl.style.display='none'; tocMbEl.style.display='block';
       }
-      setHeaderVars();
+      updateLayoutVars();
     }
+
     function scrollToSectionStart(sectionId){
       const section=document.getElementById(sectionId); if(!section) return;
-      const y = section.getBoundingClientRect().top + window.scrollY - (headerEl.offsetHeight + (getComputedStyle(tocMbEl).display!=='none'? (document.getElementById('tocSelect').offsetHeight+16):0) + 8);
+      const y = section.getBoundingClientRect().top + window.scrollY - (isMobile()? (getHeaderH()+getTocH()+10):(getHeaderH()+8));
       window.scrollTo({ top:y, behavior:'smooth' });
     }
 
@@ -348,19 +399,33 @@
     const msdlInput = document.getElementById('msdlInput');
     const dateInput = document.getElementById('dateInput');
     const loginBtn  = loginForm.querySelector('button');
-    loginBtn.disabled=true; loginBtn.textContent='Đang tải dữ liệu...';
+
+    // chặn nhấn trước khi tải xong dữ liệu
+    loginBtn.disabled = true; loginBtn.textContent = 'Đang tải dữ liệu...';
     dataReady.finally(()=>{ loginBtn.disabled=false; loginBtn.textContent='Đăng nhập'; });
+
+    let lastMsdl="", lastJoin="";
 
     loginForm.onsubmit = async (e)=>{
       e.preventDefault();
-      hideErrors(); await dataReady;
-      if(!Array.isArray(dataRows)||dataRows.length===0){ showError("Không tải được dữ liệu. Hãy kiểm tra data.json."); return; }
-      const msdlNorm=normalizeMSDL(msdlInput.value);
-      const dateNorm=normalizeDate(dateInput.value);
-      const msdlCols=["MSDL","AGEN CODE","AGENT CODE","Agent Code","Mã Số Đại Lý","MÃ SỐ ĐẠI LÝ"];
-      const joinCols=["JOIN DATE","Join Date","NGÀY GIA NHẬP","Ngày gia nhập"];
-      const row = dataRows.find(r => normalizeMSDL(pick(r,msdlCols))===msdlNorm && normalizeDate(pick(r,joinCols))===dateNorm);
-      if(!row){
+      hideErrors();
+      await dataReady;
+
+      if (!Array.isArray(dataRows) || dataRows.length===0){
+        showError("Không tải được dữ liệu. Hãy kiểm tra data.json.");
+        return;
+      }
+
+      const msdlNorm = normalizeMSDL(msdlInput.value);
+      const dateNorm = normalizeDate(dateInput.value);
+
+      const msdlCols = ["MSDL","AGEN CODE","AGENT CODE","Agent Code","Mã Số Đại Lý","MÃ SỐ ĐẠI LÝ"];
+      const joinCols = ["JOIN DATE","Join Date","NGÀY GIA NHẬP","Ngày gia nhập"];
+
+      const row = dataRows.find(r => normalizeMSDL(pick(r,msdlCols))===msdlNorm &&
+                                     normalizeDate(pick(r,joinCols))===dateNorm);
+
+      if (!row){
         const rowByMsdl = dataRows.find(r=>normalizeMSDL(pick(r,msdlCols))===msdlNorm);
         if(rowByMsdl){
           const expected=normalizeDate(pick(rowByMsdl,joinCols)) || (pick(rowByMsdl,joinCols)||'').trim();
@@ -368,38 +433,48 @@
         } else showError("Không tìm thấy đại lý phù hợp với thông tin bạn nhập!");
         return;
       }
-      lastRow=row; renderReport(row); buildSidebarNav(); loggedIn=true;
 
-      // sau login: chỉ hiển thị Thông tin đại lý
+      lastMsdl = pick(row, msdlCols);
+      lastJoin = pick(row, joinCols);
+
+      renderReport(row);
+      buildSidebarNav();
+      loggedIn = true;
+
+      // Sau đăng nhập: chỉ hiển thị "Thông tin đại lý"
       activateSection('sectionInfo');
+
+      // Show sidebar/toc theo viewport
       toggleNavByViewport();
       window.addEventListener('resize', toggleNavByViewport);
 
+      // hiện nội dung, update bản quyền
       reportEl.classList.remove('hidden');
-      hintEl.textContent="Bản quyền trang web thuộc về Vùng Hằng Lâm®";
-      msdlInput.value=""; dateInput.value="";
-      setHeaderVars();
+      hintEl.textContent = "Bản quyền trang web thuộc về Vùng Hằng Lâm®";
+      hintEl.classList.remove('hidden');
+
+      // clear form
+      msdlInput.value=""; dateInput.value=""; msdlInput.blur(); dateInput.blur();
     };
 
-    /* ===== RENDER ===== */
-    function formatThousand(n,dec){ if(n===null||n===undefined||isNaN(+n)) return "";
-      const fixed=Number(n).toFixed(dec); let [i,f=""]=fixed.split('.'); const sign=i.startsWith('-')?'-':''; i=i.replace('-','').replace(/\B(?=(\d{3})+(?!\d))/g,'.'); return sign+i+(dec>0?','+f:""); }
-    function parseLocaleNumber(v){ if(v===null||v===undefined||v==='') return NaN; if(typeof v==='number') return v;
-      let s=String(v).trim().replace(/[^0-9,.\-]/g,''); if(s===''||s==='-'||s==='.'||s===',') return NaN;
-      const hasDot=s.includes('.'), hasComma=s.includes(','); if(hasDot&&hasComma){ if(s.lastIndexOf(',')>s.lastIndexOf('.')){ s=s.replace(/\./g,'').replace(',', '.'); } else { s=s.replace(/,/g,''); } }
-      else if(hasComma&&!hasDot){ s=s.replace(',', '.'); } const n=parseFloat(s); return isNaN(n)?NaN:n; }
-    function formatF3(v){ const n=parseLocaleNumber(v); return isNaN(n)? (v??"") : formatThousand(n,3); }
-    function formatNumber(v){ return (v??""); }
-    function addPercent(v){ return (v??""); }
-    function existsVal(v){ return !(v===null||v===undefined||(typeof v==='string'&&v.trim()==='')); }
-    function infoItem(label, value){ if(!existsVal(value)) return ''; return `<div class="info-item"><div class="label">${label}:</div><div class="val">${value}</div></div>`; }
-
+    /* ===== INFO SECTION ===== */
+    function infoItem(label, value){
+      if(!exists(value)) return '';
+      return `<div class="info-item"><div class="label">${label}:</div><div class="val">${value}</div></div>`;
+    }
     function renderInfoSection(row){
+      const p13cn = addPercent(row["TLDTHD cá nhân"]);
+      const p13nh = addPercent(row["TLDTHD toàn nhánh"]);
+      const p13c1 = addPercent(row["TLDTHD cấp 1"]);
+
       const proMoc3 = row["PRO.MOC 3 THANG"];
-      const hasAlert = existsVal(proMoc3) && String(proMoc3).trim() !== "-";
-      const alertHtml = hasAlert ? `<div class="pro-alert ${isMobile() ? 'info-alert' : ''}">Cảnh báo: <span style="font-weight:900;">Danh hiệu Manulife Pro</span> – ${proMoc3}</div>` : "";
-      const blocks = `
-        ${infoItem("Báo cáo dành cho", (row["TEN DAI LY"] || row["AGEN NAME"]))}
+      const hasAlert = exists(proMoc3) && String(proMoc3).trim() !== "-";
+      const alertHtml = hasAlert
+        ? `<div class="pro-alert ${isMobile() ? 'info-alert' : ''}">Cảnh báo: <span class="pro-name" style="font-weight:900;">Danh hiệu Manulife Pro</span> – ${proMoc3}</div>`
+        : "";
+
+      const firstBlock = infoItem("Báo cáo dành cho", (row["TEN DAI LY"] || row["AGEN NAME"]));
+      const restBlocks = `
         ${infoItem("KV | MS", row["KV|MS"])}
         ${infoItem("Ngày gia nhập", row["JOIN DATE"])}
         ${infoItem("Tháng làm việc", row["WORK MNTHS"])}
@@ -408,22 +483,25 @@
         ${infoItem("Nhóm đại lý", row["Nhóm Đại lý"])}
         ${infoItem("Manulife Pro (chính thức)", row["PRO.DH CHINH THUC"])}
         ${infoItem("Chính thức từ", row["PRO.BAT DAU"])}
-        ${infoItem("P13 Cá nhân", addPercent(row["TLDTHD cá nhân"]))}
-        ${infoItem("P13 Toàn nhánh", addPercent(row["TLDTHD toàn nhánh"]))}
-        ${infoItem("P13 cấp 1", addPercent(row["TLDTHD cấp 1"]))}
+        ${infoItem("P13 Cá nhân", p13cn)}
+        ${infoItem("P13 Toàn nhánh", p13nh)}
+        ${infoItem("P13 cấp 1", p13c1)}
         ${infoItem("Số liệu cập nhật đến ngày", row["NGAY CHOT DATA"])}
         ${infoItem("ĐVT", "Nghìn VND")}
       `;
-      const gridInner = isMobile() ? `${alertHtml}${blocks}` : blocks;
+      const gridInner = isMobile() ? `${alertHtml}${firstBlock}${restBlocks}` : `${firstBlock}${restBlocks}`;
       const alertAfter = (!isMobile() && hasAlert) ? alertHtml : "";
-      return `<div id="sectionInfo" class="section"><div class="section-title">Thông tin đại lý</div><div class="info-grid">${gridInner}</div>${alertAfter}</div>`;
+
+      return `
+        <div id="sectionInfo" class="section">
+          <div class="section-title">Thông tin đại lý</div>
+          <div class="info-grid">${gridInner}</div>
+          ${alertAfter}
+        </div>
+      `;
     }
 
-    function fmt(val,key="",label=""){
-      const needF3 = /fyp|fyc/i.test(String(label||key||""));
-      return needF3 ? formatF3(val) : (val ?? "");
-    }
-
+    /* ===== RENDER REPORT ===== */
     function renderReport(row){
       const Info = renderInfoSection(row);
 
@@ -435,19 +513,21 @@
             <li>Doanh thu FYP thực cấp: <span class="hl">${fmt(row["MTD.FYP CAP"], "MTD.FYP CAP", "Doanh thu FYP thực cấp")}</span></li>
             <li>Số lượng Đại lý mới tuyển dụng: <span class="hl">${formatNumber(row["RECRUIT T"])}</span></li>
           </ul>
-        </div>`;
+        </div>
+      `;
 
       const B = `
         <div id="sectionB" class="section hide">
           <div class="section-title">B. BÁO CÁO CHI TIẾT HOẠT ĐỘNG CÁ NHÂN</div>
+
           <div id="b1" class="sub-block">
             <div class="subsec lvl-1">1. Hoạt động bán hàng</div>
-            <div class="lvl-2">Nộp mới trong tháng</div>
+            <div class="thin lvl-2">Nộp mới trong tháng</div>
             <ul class="mb-2 list-dot bullet-strong lvl-3">
               <li>Tổng số hợp đồng: <span class="hl">${formatNumber(row["MTD.CC NOP"])}</span></li>
               <li>Tổng doanh thu FYP: <span class="hl">${fmt(row["MTD.FYP NOP"], "MTD.FYP NOP", "Tổng doanh thu FYP")}</span></li>
             </ul>
-            <div class="lvl-2">Thực cấp trong tháng</div>
+            <div class="thin lvl-2">Thực cấp trong tháng</div>
             <ul class="mb-2 list-dot bullet-strong lvl-3">
               <li>Tổng số hợp đồng: <span class="hl">${formatNumber(row["MTD.CC CAP"])}</span></li>
               <li>Tổng doanh thu FYP: <span class="hl">${fmt(row["MTD.FYP CAP"], "MTD.FYP CAP", "Tổng doanh thu FYP")}</span></li>
@@ -461,13 +541,35 @@
               <li>Tháng bắt đầu: <span class="hl">${formatNumber(row["PRO.BAT DAU"])}</span></li>
               <li>Tháng kết thúc: <span class="hl">${formatNumber(row["PRO.KET THUC"])}</span></li>
             </ul>
-            <div class="lvl-2">Thưởng năng suất xuất sắc tháng hiện tại:</div>
+            <div class="thin mb-1 lvl-2">Thưởng năng suất xuất sắc tháng hiện tại:</div>
             <ul class="mb-2 list-dot lvl-3">
               <li>Danh hiệu dùng để xét thưởng: <span class="hl">${formatNumber(row["PRO.DH XET THUONG"])}</span></li>
               <li>FYP phát sinh tính thưởng: <span class="hl">${fmt(row["PRO.FYP HIEN TAI"], "PRO.FYP HIEN TAI", "FYP phát sinh tính thưởng")}</span></li>
               <li>Mức thưởng tạm đạt: <span class="hl">${fmt(row["PRO.THUONG TAM DAT"], "PRO.THUONG TAM DAT", "Mức thưởng tạm đạt")}</span></li>
               <li>Cần thêm để đạt mức thưởng tiếp theo: <span class="hl">${fmt(row["PRO.FYP CAN TANG THUONG"], "PRO.FYP CAN TANG THUONG", "Cần thêm để đạt mức thưởng tiếp theo")}</span></li>
               <li>Mức thưởng tiếp theo: <span class="hl">${fmt(row["PRO.THUONG TIEP THEO"], "PRO.THUONG TIEP THEO", "Mức thưởng tiếp theo")}</span></li>
+            </ul>
+            <div class="thin mb-1 lvl-2">Theo dõi thăng hạng danh hiệu</div>
+            <ul class="mb-2 list-dot lvl-3">
+              <li>Tiến độ thăng hạng danh hiệu: <span class="hl">${addPercent(row["PRO % THANG HANG"])}</span></li>
+              <li>Kết quả tại tháng T-2: <span class="hl">${formatNumber(row["PRO.DH TAM TINH T-2"])}</span></li>
+              <li>Kết quả tại tháng T-1: <span class="hl">${formatNumber(row["PRO.DH TAM TINH T-1"])}</span></li>
+              <li>FYP cần thêm để thăng hạng: <span class="hl">${fmt(row["PRO.UP FYP CAN THEM"], "PRO.UP FYP CAN THEM", "FYP cần thêm để thăng hạng")}</span></li>
+              <li>CC cần thêm để để thăng hạng: <span class="hl">${formatNumber(row["PRO.UP CC CAN THEM"])}</span></li>
+              <li>Số tháng có hoạt động cần thêm: <span class="hl">${formatNumber(row["PRO.UP THANG CAN THEM"])}</span></li>
+              <li>Tỷ lệ P13 cần thêm để đạt danh hiệu: <span class="hl">${addPercent(row["PRO.UP P13 CAN THEM"])}</span></li>
+            </ul>
+            <div class="thin mb-1 lvl-2">Theo dõi duy trì danh hiệu</div>
+            <ul class="mb-2 list-dot lvl-3">
+              <li>Kết quả xét duy trì danh hiệu: <span class="hl">${formatNumber(row["PRO.KQ DUY TRI"])}</span></li>
+              <li>Tạm tính theo kết quả tại tháng T-2: <span class="hl">${formatNumber(row["PRO.DH TAM TINH T-2"])}</span></li>
+              <li>Tạm tính theo kết quả tại tháng T-1: <span class="hl">${formatNumber(row["PRO.DH TAM TINH T-1"])}</span></li>
+              <li>Danh hiệu tạm tính cao nhất: <span class="hl">${formatNumber(row["PRO.DH TAM TINH CAO NHAT"])}</span></li>
+              <li>Tiến độ duy trì danh hiệu: <span class="hl">${addPercent(row["PRO % MOC"])}</span></li>
+              <li>Giai đoạn đánh giá: <span class="hl">${formatNumber(row["PRO.GD MOC"])}</span></li>
+              <li>FYP đã đạt so với yêu cầu: <span class="hl">${fmt(row["PRO.MOC FYP"], "PRO.MOC FYP", "FYP đã đạt so với yêu cầu")}</span></li>
+              <li>Số tháng có hoạt động so với yêu cầu: <span class="hl">${formatNumber(row["PRO.MOC THANG HĐ"])}</span></li>
+              <li>Cảnh báo 3 tháng cuối kỳ xét: <span class="hl">${formatNumber(row["PRO.MOC 3 THANG"])}</span></li>
             </ul>
           </div>
 
@@ -484,7 +586,7 @@
           </div>
 
           <div id="b4" class="sub-block hide">
-            <div class="subsec lvl-1">4. Hành trình M-Star / Japan</div>
+            <div class="subsec lvl-1">4. Hành trình M-Star, Xứ sở hoa anh đào</div>
             <ul class="mb-2 list-dot lvl-2">
               <li>FYP phát sinh trong thời gian thi đua: <span class="hl">${fmt(row["JPAN.FYP THI DUA"], "JPAN.FYP THI DUA", "FYP phát sinh trong thời gian thi đua")}</span></li>
               <li>Tổng FYP cần thêm để đạt thi đua: <span class="hl">${fmt(row["JPAN.FYP CAN DAT"], "JPAN.FYP CAN DAT", "Tổng FYP cần thêm để đạt thi đua")}</span></li>
@@ -494,227 +596,150 @@
           </div>
 
           <div id="b5" class="sub-block hide">
-            <div class="subsec lvl-1">5. Thưởng kinh doanh xuất sắc năm</div>
+            <div class="subsec lvl-1">5. Khoản thưởng kinh doanh xuất sắc hàng năm</div>
             <ul class="mb-4 list-dot lvl-2">
               <li>Tổng số CC thực cấp (YTD): <span class="hl">${formatNumber(row["FC.FC CC YTD"])}</span></li>
               <li>Tổng FYP phát sinh (YTD): <span class="hl">${fmt(row["FC.FC FYP YTD"], "FC.FC FYP YTD", "Tổng FYP phát sinh (YTD)")}</span></li>
             </ul>
           </div>
-        </div>`;
+        </div>
+      `;
 
       const C = `
         <div id="sectionC" class="section hide">
-          <div class="section-title">C. BÁO CÁO CHI TIẾT HOẠT ĐỘNG TUYỂN DỤNG & HỆ THỐNG</div>
+          <div class="section-title">C. BÁO CÁO CHI TIẾT HOẠT ĐỘNG TUYỂN DỤNG VÀ HỆ THỐNG</div>
+
           <div id="c1" class="sub-block">
-            <div class="subsec lvl-1">1. Tuyển dụng</div>
+            <div class="subsec lvl-1">1. Hoạt động tuyển dụng</div>
             <ul class="mb-2 list-dot lvl-2">
               <li>Số lượng tuyển dụng trực tiếp tháng hiện tại: <span class="hl">${formatNumber(row["RECRUIT T"])}</span></li>
               <li>Số lượng tuyển dụng trực tiếp active M0: <span class="hl">${formatNumber(row["RECRUIT ACT T"])}</span></li>
             </ul>
           </div>
+
           <div id="c2" class="sub-block hide">
-            <div class="subsec lvl-1">2. Thăng cấp</div>
+            <div class="subsec lvl-1">2. Theo dõi thăng cấp</div>
             <ul class="mb-2 list-dot lvl-2">
               <li>Tiến độ thăng lên UM (đối với FA): <span class="hl">${addPercent(row["UP % FA TO UM"])}</span></li>
               <li>Vị trí thăng cấp: <span class="hl">${formatNumber(row["UP.TC LEN"])}</span></li>
               <li>Kết quả đánh giá: <span class="hl">${formatNumber(row["UP.KQ DG"])}</span></li>
               <li>Tiềm năng thăng cấp: <span class="hl">${formatNumber(row["UP.TIEM NANG TC UM"])}</span></li>
-              <li>Theo dõi các khóa đào tạo bắt buộc (Y/N): SBW: <span class="hl">${formatNumber(row["UP.SBW"])}</span> &nbsp; MS: <span class="hl">${formatNumber(row["UP.MS"])}</span> &nbsp; LS: <span class="hl">${formatNumber(row["UP.LS"])}</span> &nbsp; COACHING: <span class="hl">${formatNumber(row["UP.COACHING"])}</span></li>
+              <li>Theo dõi các khóa đào tạo bắt buộc (Y/N):<br>
+                SBW: <span class="hl">${formatNumber(row["UP.SBW"])}</span> &nbsp; 
+                MS: <span class="hl">${formatNumber(row["UP.MS"])}</span> &nbsp;
+                LS: <span class="hl">${formatNumber(row["UP.LS"])}</span> &nbsp;
+                COACHING: <span class="hl">${formatNumber(row["UP.COACHING"])}</span>
+              </li>
+              <li>Số lượng NRA với 1CC & 4tr FYC cần thêm: <span class="hl">${fmt(row["UP.CAN TD ACT 4TR FYC L3M"], "UP.CAN TD ACT 4TR FYC L3M", "FYC Whole team L6M sau luật 50% cần thêm")}</span></li>
+              <li>2A Số lượng đại lý còn làm việc Whole team cần thêm: <span class="hl">${formatNumber(row["UP.CAN CA WT"])}</span></li>
+              <li>2B Số lượng đại lý còn làm việc và có ≥ 15tr FYC L3M cần thêm: <span class="hl">${formatNumber(row["UP.CAN CA 15TR L3M"])}</span></li>
+              <li>Số lượng UM+ báo cáo trực tiếp cần thêm: <span class="hl">${formatNumber(row["UP.CAN UM+TT"])}</span></li>
+              <li>Nguồn sản xuất cần thêm: <span class="hl">${formatNumber(row["UP.CAN NGUON SX"])}</span></li>
               <li>FYC Whole team L6M sau luật 50% cần thêm: <span class="hl">${fmt(row["UP.CAN FYC WT L6M"], "UP.CAN FYC WT L6M", "FYC Whole team L6M sau luật 50% cần thêm")}</span></li>
             </ul>
           </div>
+
           <div id="c3" class="sub-block hide">
-            <div class="subsec lvl-1">3. Duy trì chức danh</div>
-            <div class="lvl-2">Đánh giá từ <span class="hl">${formatNumber(row["MOC.FROM"])}</span> đến <span class="hl">${formatNumber(row["MOC.TO"])}</span> của kỳ đánh giá ngày <span class="hl">${formatNumber(row["MOC.IN"])}</span></div>
+            <div class="subsec lvl-1">3. Theo dõi duy trì chức danh</div>
+            <div class="thin lvl-2">Đánh giá từ <span class="hl">${formatNumber(row["MOC.FROM"])}</span> đến <span class="hl">${formatNumber(row["MOC.TO"])}</span> của kỳ đánh giá ngày <span class="hl">${formatNumber(row["MOC.IN"])}</span></div>
+            <ul class="mb-2 list-dot lvl-3">
+              <li>Chức danh hiện tại: <span class="hl">${formatNumber(row["MOC.RANK"])}</span></li>
+              <li>Tháng tại chức: <span class="hl">${formatNumber(row["MOC.TAI VI"])}</span></li>
+              <li>Kết quả đánh giá tạm tính (Y/N): <span class="hl">${formatNumber(row["MOC.KQ TAM TINH"])}</span></li>
+              <li>Theo dõi các khóa đào tạo bắt buộc (Y/N):<br>
+                MS: <span class="hl">${formatNumber(row["UP.MS"])}</span> &nbsp;
+                LS: <span class="hl">${formatNumber(row["UP.LS"])}</span> &nbsp;
+                COACHING: <span class="hl">${formatNumber(row["UP.COACHING"])}</span>
+              </li>
+              <li>Số lượng NRA với 1CC & 4tr FYC cần thêm: <span class="hl">${fmt(row["MOC.CAN TD ACT 4TR L6M"], "MOC.CAN TD ACT 4TR L6M", "FYC Whole team L6M sau luật 50% cần thêm")}</span></li>
+              <li>Số lượng UM+ báo cáo trực tiếp cần thêm: <span class="hl">${formatNumber(row["MOC.CAN UM+ TT"])}</span></li>
+              <li>FYP Whole team L6M sau luật 50% cần thêm: <span class="hl">${fmt(row["MOC.CAN FYC WT L6M"], "MOC.CAN FYC WT L6M", "FYP Whole team L6M sau luật 50% cần thêm")}</span></li>
+              <li>Tỷ lệ duy trì P13 cần thêm: <span class="hl">${addPercent(row["MOC.CAN P13 WT"])}</span></li>
+            </ul>
           </div>
+
           <div id="c4" class="sub-block hide">
-            <div class="subsec lvl-1">4. MBA Pro</div>
-            <ul class="mb-2 list-dot lvl-2"><li>Danh hiệu chính thức hiện tại: <span class="hl">${formatNumber(row["MBA.DH CT HIEN TAI"])}</span></li></ul>
-          </div>
-          <div id="c5" class="sub-block hide">
-            <div class="subsec lvl-1">5. Thưởng nhóm ưu tú</div>
+            <div class="subsec lvl-1">4. Danh hiệu MBA Pro</div>
             <ul class="mb-2 list-dot lvl-2">
+              <li>Danh hiệu chính thức hiện tại: <span class="hl">${formatNumber(row["MBA.DH CT HIEN TAI"])}</span></li>
+              <li><span class="thin">Theo dõi thăng hạng:</span></li>
+            </ul>
+            <ul class="mb-2 list-dot lvl-3">
+              <li>Tiềm năng thăng hạng (FYC ≥ 80% yêu cầu hạn tiếp theo): <span class="hl">${fmt(row["MBA.TIEM NANG 80%FYC"], "MBA.TIEM NANG 80%FYC", "FYC cá nhân UM+ và ĐL trực tiếp L12M sau luật 50%")}</span></li>
+              <li>Số lượng đại lý đạt chuẩn trong quý: <span class="hl">${formatNumber(row["MBA.TH DL DAT CHUAN TRONG QUY"])}</span></li>
+              <li>Số lượng đại lý đạt chuẩn trong 2 quý: <span class="hl">${formatNumber(row["MBA.TH DL DAT CHUAN 2 QUY"])}</span></li>
+              <li>FYC cá nhân UM+ và ĐL trực tiếp L12M sau luật 50%: <span class="hl">${fmt(row["MBA.TH FYC TO TT SAU 50"], "MBA.TH FYC TO TT SAU 50", "FYC cá nhân UM+ và ĐL trực tiếp L12M sau luật 50%")}</span></li>
+              <li>Số UM+ mới thăng cấp L12M: <span class="hl">${formatNumber(row["MBA.TH UM+ MOI L12M"])}</span></li>
+              <li>P13 cấp báo cáo trực tiếp: <span class="hl">${addPercent(row["MBA.TH P13 BCTT"])}</span></li>
+              <li>Danh hiệu MBA Pro tạm tính theo kết quả xét thăng hạng: <span class="hl">${formatNumber(row["MBA.TH DH TAM TINH QUY SAU"])}</span></li>
+            </ul>
+            <ul class="mb-2 list-dot lvl-2"><li><span class="thin">Theo dõi duy trì hạng:</span></li></ul>
+            <ul class="mb-2 list-dot lvl-3">
+              <li>Kết quả xét duy trì tạm tính: <span class="hl">${formatNumber(row["MBA.KQ DT DH HTAI"])}</span></li>
+              <li>Số quý liên tục giữ danh hiệu MBA Pro hiện tại: <span class="hl">${formatNumber(row["MBA.DT SO QUY LIEN TUC"])}</span></li>
+              <li>Số lượng Manulife Pro có sản xuất trong quý: <span class="hl">${formatNumber(row["MBA.SO MANPRO ACT TRONG QUY"])}</span></li>
+              <li>FYC cá nhân UM+ và ĐL trực tiếp L12M sau luật 50%: <span class="hl">${fmt(row["MBA.TH FYC TO TT SAU 50"], "MBA.TH FYC TO TT SAU 50", "FYC cá nhân UM+ và ĐL trực tiếp L12M sau luật 50%")}</span></li>
+              <li>Số UM+ mới thăng cấp L12M: <span class="hl">${formatNumber(row["MBA.TH UM+ MOI L12M"])}</span></li>
+            </ul>
+            <ul class="mb-2 list-dot lvl-2"><li>Danh hiệu tạm tính quý sau (sau thăng hạng & duy trì): <span class="hl">${formatNumber(row["MBA.DH TAM TINH QUY SAU"])}</span></li></ul>
+          </div>
+
+          <div id="c5" class="sub-block hide">
+            <div class="subsec lvl-1">5. Thưởng năng suất nhóm ưu tú hàng tháng</div>
+            <ul class="mb-2 list-dot lvl-2">
+              <li>Tổng CC phát sinh trong tháng của bản thân UM+ (A): <span class="hl">${formatNumber(row["OTEAM.CC UM+"])}</span></li>
+              <li>Tổng FYP phát sinh trong tháng của bản thân UM+ (A): <span class="hl">${fmt(row["OTEAM.FYP UM+"], "OTEAM.FYP UM+", "Tổng FYP phát sinh trong tháng của bản thân UM+ (A)")}</span></li>
+              <li>Số NRA có ≥1CC và 15tr FYP L3M của bản thân UM+(A): <span class="hl">${formatNumber(row["OTEAM.TDTT ACT"])}</span></li>
+              <li>FYP của bản thân UM+ (A) và nhóm trực tiếp sau luật 50%: <span class="hl">${fmt(row["OTEAM.TONG FYP TT"], "OTEAM.TONG FYP TT", "FYP của bản thân UM+ (A) và nhóm trực tiếp sau luật 50%")}</span></li>
+              <li>FYP của bản thân UM+ (B) báo cáo trực tiếp cho UM+ (A): <span class="hl">${fmt(row["OTEAM.FYP UM+ MOI"], "OTEAM.FYP UM+ MOI", "FYP của bản thân UM+ (B) báo cáo trực tiếp cho UM+ (A)")}</span></li>
+              <li>Tổng FYP sau luật 50% dùng để tính thưởng (cấp UM): <span class="hl">${fmt(row["OTEAM.TONG FYP SAU LUAT XET THUONG"], "OTEAM.TONG FYP SAU LUAT XET THUONG", "Tổng FYP sau luật 50% dùng để tính thưởng (cấp UM)")}</span></li>
+              <li>Tổng FYP WT trước luật 50% (cấp SUM+): <span class="hl">${fmt(row["OTEAM.FYP WT TRUOC LUAT"], "OTEAM.FYP WT TRUOC LUAT", "Tổng FYP WT trước luật 50% (cấp SUM+)")}</span></li>
+              <li>Tổng FYP WT sau luật 50% để tính thưởng (cấp SUM+):(2): <span class="hl">${fmt(row["OTEAM.FYP WT SAU LUAT"], "OTEAM.FYP WT SAU LUAT", "Tổng FYP WT sau luật 50% để tính thưởng (cấp SUM+)")}</span></li>
+              <li>Y/c về tổng FYP: <span class="hl">${fmt(row["OTEAM.Y/C TONG FYP"], "OTEAM.Y/C TONG FYP", "Y/c về tổng FYP")}</span></li>
+              <li>Y/c về bán cá nhân: <span class="hl">${formatNumber(row["OTEAM.Y/C SX CA NHAN"])}</span></li>
+              <li>Y/c về tuyển có active: <span class="hl">${formatNumber(row["OTEAM.Y/C TDTT ACT"])}</span></li>
+              <li>Kết quả đạt thưởng thi đua (Y/N): <span class="hl">${formatNumber(row["OTEAM.DAT THUONG"])}</span></li>
+              <li>Tỷ lệ P13: <span class="hl">${addPercent(row["OTEAM.P13"])}</span></li>
+              <li>Hệ số nhân TLDTHD: <span class="hl">${formatNumber(row["OTEAM.HE SO THUONG"])}</span></li>
               <li>Thưởng dự tính sau khi đã nhân hệ số TLDTHD: <span class="hl">${fmt(row["OTEAM.TIEN THUONG"], "OTEAM.TIEN THUONG", "Thưởng dự tính sau khi đã nhân hệ số TLDTHD")}</span></li>
             </ul>
           </div>
-        </div>`;
+        </div>
+      `;
 
-      /* ==== Công cụ THU NHẬP (giữ nguyên thuật toán; chỉ tính khi bấm nút) ==== */
-      const Income = `<!-- (phần này được giữ nguyên thuật toán từ phiên bản trước) -->
+      // Tính thu nhập
+      const ms = encodeURIComponent(lastMsdl || '');
+      const jd = encodeURIComponent(normalizeDate(lastJoin || ''));
+      const incomeURL = `https://dutinhthunhap.vunghanglam.com/?msdl=${ms}&join=${jd}`;
+      const Income = `
         <div id="sectionIncome" class="section hide">
-          <div class="section-title">CÔNG CỤ DỰ TÍNH THU NHẬP</div>
-          <!-- ====== CONTENT FROM PREVIOUS TOOL (unchanged) ====== -->
-          <div id="incomeApp">
-            <div class="container" id="app-root">
-              <div class="note-green">(Vui lòng nhập thông tin tại các ô tô màu)</div>
-              <div class="note-right">Dữ liệu tham chiếu được chốt đến 31/07/2025</div>
-              <hr />
-              <div class="top-fields">
-                <div class="field w-6">
-                  <label for="month-select"><b>Tháng dự tính</b></label>
-                  <select id="month-select"></select>
-                </div>
-              </div>
-              <hr />
-              <div class="top-fields">
-                <div class="field" style="flex: 6">
-                  <label for="ho-ten"><b>Họ và tên</b></label>
-                  <input type="text" id="ho-ten" readonly />
-                </div>
-                <div class="field" style="flex: 0.5">
-                  <label for="khu-vuc"><b>Khu vực</b></label>
-                  <input type="text" id="khu-vuc" readonly />
-                </div>
-              </div>
-              <div class="top-fields">
-                <div class="field" style="flex: 1.5">
-                  <label for="thang-lam-viec"><b>Thâm niên (tháng)</b></label>
-                  <input type="text" id="thang-lam-viec" readonly />
-                </div>
-                <div class="field" style="flex: 4">
-                  <label for="nhom-dai-ly"><b>Phân nhóm đại lý</b></label>
-                  <input type="text" id="nhom-dai-ly" readonly />
-                </div>
-              </div>
-              <div class="top-fields">
-                <div class="field" style="flex: 1">
-                  <label for="p13-ca-nhan"><b>P13 cá nhân</b></label>
-                  <input type="text" id="p13-ca-nhan" readonly />
-                </div>
-                <div class="field" style="flex: 1">
-                  <label for="he-so-thuong"><b>Hệ số tính thưởng</b></label>
-                  <input type="text" id="he-so-thuong" readonly />
-                </div>
-              </div>
-              <div class="top-fields">
-                <div class="field" style="flex: 1">
-                  <label for="mdrt-fyp"><b>∑ FYP DH MDRT</b></label>
-                  <input type="text" id="mdrt-fyp" readonly />
-                </div>
-                <div class="field" style="flex: 1">
-                  <label for="tong-fyc"><b>∑ FYC T-1 và T-2</b></label>
-                  <input type="text" id="tong-fyc" readonly />
-                </div>
-                <div class="field" style="flex: 1">
-                  <label for="tong-fyc-quy"><b>∑ FYC Quý hiện tại</b></label>
-                  <input type="text" id="tong-fyc-quy" readonly />
-                </div>
-              </div>
-              <hr />
-              <h2>MỤC TIÊU THÁNG HIỆN TẠI</h2>
-              <div id="memo-giai-doan">
-                <div class="gd-stage">
-                  <b>Giai đoạn 1 (1-11/8)</b>
-                  <div class="top-fields-2" style="flex:1">
-                    <div class="field"><label for="fypchinh-gd1"><b>FYP SP chính</b></label><input type="text" inputmode="decimal" id="fypchinh-gd1" /></div>
-                    <div class="field"><label for="fypkem-gd1"><b>FYP SP gắn kèm</b></label><input type="text" inputmode="decimal" id="fypkem-gd1" /></div>
-                  </div>
-                  <div class="top-fields-2" style="flex:1">
-                    <div class="field"><label for="sohd-gd1"><b>Số HĐ</b></label><input type="number" id="sohd-gd1" /></div>
-                    <div class="field"><label for="fyp-gd1"><b>∑ FYP</b></label><input type="text" id="fyp-gd1" readonly /></div>
-                  </div>
-                  <div class="top-fields-2" style="flex:1">
-                    <div class="field"><label for="thuongmemo-gd1"><b>Thưởng Memo Giai đoạn 1</b></label><input type="text" id="thuongmemo-gd1" readonly /><span id="alert-gd1" style="color:red;display:none"></span></div>
-                  </div>
-                </div>
-                <div class="gd-stage">
-                  <b>Giai đoạn 2 (12-25/8)</b>
-                  <div class="top-fields-2" style="flex:1">
-                    <div class="field"><label for="fypchinh-gd2"><b>FYP SP chính</b></label><input type="text" inputmode="decimal" id="fypchinh-gd2" /></div>
-                    <div class="field"><label for="fypkem-gd2"><b>FYP SP gắn kèm</b></label><input type="text" inputmode="decimal" id="fypkem-gd2" /></div>
-                  </div>
-                  <div class="top-fields-2" style="flex:1">
-                    <div class="field"><label for="sohd-gd2"><b>Số HĐ</b></label><input type="number" id="sohd-gd2" /></div>
-                    <div class="field"><label for="fyp-gd2"><b>∑ FYP</b></label><input type="text" id="fyp-gd2" readonly /></div>
-                  </div>
-                  <div class="top-fields-2" style="flex:1">
-                    <div class="field"><label for="thuongmemo-gd2"><b>Thưởng Memo Giai đoạn 2</b></label><input type="text" id="thuongmemo-gd2" readonly /><span id="alert-gd2" style="color:red;display:none"></span></div>
-                  </div>
-                </div>
-                <div class="gd-stage">
-                  <b>Giai đoạn 3 (26-31/8)</b>
-                  <div class="top-fields-2" style="flex:1">
-                    <div class="field"><label for="fypchinh-gd3"><b>FYP SP chính</b></label><input type="text" inputmode="decimal" id="fypchinh-gd3" /></div>
-                    <div class="field"><label for="fypkem-gd3"><b>FYP SP gắn kèm</b></label><input type="text" inputmode="decimal" id="fypkem-gd3" /></div>
-                  </div>
-                  <div class="top-fields-2" style="flex:1">
-                    <div class="field"><label for="sohd-gd3"><b>Số HĐ</b></label><input type="number" id="sohd-gd3" /></div>
-                    <div class="field"><label for="fyp-gd3"><b>∑ FYP</b></label><input type="text" id="fyp-gd3" readonly /></div>
-                  </div>
-                  <div class="top-fields-2" style="flex:1">
-                    <div class="field"><label for="thuongmemo-gd3"><b>Thưởng Memo Giai đoạn 3</b></label><input type="text" id="thuongmemo-gd3" readonly /><span id="alert-gd3" style="color:red;display:none"></span></div>
-                  </div>
-                </div>
-                <br />
-                <div>
-                  <b>TỔNG HỢP</b>
-                  <div class="top-fields" style="flex:1">
-                    <div class="field"><label for="tong-cc"><b>∑ Số lượng Hợp đồng</b></label><input type="number" id="tong-cc" readonly /></div>
-                    <div class="field"><label for="fyp-chinh"><b>∑ FYP SP chính</b></label><input type="text" id="fyp-chinh" readonly /></div>
-                    <div class="field"><label for="fyp-kem"><b>∑ FYP SP gắn kèm</b></label><input type="text" id="fyp-kem" readonly /></div>
-                  </div>
-                  <div class="top-fields">
-                    <div class="field" style="flex:3"><label for="tong-fyp"><b>∑ FYP Từ các HĐ</b></label><input type="text" id="tong-fyp" readonly /></div>
-                    <div class="field" style="flex:3;display:flex;gap:10px;align-items:flex-end;">
-                      <button id="calc-btn" type="button">Tính thu nhập</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <hr />
-              <h2>CÁC KHOẢN THU NHẬP</h2>
-              <div class="income-mini-title"><b>1. Hoa hồng sản phẩm (FYC)</b></div>
-              <div class="top-fields">
-                <div class="field" style="flex:1"><label><b>FYC SP chính (30%)</b></label><input type="text" id="fyc-chinh" readonly /></div>
-                <div class="field" style="flex:1"><label><b>FYC SP gắn kèm (20%)</b></label><input type="text" id="fyc-kem" readonly /></div>
-              </div>
-              <div class="top-fields">
-                <div class="field" style="flex:1"><label><b>Thưởng thêm SP gắn kèm (20%)</b></label><input type="text" id="thuong-kem" readonly /></div>
-                <div class="field" style="flex:1"><label><b>FYC Tính chính sách</b></label><input type="text" id="fyc-thuong" readonly /></div>
-              </div>
-              <div class="income-mini-title"><b>2. Thưởng theo Chính sách chi trả</b></div>
-              <div class="top-fields">
-                <div class="field" style="flex:1"><label><b>Thưởng NSXS Manulife Pro</b></label><input type="text" id="thuong-nspro" readonly /></div>
-                <div class="field" style="flex:1"><label><b>Thưởng Năng suất hàng tháng</b></label><input type="text" id="thuong-nst" readonly /></div>
-              </div>
-              <div class="top-fields">
-                <div class="field" style="flex:1"><label><b>Thưởng Năng suất hàng Quý</b></label><input type="text" id="thuong-nsq" readonly /></div>
-                <div class="field" style="flex:1"><label><b>Thưởng Tiến độ MDRT</b></label><input type="text" id="thuong-mdrt" readonly /></div>
-              </div>
-              <div class="income-mini-title"><b>3. Thưởng theo Memo hàng Tháng</b></div>
-              <div class="top-fields">
-                <div class="field" style="flex:1"><label for="thuong-memo" class="income-note"><b>0001M08/2025/ASBD</b></label><input type="text" id="thuong-memo" maxlength="12" readonly /></div>
-              </div>
-              <hr />
-              <h2>THU NHẬP</h2>
-              <div class="summary-row">
-                <div class="summary-block"><label for="tong-thu-nhap">Tổng thu nhập dự kiến</label><input type="text" id="tong-thu-nhap" readonly /></div>
-                <div class="summary-block"><label for="ty-le-thu-nhap">Tỷ lệ thu nhập/doanh thu</label><input type="text" id="ty-le-thu-nhap" readonly /></div>
-              </div>
-              <hr><h2>CHÚC BẠN SỞ HỮU TỐI ĐA THU NHẬP</h2>
-            </div>
+          <div class="section-title">Tính thu nhập</div>
+          <div>
+            <iframe id="incomeFrame" src="${incomeURL}" class="w-full h-[78vh] border rounded-lg"></iframe>
           </div>
-        </div>`;
+        </div>
+      `;
 
+      // ghép & chỉ hiển thị Info ban đầu
       reportEl.innerHTML = Info + A + B + C + Income;
 
-      // Dropdown mobile
+      // TOC mobile: chuyển section khi chọn
       const sel = document.getElementById('tocSelect');
       sel.onchange = (e)=>{
         const v=e.target.value; if(!v) return;
         if(v.includes('#')){ const [parent,anchor]=v.split('#'); activateSection(parent,'#'+anchor); }
         else { activateSection(v); }
       };
-
-      // Khởi tạo công cụ thu nhập
-      initIncomeTool(row);
     }
 
+    /* ===== NAV ===== */
     function buildSidebarNav(){
       navEl.innerHTML = `
         <div class="font-extrabold text-emerald-800 mb-2">Danh mục</div>
+
         <a href="#" data-type="section" data-target="sectionInfo" class="menu-item active">Thông tin đại lý</a>
         <a href="#" data-type="section" data-target="sectionA" class="menu-item">A. Tổng quan (MTD)</a>
+
         <div class="menu-item-group">
           <div class="menu-head">B. Hoạt động cá nhân</div>
           <div class="submenu">
@@ -725,6 +750,7 @@
             <a href="#" data-type="sub" data-parent="sectionB" data-anchor="#b5">B.5 Thưởng năm</a>
           </div>
         </div>
+
         <div class="menu-item-group">
           <div class="menu-head">C. Tuyển dụng & Hệ thống</div>
           <div class="submenu">
@@ -735,7 +761,8 @@
             <a href="#" data-type="sub" data-parent="sectionC" data-anchor="#c5">C.5 Thưởng nhóm ưu tú</a>
           </div>
         </div>
-        <a href="#" data-type="section" data-target="sectionIncome" class="menu-item">CÔNG CỤ DỰ TÍNH THU NHẬP</a>
+
+        <a href="#" data-type="section" data-target="sectionIncome" class="menu-item">Tính thu nhập</a>
       `;
       navEl.querySelectorAll('a').forEach(a=>{
         a.addEventListener('click',(e)=>{
@@ -750,162 +777,54 @@
       });
     }
 
+    /* ===== ACTIVATE SECTION ===== */
     function activateSection(sectionId, anchor){
+      // Ẩn mọi section
       document.querySelectorAll('#report .section').forEach(sec=>sec.classList.add('hide'));
-      const section=document.getElementById(sectionId); if(!section) return;
+      const section = document.getElementById(sectionId); if(!section) return;
       section.classList.remove('hide');
 
+      // Nếu chọn mục con, chỉ hiển thị block đó
       section.querySelectorAll('.sub-block').forEach(sb=>sb.classList.remove('hide'));
-      if(anchor){ section.querySelectorAll('.sub-block').forEach(sb=>sb.classList.add('hide')); const sub=section.querySelector(anchor); if(sub) sub.classList.remove('hide'); }
+      if(anchor){
+        section.querySelectorAll('.sub-block').forEach(sb=>sb.classList.add('hide'));
+        const sub = section.querySelector(anchor); if(sub) sub.classList.remove('hide');
+      }
 
+      // Active menu
       document.querySelectorAll('#nav .menu-item, #nav .submenu a').forEach(el=>el.classList.remove('active'));
-      if(!anchor){ const top=document.querySelector(`#nav .menu-item[data-target="${sectionId}"]`); if(top) top.classList.add('active'); }
-      else { const sublink=document.querySelector(`#nav .submenu a[data-parent="${sectionId}"][data-anchor="${anchor}"]`); if(sublink) sublink.classList.add('active'); }
+      if(!anchor){
+        const top=document.querySelector(`#nav .menu-item[data-target="${sectionId}"]`);
+        if(top) top.classList.add('active');
+      } else {
+        const sublink=document.querySelector(`#nav .submenu a[data-parent="${sectionId}"][data-anchor="${anchor}"]`);
+        if(sublink) sublink.classList.add('active');
+      }
 
+      // Đồng bộ dropdown mobile
       const select=document.getElementById('tocSelect');
-      if (select && getComputedStyle(tocMbEl).display!=='none'){ select.value = anchor?`${sectionId}${anchor}`:sectionId; }
+      if (select && getComputedStyle(tocMbEl).display!=='none'){
+        const value=anchor?`${sectionId}${anchor}`:sectionId;
+        const opt=Array.from(select.options).find(o=>o.value===value);
+        if(opt) select.value=value;
+      }
 
+      // cuộn tới đầu section
       scrollToSectionStart(sectionId);
     }
 
-    /* ===== INCOME TOOL – giữ thuật toán; chỉ tính khi bấm nút ===== */
-    function initIncomeTool(rowFromLogin){
-      // (nguyên vẹn code tool – lược bỏ phần lặp chú thích để ngắn)
-      let incomeData=[], nspro=[], nst6=[], nst7=[], nsq6=[], nsq7=[], hsdt=[], trackingMDRT=[];
-      const NF3=new Intl.NumberFormat('vi-VN',{minimumFractionDigits:3,maximumFractionDigits:3});
-      const formatMoney3=(v)=>{const n=Number(v);return Number.isFinite(n)?NF3.format(n):'';};
-      function parseMoney3(s){ if(typeof s==='number') return s; if(!s) return 0; const x=String(s).replace(/\./g,'').replace(',', '.').trim(); const n=parseFloat(x); return Number.isFinite(n)?n:0; }
-      const rmAccent=s=>(s??'').toString().normalize('NFKD').replace(/[\u0300-\u036f]/g,'');
-      function normKeyMap(o){const m={}; for(const k of Object.keys(o)) m[rmAccent(k).replace(/\s+/g,'').toUpperCase()]=k; return m;}
-      function getByKeyLoose(r,t){const map=normKeyMap(r); const w=rmAccent(t).replace(/\s+/g,'').toUpperCase(); const a=map[w]; return a? r[a]:undefined;}
-      async function firstJson(arr){ for(const u of arr){ try{ const r=await fetch(u,{cache:'no-store'}); if(r.ok) return await r.json(); }catch{} } return null; }
-      async function loadIncome(){
-        try{ const r=await fetch('dataincome.json',{cache:'no-store'}); if(r.ok) incomeData=await r.json(); }catch{}
-        nspro=await firstJson(['nspro.json','NSPRO.json','Nspro.json'])||[];
-        nst6 =await firstJson(['6nst.json','6NST.json'])||[];
-        nst7 =await firstJson(['7nst.json','7NST.json'])||[];
-        nsq6 =await firstJson(['6NSQ.json','6nsq.json'])||[];
-        nsq7 =await firstJson(['7NSQ.json','7nsq.json'])||[];
-        hsdt =await firstJson(['hsdt.json','HSDT.json'])||[];
-        trackingMDRT=await firstJson(['trackingmdrt.json','TRACKING MDRT.json','TRACKING%20MDRT.json'])||[];
-      }
+    /* ===== INIT ===== */
+    function init(){
+      fitTitles();
+      updateLayoutVars();
 
-      function parseIntOnly(id){ return parseInt((document.getElementById(id).value||'').replace(/[^\d]/g,''),10)||0; }
-      function getNum(id){ return parseMoney3(document.getElementById(id).value); }
-      function setMoney(id,val){ const el=document.getElementById(id); if(el) el.value=formatMoney3(val||0); }
-
-      function updateSumsOnly(){
-        const cc1=parseIntOnly('sohd-gd1'), cc2=parseIntOnly('sohd-gd2'), cc3=parseIntOnly('sohd-gd3');
-        const ccEl=document.getElementById('tong-cc'); if(ccEl) ccEl.value=cc1+cc2+cc3;
-        function n(id){ return getNum(id); }
-        const f1c=n('fypchinh-gd1'), f2c=n('fypchinh-gd2'), f3c=n('fypchinh-gd3');
-        const f1k=n('fypkem-gd1'), f2k=n('fypkem-gd2'), f3k=n('fypkem-gd3');
-        const fyp1=f1c+f1k, fyp2=f2c+f2k, fyp3=f3c+f3k;
-        setMoney('fyp-gd1',fyp1); setMoney('fyp-gd2',fyp2); setMoney('fyp-gd3',fyp3);
-        const fypCh=f1c+f2c+f3c, fypKem=f1k+f2k+f3k;
-        setMoney('fyp-chinh',fypCh); setMoney('fyp-kem',fypKem); setMoney('tong-fyp',fypCh+fypKem);
-        ['thuongmemo-gd1','thuongmemo-gd2','thuongmemo-gd3','thuong-memo','fyc-chinh','fyc-kem','thuong-kem','fyc-thuong','thuong-nspro','thuong-nst','thuong-nsq','thuong-mdrt','tong-thu-nhap','ty-le-thu-nhap'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
-        ['alert-gd1','alert-gd2','alert-gd3'].forEach(id=>{ const el=document.getElementById(id); if(el){ el.textContent=''; el.style.display='none'; } });
-      }
-
-      function optimizeMemo(fyp,cap,m1,t1,m2,t2){
-        const F=Math.max(0,Number(fyp)||0); const limit=(cap==null||cap<=0)?Infinity:Math.max(0,Math.floor(cap));
-        let best=0, used=0; const max25=Math.floor(F/25000); const loops=Math.min(max25,limit);
-        for(let k25=0;k25<=loops;k25++){ const rem=F-k25*25000; const remain=(limit===Infinity)?Infinity:(limit-k25); const k16=Math.min(Math.floor(rem/16000),remain); const u=k25+k16; const r=k25*t1+k16*t2; if(r>best||(r===best&&u<used)){ best=r; used=u; } }
-        return {reward:best,used};
-      }
-      function calcMemoStage(gd,sohd,tFYP){
-        let t1,t2; if(gd==='gd1'){t1=2500;t2=1500;} else if(gd==='gd2'){t1=2000;t2=1000;} else {t1=1500;t2=750;}
-        const best = optimizeMemo(tFYP, sohd, 25000,t1,16000,t2);
-        let alert=''; if(sohd>0 && sohd<best.used) alert=`Thưởng tối ưu cần ${best.used} HĐ; bạn nhập ${sohd}.`;
-        return {reward:best.reward, alert};
-      }
-      function computeMemoAllStages(){
-        const cc1=parseIntOnly('sohd-gd1'), cc2=parseIntOnly('sohd-gd2'), cc3=parseIntOnly('sohd-gd3');
-        const m1=calcMemoStage('gd1',cc1,getNum('fyp-gd1'));
-        const m2=calcMemoStage('gd2',cc2,getNum('fyp-gd2'));
-        const m3=calcMemoStage('gd3',cc3,getNum('fyp-gd3'));
-        setMoney('thuongmemo-gd1',m1.reward); setMoney('thuongmemo-gd2',m2.reward); setMoney('thuongmemo-gd3',m3.reward);
-        const a1=document.getElementById('alert-gd1'), a2=document.getElementById('alert-gd2'), a3=document.getElementById('alert-gd3');
-        if(a1){ a1.textContent=m1.alert||''; a1.style.display=m1.alert?'block':'none'; }
-        if(a2){ a2.textContent=m2.alert||''; a2.style.display=m2.alert?'block':'none'; }
-        if(a3){ a3.textContent=m3.alert||''; a3.style.display=m3.alert?'block':'none'; }
-        setMoney('thuong-memo',(m1.reward||0)+(m2.reward||0)+(m3.reward||0));
-      }
-      function getHeSoThuong(p13){ const n=Number(p13); if(!isFinite(n)) return 1; let best=1; for(const r of hsdt){ const need=Number(r["P13 cá nhân"]); const rate=Number(r["TỶ LỆ"]); if(need==null){ if(rate) best=rate; continue; } if(n>=need && rate>best) best=rate; } return best; }
-      function detectProGrade(nhom){ const s=rmAccent(nhom||'').toLowerCase(); if(/\bbach\s*kim\b|platinum/.test(s)) return 'BACHKIM'; if(/\bvang\b|gold/.test(s)) return 'VANG'; if(/\bbac\b|silver/.test(s)) return 'BAC'; if(/\bpro\b|manulife\s*pro/.test(s)) return 'BAC'; return null; }
-      function calculateNSPro(){
-        const nhom=document.getElementById("nhom-dai-ly").value||''; const grade=detectProGrade(nhom); const tongFYP=getNum('tong-fyp');
-        if(!grade || !nspro.length || !tongFYP){ setMoney('thuong-nspro',0); return; }
-        let base=0; for(const r of nspro){
-          const need=parseMoney3(getByKeyLoose(r,"FYP của tháng xét thưởng")); if(tongFYP<need) continue;
-          const keys=normKeyMap(r); let colKey=null;
-          if(grade==='BACHKIM') colKey=keys['MANULIFEPROBACHKIM']||keys['PROBACHKIM']||keys['BACHKIM'];
-          else if(grade==='VANG') colKey=keys['MANULIFEPROVANG']||keys['PROVANG']||keys['VANG'];
-          else colKey=keys['MANULIFEPROBAC']||keys['PROBAC']||keys['BAC'];
-          const val = colKey? r[colKey] : 0; base=Math.max(base, parseMoney3(val));
-        }
-        const hs=parseFloat(document.getElementById("he-so-thuong").value)||1; setMoney('thuong-nspro', base*hs);
-      }
-      function calculateNST(){
-        const th=parseInt((document.getElementById("thang-lam-viec").value||'').replace(/[^\d]/g,''),10)||0; const table=(th<=6)?nst6:nst7;
-        const tongFYC=parseMoney3(document.getElementById("tong-fyc").value); const fycThuong=parseMoney3(document.getElementById("fyc-thuong").value); const sum=tongFYC+fycThuong;
-        let rate=0; for(const r of table){ const need=parseMoney3(getByKeyLoose(r,"FYC trong 3 tháng gần nhất")); const rt=parseFloat(getByKeyLoose(r,"% Tỷ lệ thưởng năng suất tháng"))||0; if(sum>=need && rt>=rate) rate=rt; }
-        const hs=parseFloat(document.getElementById("he-so-thuong").value)||1; setMoney('thuong-nst', fycThuong*rate*hs);
-      }
-      function calculateNSQ(){
-        const m=parseInt((document.getElementById("month-select").value||'').replace(/[^\d]/g,''),10)||0; if(![3,6,9,12].includes(m)){ setMoney('thuong-nsq',0); return; }
-        const th=parseInt((document.getElementById("thang-lam-viec").value||'').replace(/[^\d]/g,''),10)||0; const table=(th<=6)?nsq6:nsq7;
-        const cur=parseMoney3(document.getElementById("tong-fyc-quy").value); const fycThuong=parseMoney3(document.getElementById("fyc-thuong").value); const sum=cur+fycThuong;
-        const nhom=(document.getElementById("nhom-dai-ly").value||"").trim(); const s=rmAccent(nhom);
-        let rate=0; for(const r of table){ const need=parseMoney3(getByKeyLoose(r,"FYC của quý xét thưởng")); if(sum>=need){ const keys=normKeyMap(r); let val; if(/manulife\s*pro/i.test(s)||/manulife$/i.test(s)) val=r[keys['MANULIFE']]; else val=r[keys['DLTHUONG']]||r[keys['DAILY']]; if(typeof val==='string') val=val.replace('%',''); const rt=(parseFloat(val)||0)/100; if(rt>=rate) rate=rt; } }
-        const hs=parseFloat(document.getElementById("he-so-thuong").value)||1; setMoney('thuong-nsq', sum*rate*hs);
-      }
-      function calculateThuongMDRT(){
-        const m=parseInt((document.getElementById("month-select").value||'').replace(/[^\d]/g,''),10)||0; if(![3,6,9,12].includes(m)){ setMoney('thuong-mdrt',0); return; }
-        const mdrt=parseMoney3(document.getElementById("mdrt-fyp").value); const fyp=parseMoney3(document.getElementById("tong-fyp").value); const prog=mdrt+fyp;
-        const row=trackingMDRT.find(r=>parseInt(getByKeyLoose(r,'Tháng xét'),10)===m); if(!row){ setMoney('thuong-mdrt',0); return; }
-        const need=parseMoney3(getByKeyLoose(row,'FYP YÊU CẦU')); const muc1=parseMoney3(getByKeyLoose(row,'MỨC 1 THẤP'))||parseMoney3(getByKeyLoose(row,'MÚC 1 THẤP'))||parseMoney3(getByKeyLoose(row,'MUC 1 THAP'))||0; const muc2=parseMoney3(getByKeyLoose(row,'MỨC 2 CAO'))||parseMoney3(getByKeyLoose(row,'MUC 2 CAO'))||0;
-        let t=0; if(need>0 && prog>0){ const tl=prog/need; if(tl>=1) t=muc2; else if(tl>=0.9) t=muc1; } setMoney('thuong-mdrt',t);
-      }
-      function calculateAllBonuses(){
-        const fypC=getNum('fyp-chinh'), fypK=getNum('fyp-kem'); const tong=fypC+fypK; setMoney('tong-fyp',tong);
-        const fycC=fypC*0.3, fycK=fypK*0.2, thuongK=fypK*0.2, fycT=fycC+fycK;
-        setMoney('fyc-chinh',fycC); setMoney('fyc-kem',fycK); setMoney('thuong-kem',thuongK); setMoney('fyc-thuong',fycT);
-        computeMemoAllStages(); calculateNSPro(); calculateNST(); calculateNSQ(); calculateThuongMDRT();
-        const sum=getNum('fyc-chinh')+getNum('fyc-kem')+getNum('thuong-kem')+getNum('thuong-nspro')+getNum('thuong-nst')+getNum('thuong-nsq')+getNum('thuong-memo')+getNum('thuong-mdrt');
-        setMoney('tong-thu-nhap',sum); const tl=tong>0?((sum/tong)*100).toFixed(2)+' %':''; const tlEl=document.getElementById('ty-le-thu-nhap'); if(tlEl) tlEl.value=tl;
-      }
-      function attachEvents(){
-        ['fypchinh-gd1','fypkem-gd1','fypchinh-gd2','fypkem-gd2','fypchinh-gd3','fypkem-gd3'].forEach(id=>{
-          const el=document.getElementById(id); if(!el) return;
-          el.setAttribute('inputmode','decimal'); el.addEventListener('input',()=>{ el.value=el.value.replace(/[^\d\.,]/g,''); });
-          el.addEventListener('blur',()=>{ const n=parseMoney3(el.value); el.value = n?formatMoney3(n):''; updateSumsOnly(); });
-        });
-        ['sohd-gd1','sohd-gd2','sohd-gd3'].forEach(id=>{
-          const el=document.getElementById(id); if(!el) return;
-          el.addEventListener('input',()=>{ el.value=el.value.replace(/[^\d]/g,''); });
-          el.addEventListener('blur',()=>{ el.value=el.value?String(parseInt(el.value,10)) : ''; updateSumsOnly(); });
-        });
-        const msel=document.getElementById('month-select'); if(msel){ msel.addEventListener('change',()=>{}); }
-        const btn=document.getElementById('calc-btn'); if(btn){ btn.addEventListener('click',()=>{ updateSumsOnly(); calculateAllBonuses(); }); }
-      }
-      function populateMonthSelect(){ const sel=document.getElementById('month-select'); if(!sel) return; sel.innerHTML=''; const cur=(new Date()).getMonth()+1; for(let m=cur;m<=12;m++){ const op=document.createElement('option'); op.value=m; op.textContent=`Tháng ${m}`; sel.appendChild(op);} sel.value=cur; }
-      async function refillFromLoginRow(){
-        await loadIncome(); document.getElementById('ho-ten').value=rowFromLogin["TEN DAI LY"]||rowFromLogin["AGEN NAME"]||'';
-        document.getElementById('khu-vuc').value=rowFromLogin["KV|MS"]||''; document.getElementById('thang-lam-viec').value=rowFromLogin["WORK MNTHS"]||'';
-        document.getElementById('nhom-dai-ly').value=rowFromLogin["Nhóm Đại lý"]||'';
-        const p13raw=rowFromLogin["TLDTHD cá nhân"] ?? rowFromLogin["P13 cá nhân"]; const p13=parseMoney3(p13raw);
-        document.getElementById('p13-ca-nhan').value=(p13raw??''); document.getElementById('he-so-thuong').value=getHeSoThuong(p13);
-        document.getElementById('mdrt-fyp').value = formatMoney3(parseMoney3(rowFromLogin["MDRT.FYP CAP"]||rowFromLogin["MDRT-FYP tới hiện tại"]));
-        const fycT1=parseMoney3(rowFromLogin["FYC tháng T-1"]); const fycT2=parseMoney3(rowFromLogin["FYC tháng T-2"]);
-        document.getElementById('tong-fyc').value = formatMoney3(fycT1+fycT2);
-        document.getElementById('tong-fyc-quy').value = formatMoney3(parseMoney3(rowFromLogin["Tổng FYC trong Qúy hiện tại"]));
-        ['sohd-gd1','sohd-gd2','sohd-gd3','fypchinh-gd1','fypchinh-gd2','fypchinh-gd3','fypkem-gd1','fypkem-gd2','fypkem-gd3'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
-        updateSumsOnly();
-      }
-      populateMonthSelect(); attachEvents(); refillFromLoginRow();
+      // Trước đăng nhập: ẩn sidebar & dropdown, ẩn report
+      sidebarEl.style.display='none';
+      tocMbEl.style.display='none';
+      reportEl.classList.add('hidden');
     }
+    window.addEventListener('load', init);
+    window.addEventListener('resize', ()=>{ fitTitles(); updateLayoutVars(); toggleNavByViewport(); });
   </script>
 </body>
 </html>
