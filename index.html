@@ -2,266 +2,225 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
-  <title>Báo cáo Kinh doanh Đại lý</title>
+  <title>Báo cáo Cá nhân – Vùng Hằng Lâm</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="./fonts/fonts.css">
   <style>
+    /* ====== FONT: Manulife JH Sans (đặt file vào ./fonts) ====== */
+    @font-face{
+      font-family: "Manulife JH Sans";
+      src: local("Manulife JH Sans"),
+           url("./fonts/ManulifeJHSans-ExtraBold.woff2") format("woff2"),
+           url("./fonts/ManulifeJHSans-ExtraBold.woff") format("woff");
+      font-weight: 800; font-style: normal; font-display: swap;
+    }
+    @font-face{
+      font-family: "Manulife JH Sans";
+      src: local("Manulife JH Sans"),
+           url("./fonts/ManulifeJHSans-Bold.woff2") format("woff2"),
+           url("./fonts/ManulifeJHSans-Bold.woff") format("woff");
+      font-weight: 700; font-style: normal; font-display: swap;
+    }
+
     :root{
-      --sidebar-width: 260px;  /* rộng danh mục trái (desktop) */
-      --header-h: 64px;        /* cập nhật bằng JS */
-      --fixed-top: 64px;       /* bằng header-h */
-      --toc-h: 52px;           /* dropdown mobile (cập nhật JS) */
+      --sidebar-width: 260px;
+      --header-h: 64px;     /* set runtime */
+      --fixed-top: 64px;    /* = header-h */
+      --toc-h: 52px;
     }
-    body { background: #f3f4f6; }
-    .sticky-header { position: sticky; top: 0; z-index: 40; background: #fff; }
 
-    html, body { font-size: 17px; }
+    *{ box-sizing: border-box; }
+    body{ background:#f3f4f6; }
+    html, body{ font-size:17px; }
+    .sticky-header{ position: sticky; top: 0; z-index: 40; background:#e8fff3; overflow:hidden; }
 
-    /* màu & nhấn */
-    b, strong, .val, .hl { color: #10b981; }
-    .label { font-weight: 700; color: #0b3d2c; }
-    .val   { font-weight: 900; }
-    .thin  { font-weight: 700; color: #0b3d2c; }
-    .hide  { display:none; }
+    /* Màu & nhấn */
+    b,strong,.val,.hl{ color:#10b981; }
+    .label{ font-weight:700; color:#0b3d2c; }
+    .val{ font-weight:900; }
+    .thin{ font-weight:700; color:#0b3d2c; }
+    .hide{ display:none; }
 
-    /* ===== HEADER 2 HÀNG ===== */
+    /* ===== HEADER theo mockup ===== */
     .header-grid{
-      display: grid;
-      grid-template-columns: var(--sidebar-width) 1fr;          /* logo | title/login */
-      grid-template-areas:
-        "logo title"
-        "logo login";                                           /* login xuống dòng */
-      align-items: center;
-      gap: .75rem;
+      display:grid;
+      grid-template-columns: var(--sidebar-width) 1fr max-content;   /* logo | title | login */
+      grid-template-areas: "logo title login";
+      align-items:center;
+      gap:.75rem;
     }
-    .logo-cell{ grid-area: logo; }
-    .logo-d{ height: 56px; margin-left: 8px; }                  /* desktop logo_text.webp */
-    .logo-m{ display:none; }                                    /* mobile logo.webp */
+    .logo-cell{ grid-area:logo; }
+    .logo-d{ height:72px; margin-left:8px; }
+    .logo-m{ display:none; }
 
-    .title-d{                                                   /* tiêu đề = cao logo */
-      grid-area: title;
-      line-height: 56px; font-size: 2rem; font-weight: 800; color:#065f46;
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    .title-cell{ grid-area:title; min-width:0; }
+    .title-top, .title-main{
+      font-family: "Manulife JH Sans", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      white-space: nowrap; overflow:hidden; text-overflow: ellipsis;
     }
+    .title-top{ font-weight:900; letter-spacing:.5px; color:#059669; font-size:1.55rem; line-height:1.1; text-transform:uppercase; }
+    .title-main{ font-weight:900; color:#059669; font-size:3.2rem; line-height:1; margin-top:.25rem; }
 
+    /* Cụm đăng nhập – desktop */
     #loginForm{
-      grid-area: login;
-      justify-self: end;
-      align-self: start;
-      width: min(720px, 100%);
-    }
-    .login-grid{
-      display: grid;
+      grid-area:login;
+      justify-self:end;
+      width:440px; max-width:100%;
+      display:grid;
+      grid-template-columns: 1fr auto;   /* col1 input, col2 button */
+      grid-template-rows: auto auto;     /* 2 hàng */
       grid-template-areas:
-        "inputs"
-        "button";
-      gap: .5rem;
-      width: 100%;
+        "msdl msdl"   /* hàng 1: MSĐL full */
+        "date btn";   /* hàng 2: Ngày | Nút */
+      gap:.5rem; align-items:center;
     }
-    .login-inputs{
-      grid-area: inputs;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: .5rem;
-    }
-    .login-btn{
-      grid-area: button;
-      justify-self: end;     /* desktop: nút phải */
-    }
+    #msdlInput{ grid-area:msdl; }
+    #dateInput{ grid-area:date; }
+    .login-btn{ grid-area:btn; height:44px; padding:0 18px; }
 
-    /* ===== SIDEBAR (desktop cố định) ===== */
+    /* ===== SIDEBAR (desktop) ===== */
     #sidebar{
-      width: var(--sidebar-width);
-      position: fixed;
-      top: var(--fixed-top);
-      left: 0;
-      bottom: 0;
-      overflow: auto;
-      z-index: 35;
-      background: #ffffff;
-      border-right: 1px solid #e5e7eb;
-      border-top-right-radius: 12px;
+      width:var(--sidebar-width);
+      position:fixed; top:var(--fixed-top); left:0; bottom:0;
+      overflow:auto; z-index:35; background:#fff;
+      border-right:1px solid #e5e7eb; border-top-right-radius:12px;
+      display:none; /* ẩn đến khi đăng nhập */
     }
-    .sidebar-inner{ padding: 12px; }
-
-    /* Top-level items & headings: cùng độ đậm */
-    .menu-item,
-    .menu-head{
-      display:block;
-      font-weight: 800;
-      color: #0b3d2c;
-    }
+    .sidebar-inner{ padding:12px; }
+    .menu-item,.menu-head{ display:block; font-weight:800; color:#0b3d2c; }
     .menu-item{ padding:.5rem .75rem; border-radius:.5rem; }
     .menu-item:hover{ background:#e5f7ee; }
-    .menu-item.active{ background:#0ea35b; color:#ffffff; }
+    .menu-item.active{ background:#0ea35b; color:#fff; }
     .menu-head{ padding:.5rem .75rem; }
     .submenu{ margin:.25rem 0 .5rem .75rem; }
     .submenu a{ display:block; padding:.35rem .5rem; border-radius:.375rem; color:#0b3d2c; font-weight:700; }
     .submenu a:hover{ background:#edfdf6; }
     .submenu a.active{ background:#0ea35b; color:#fff; }
 
-    /* ===== CONTENT WRAP (desktop chừa sidebar) ===== */
+    /* CONTENT chừa sidebar */
     #contentWrap{ margin-left: var(--sidebar-width); }
+    /* TOC mobile */
+    .toc-mobile{ position:sticky; top:calc(var(--header-h)); z-index:30; background:#fff; padding:8px 0; display:none; } /* ẩn tới khi login */
 
-    /* ===== TOC MOBILE (sticky) ===== */
-    .toc-mobile{
-      position: sticky;
-      top: calc(var(--header-h));
-      z-index: 30;
-      background: #fff;
-      padding: 8px 0;
+    /* SECTION */
+    .section-title{
+      font-weight:800; color:#0b3d2c; background:#fff;
+      padding:10px 16px; border-left:6px solid #0ea35b;
+      border-radius:.5rem; margin:18px 0 12px; font-size:1.25rem;
     }
-
-    /* ===== SECTION ===== */
-    .section-title {
-      font-weight: 800; color: #0b3d2c; background: #ffffff;
-      padding: 10px 16px; border-left: 6px solid #0ea35b;
-      border-radius: 0.5rem; margin: 18px 0 12px; font-size: 1.25rem;
-    }
-    .subsec {
-      margin: 12px 0 10px; font-weight: 800; color: #0b3d2c;
-      padding-left: .75rem; border-left: 6px solid #0ea35b; font-size: 1.15rem;
-    }
+    .subsec{ margin:12px 0 10px; font-weight:800; color:#0b3d2c; padding-left:.75rem; border-left:6px solid #0ea35b; font-size:1.15rem; }
     .section{ scroll-margin-top: calc(var(--header-h) + 8px); }
 
-    /* ===== INFO GRID ===== */
-    .info-grid{
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: .85rem;
-    }
-    .info-item{
-      display: flex; flex-direction: column; gap: .3rem;
-      background:#fff; border:1px solid #e5e7eb; border-left:4px solid #0ea35b;
-      border-radius:.6rem; padding:.7rem .85rem; min-height:auto;
-    }
-    .info-item .val{ font-size: 1.15rem; line-height: 1.25; word-break: break-word; }
+    /* INFO GRID */
+    .info-grid{ display:grid; grid-template-columns: repeat(auto-fit, minmax(240px,1fr)); gap:.85rem; }
+    .info-item{ display:flex; flex-direction:column; gap:.3rem; background:#fff; border:1px solid #e5e7eb; border-left:4px solid #0ea35b; border-radius:.6rem; padding:.7rem .85rem; }
+    .info-item .val{ font-size:1.15rem; line-height:1.25; word-break:break-word; }
 
-    /* CẢNH BÁO PRO.MOC 3 THANG */
-    .pro-alert{
-      margin-top: .4rem; padding: .7rem .9rem; border: 2px solid #dc2626;
-      border-left-width: 6px; border-radius: .6rem; background: #fff;
-      color: #b91c1c; font-weight: 900; font-size: 1.15rem;
-    }
-    .info-alert{ grid-column: 1 / -1; }
-    .pro-alert .pro-name{ font-weight: 900; }
+    /* Cảnh báo */
+    .pro-alert{ margin-top:.4rem; padding:.7rem .9rem; border:2px solid #dc2626; border-left-width:6px; border-radius:.6rem; background:#fff; color:#b91c1c; font-weight:900; font-size:1.15rem; }
+    .info-alert{ grid-column:1 / -1; }
 
-    /* LIST label|value 2 cột */
+    /* list label|value */
     .list-dot li, .bullet-strong li{
-      list-style: none; padding-left: 0;
-      display: grid; grid-template-columns: minmax(170px, max-content) 1fr;
-      column-gap: 1rem; align-items: start; margin: .3rem 0;
+      list-style:none; padding-left:0;
+      display:grid; grid-template-columns:minmax(170px,max-content) 1fr;
+      column-gap:1rem; align-items:start; margin:.3rem 0;
     }
-    .bullet-strong li{ border-left: 3px solid #0ea35b; padding-left: .75rem; }
-    .hl{ grid-column: 2; font-weight: 900; font-size: 1.05rem; line-height: 1.3; }
+    .bullet-strong li{ border-left:3px solid #0ea35b; padding-left:.75rem; }
+    .hl{ grid-column:2; font-weight:900; font-size:1.05rem; line-height:1.3; }
 
-    /* THỤT DÒNG */
-    .lvl-2{ margin-left: 1.25rem; padding-left: .75rem; border-left:3px solid #a7f3d0; border-radius: .25rem; }
-    .lvl-3{ margin-left: 2.25rem; padding-left: .75rem; border-left:2px dashed #c7f9e9; border-radius: .25rem; }
-    .lvl-4{ margin-left: 3.25rem; padding-left: .75rem; border-left:2px dotted #def7ef; border-radius: .25rem; }
+    /* thụt dòng */
+    .lvl-2{ margin-left:1.25rem; padding-left:.75rem; border-left:3px solid #a7f3d0; border-radius:.25rem; }
+    .lvl-3{ margin-left:2.25rem; padding-left:.75rem; border-left:2px dashed #c7f9e9; border-radius:.25rem; }
+    .lvl-4{ margin-left:3.25rem; padding-left:.75rem; border-left:2px dotted #def7ef; border-radius:.25rem; }
 
     /* ===== MOBILE ===== */
-    @media (max-width: 1023px){
-      #sidebar{ display: none !important; }
-      #contentWrap{ margin-left: 0; }
-    }
-    @media (max-width: 640px){
+    @media (max-width:1023px){ #contentWrap{ margin-left:0; } }
+    @media (max-width:640px){
       .header-grid{
         grid-template-columns: auto 1fr;
-        grid-template-areas:
-          "logo title"
-          "login login";
-        align-items: flex-start;
+        grid-template-areas: "logo title" "login login";
+        align-items:flex-start;
       }
       .logo-d{ display:none; }
-      .logo-m{ display:block; height:44px; margin-left:8px; }
-      .title-d{ grid-area:title; text-align:center; line-height:44px; font-size:1.5rem; }
+      .logo-m{ display:block; height:56px; margin-left:8px; }
+      .title-cell{ text-align:center; padding-top:.25rem; }
+      .title-top{ font-size:1.25rem; }
+      .title-main{ font-size:2.25rem; }
 
-      #loginForm{ justify-self: stretch; width: 100%; }
-      .login-inputs{ grid-template-columns: 1fr 1fr; }  /* 2 ô cùng hàng */
-      .login-btn{ justify-self: stretch; }              /* nút riêng 1 dòng */
-
-      .section-title{ position: sticky; top: calc(var(--header-h) + var(--toc-h) + 6px); z-index: 20; background: #fff; }
+      /* form: 2 input cùng hàng, nút dòng riêng – nằm gọn trong khung */
+      #loginForm{
+        justify-self:stretch; width:100%;
+        grid-template-columns: minmax(0,1fr) minmax(0,1fr);
+        grid-template-rows: auto auto;
+        grid-template-areas:
+          "msdl date"
+          "btn  btn";
+      }
+      .login-btn{ height:46px; justify-self:stretch; }
+      .section-title{ position:sticky; top:calc(var(--header-h) + var(--toc-h) + 6px); z-index:20; background:#fff; }
       .section{ scroll-margin-top: calc(var(--header-h) + var(--toc-h) + 10px); }
     }
-/* ===== FIX: DESKTOP logo ngang chữ ===== */
-.header-grid{ align-items: center !important; }       /* căn giữa chiều cao hàng */
-.logo-cell{ display:flex; align-items:center; }        /* logo canh giữa theo trục dọc */
-.title-d{
-  display:flex; align-items:center;                    /* chữ căn giữa theo trục dọc với logo */
-  height:56px; line-height:1.1;                        /* bỏ hack line-height cao quá */
+    .title-top,
+.title-main { font-weight: 900 !important; }
+:root{
+  /* Thử cả 2 tên phổ biến để khỏi lo sai tên trong fonts.css */
+  --ml-font: 'Manulife JH Sans', 'ManulifeJHSans',
+             system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
-/* ===== FIX: MOBILE login không tràn khung ===== */
-@media (max-width:640px){
-  #pageHeader .header-grid{ padding-left:8px; padding-right:8px; }
-
-  /* form chiếm đúng bề ngang container, không overflow */
-  #loginForm{
-    width:100% !important;
-    max-width:100%;
-    justify-self:stretch;
-    padding:0;                 /* tránh cộng padding làm tràn */
-    box-sizing:border-box;
-  }
-
-  /* 2 input cùng hàng, co giãn an toàn */
-  .login-inputs{
-    grid-template-columns:1fr 1fr;
-    gap:8px;
-  }
-  .login-inputs input{
-    width:100%;
-    min-width:0;               /* chống vỡ grid khi placeholder dài */
-  }
-
-  /* nút ở dòng riêng & full width */
-  .login-btn{
-    justify-self:stretch;
-    width:100%;
-  }
+/* Dùng font Manulife cho các tiêu đề chính/phụ và mục danh mục */
+.title-top,
+.title-main,
+.section-title,
+.menu-head{
+  font-family: var(--ml-font);
 }
+
+/* In đậm tiêu đề (nếu bộ font có weight 900) */
+.title-top,
+.title-main{ font-weight: 900; }  /* nếu fonts.css chỉ có Bold, đổi 900 -> 700 */
 
   </style>
 </head>
 <body class="min-h-screen font-sans">
   <!-- ===== HEADER ===== -->
   <header id="pageHeader" class="sticky-header shadow">
-    <div class="header-grid px-2 md:px-3 py-2">
+    <div class="header-grid px-2 md:px-3 py-3">
       <!-- Logo -->
       <div class="logo-cell flex items-center">
         <img src="logo_text.webp" alt="logo" class="logo-d">
         <img src="logo.webp" alt="logo" class="logo-m">
       </div>
 
-      <!-- Tiêu đề -->
-      <h1 class="title-d">BÁO CÁO KINH DOANH</h1>
+      <!-- Tiêu đề 2 dòng (auto-fit trên mobile) -->
+      <div class="title-cell">
+        <div id="tTop"  class="title-top font-extrabold">CỔNG THÔNG TIN VÙNG HẰNG LÂM</div>
+        <div id="tMain" class="title-main font-extrabold" >BÁO CÁO CÁ NHÂN</div>
+      </div>
 
-      <!-- Đăng nhập: 2 input cùng hàng, nút dòng dưới -->
-      <form id="loginForm" class="login-grid">
-        <div class="login-inputs">
-          <input id="msdlInput" class="border rounded px-3 py-2" placeholder="Nhập MSĐL" required />
-          <input id="dateInput" class="border rounded px-3 py-2" placeholder="Ngày gia nhập (dd/mm/yyyy hoặc ddmmyyyy)" required />
-        </div>
-        <button class="login-btn bg-emerald-700 text-white rounded px-4 py-2 font-semibold hover:bg-emerald-800 transition" type="submit">
-          Đăng nhập
-        </button>
+      <!-- Đăng nhập -->
+      <form id="loginForm">
+        <input id="msdlInput" class="border rounded px-3 py-2" placeholder="Nhập MSĐL" required />
+        <input id="dateInput" class="border rounded px-3 py-2" placeholder="Ngày gia nhập (dd/mm/yyyy hoặc ddmmyyyy)" required />
+        <button class="login-btn bg-emerald-700 text-white rounded font-semibold hover:bg-emerald-800 transition" type="submit">Đăng nhập</button>
       </form>
     </div>
   </header>
 
-  <!-- ===== SIDEBAR (desktop fixed) ===== -->
-  <aside id="sidebar" class="hidden lg:block">
-    <div class="sidebar-inner">
-      <nav id="nav"></nav>
-    </div>
+  <!-- ===== SIDEBAR (hiện sau khi đăng nhập) ===== -->
+  <aside id="sidebar">
+    <div class="sidebar-inner"><nav id="nav"></nav></div>
   </aside>
 
-  <!-- ===== CONTENT WRAP ===== -->
+  <!-- ===== CONTENT ===== -->
   <div id="contentWrap">
     <main class="max-w-6xl mx-auto px-3 md:px-4 py-5">
       <div id="errorMsg" class="hidden bg-red-50 border border-red-300 text-red-700 px-4 py-2 mb-4 rounded"></div>
 
-      <!-- TOC mobile -->
-      <div id="tocMobile" class="toc-mobile lg:hidden hidden">
+      <!-- TOC mobile (ẩn đến khi login) -->
+      <div id="tocMobile" class="toc-mobile">
         <select id="tocSelect" class="w-full border rounded px-3 py-2">
           <option value="" selected disabled>Danh mục báo cáo</option>
           <option value="sectionInfo">Thông tin đại lý</option>
@@ -280,16 +239,17 @@
         </select>
       </div>
 
-      <!-- Nội dung báo cáo -->
       <section id="report" class="bg-white shadow rounded-xl p-4 md:p-6 mt-0 hidden"></section>
       <div id="hint" class="mt-6 text-center text-gray-500 text-sm">Nhập thông tin để xem báo cáo đại lý</div>
     </main>
   </div>
 
   <script>
+    /* ===== STATE ===== */
     let dataRows = [];
     let mapping = [];
     let dataReady;
+    let loggedIn = false;
 
     /* ===== LOAD DATA ===== */
     async function loadData(){
@@ -312,87 +272,92 @@
     const sidebarEl = document.getElementById('sidebar');
     const navEl     = document.getElementById('nav');
     const headerEl  = document.getElementById('pageHeader');
+    const tTopEl    = document.getElementById('tTop');
+    const tMainEl   = document.getElementById('tMain');
+
+    function isMobile(){ return window.matchMedia('(max-width: 640px)').matches; }
+
+    /* ===== Title auto-fit (không xuống dòng trên mobile) ===== */
+    function fitText(el, maxPx, minPx){
+      if(!el) return;
+      const container = el.parentElement;
+      el.style.whiteSpace = 'nowrap';
+      let size = maxPx;
+      el.style.fontSize = size + 'px';
+      const maxWidth = container.clientWidth - 4;
+      while (size > minPx && el.scrollWidth > maxWidth){
+        size -= 1;
+        el.style.fontSize = size + 'px';
+      }
+    }
+    function fitTitles(){
+      if (isMobile()){
+        fitText(tTopEl, 24, 12);
+        fitText(tMainEl, 36, 18);
+      } else {
+        /* desktop: dùng size cố định, vẫn không wrap */
+        tTopEl.style.fontSize = '1.55rem';
+        tMainEl.style.fontSize = '3.2rem';
+      }
+    }
 
     /* ===== UTIL ===== */
     function normalizeDate(s){
       if(!s) return '';
       s = String(s).trim();
-      if (/^\d{8}$/.test(s)) { const d = s.slice(0,2), m = s.slice(2,4), y = s.slice(4,8); return `${d}/${m}/${y}`; }
-      if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(s)) { const [d,m,y] = s.split('/').map(x=>parseInt(x,10)); return `${String(d).padStart(2,'0')}/${String(m).padStart(2,'0')}/${y}`; }
-      if (/^\d{4}-\d{1,2}-\d{1,2}$/.test(s)) { const [y,m,d] = s.split('-').map(x=>parseInt(x,10)); return `${String(d).padStart(2,'0')}/${String(m).padStart(2,'0')}/${y}`; }
+      if (/^\d{8}$/.test(s)) { const d=s.slice(0,2), m=s.slice(2,4), y=s.slice(4,8); return `${d}/${m}/${y}`; }
+      if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(s)) { const [d,m,y]=s.split('/').map(x=>parseInt(x,10)); return `${String(d).padStart(2,'0')}/${String(m).padStart(2,'0')}/${y}`; }
+      if (/^\d{4}-\d{1,2}-\d{1,2}$/.test(s)) { const [y,m,d]=s.split('-').map(x=>parseInt(x,10)); return `${String(d).padStart(2,'0')}/${String(m).padStart(2,'0')}/${y}`; }
       return s;
     }
-    function normalizeMSDL(s){ return String(s || '').trim().replace(/\s+/g,'').toLowerCase(); }
-    function isMobile(){ return window.matchMedia('(max-width: 640px)').matches; }
-
+    function normalizeMSDL(s){ return String(s||'').trim().replace(/\s+/g,'').toLowerCase(); }
     function parseLocaleNumber(v){
-      if (v === null || v === undefined || v === '') return NaN;
-      if (typeof v === 'number') return v;
+      if (v===null||v===undefined||v==='') return NaN;
+      if (typeof v==='number') return v;
       let s = String(v).trim().replace(/[^0-9,.\-]/g,'');
-      if (s === '' || s === '-' || s === '.' || s === ',') return NaN;
-      const hasDot = s.includes('.'); const hasComma = s.includes(',');
-      if (hasDot && hasComma){
-        if (s.lastIndexOf(',') > s.lastIndexOf('.')) { s = s.replace(/\./g,'').replace(',', '.'); }
-        else { s = s.replace(/,/g,''); }
-      } else if (hasComma && !hasDot){ s = s.replace(',', '.'); }
-      const n = parseFloat(s);
-      return isNaN(n) ? NaN : n;
+      if (s===''||s==='-'||s==='.'||s===',') return NaN;
+      const hasDot=s.includes('.'), hasComma=s.includes(',');
+      if (hasDot&&hasComma){ if (s.lastIndexOf(',')>s.lastIndexOf('.')){ s=s.replace(/\./g,'').replace(',', '.'); } else { s=s.replace(/,/g,''); } }
+      else if (hasComma&&!hasDot){ s=s.replace(',', '.'); }
+      const n=parseFloat(s); return isNaN(n)?NaN:n;
     }
-    function formatThousand(n, decimals){
-      if (n === null || n === undefined || isNaN(n)) return "";
-      const fixed = Number(n).toFixed(decimals);
-      let [intPart, fracPart=""] = fixed.split('.');
-      const sign = intPart.startsWith('-') ? '-' : '';
-      intPart = intPart.replace('-', '');
-      intPart = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-      return sign + intPart + (decimals>0 ? ','+fracPart : '');
+    function formatThousand(n,dec){
+      if (n===null||n===undefined||isNaN(n)) return "";
+      const fixed = Number(n).toFixed(dec);
+      let [intPart, frac=""] = fixed.split('.');
+      const sign = intPart.startsWith('-')?'-':'';
+      intPart = intPart.replace('-','').replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+      return sign + intPart + (dec>0?','+frac:"");
     }
-    function formatF3(val){ const n = parseLocaleNumber(val); if (isNaN(n)) return val ?? ""; return formatThousand(n, 3); }
-    function formatNumber(val){ return (val ?? ""); } // giữ nguyên cho các trường khác
-    function shouldF3Label(label=""){
-      const norm = String(label||"").toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-      return (norm.includes('fyp') || norm.includes('fyc'));
-    }
-    function fmt(val, key="", label=""){ return shouldF3Label(label) ? formatF3(val) : (val ?? ""); }
-    function addPercent(val){ return (val ?? ""); } // giữ nguyên %
+    function formatF3(val){ const n=parseLocaleNumber(val); if(isNaN(n)) return val??""; return formatThousand(n,3); }
+    function formatNumber(val){ return (val ?? ""); }
+    function shouldF3Label(label=""){ const norm=String(label||"").toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''); return (norm.includes('fyp')||norm.includes('fyc')); }
+    function fmt(val,key="",label=""){ return shouldF3Label(label)?formatF3(val):(val??""); }
+    function addPercent(val){ return (val ?? ""); }
+    function exists(v){ return !(v===null||v===undefined||(typeof v==='string'&&v.trim()==='')); }
+    function pick(row,keys){ for (const k of keys) if (exists(row[k])) return row[k]; return ''; }
 
-    function exists(v){ return !(v === null || v === undefined || (typeof v === 'string' && v.trim() === '')); }
-    function pick(row, keys){ for (const k of keys) if (exists(row[k])) return row[k]; return ''; }
-
-    function hideAll(){
-      errorEl.classList.add('hidden'); reportEl.classList.add('hidden');
-      hintEl.classList.add('hidden'); tocMbEl.classList.add('hidden');
-    }
-    function showError(msg){ errorEl.textContent = msg; errorEl.classList.remove('hidden'); hintEl.classList.remove('hidden'); }
+    function showError(msg){ errorEl.textContent=msg; errorEl.classList.remove('hidden'); }
+    function hideErrors(){ errorEl.classList.add('hidden'); }
 
     function getHeaderH(){ return headerEl?.offsetHeight || 64; }
-    function getTocH(){
-      const sel = document.getElementById('tocSelect');
-      return (sel && getComputedStyle(tocMbEl).display !== 'none') ? (sel.offsetHeight + 16) : 52;
-    }
-    function updateLayoutVars(){
-      const root = document.documentElement;
-      root.style.setProperty('--header-h', getHeaderH() + 'px');
-      root.style.setProperty('--fixed-top', getHeaderH() + 'px');
-      root.style.setProperty('--toc-h', getTocH() + 'px');
-    }
-    function toggleNavForViewport(){
+    function getTocH(){ const sel=document.getElementById('tocSelect'); return (sel && getComputedStyle(tocMbEl).display!=='none') ? (sel.offsetHeight+16) : 0; }
+    function updateLayoutVars(){ const r=document.documentElement; r.style.setProperty('--header-h', getHeaderH()+'px'); r.style.setProperty('--fixed-top', getHeaderH()+'px'); r.style.setProperty('--toc-h', getTocH()+'px'); }
+
+    function toggleNavByViewport(){
+      // Ẩn dropdown & sidebar nếu chưa đăng nhập
+      if (!loggedIn){ tocMbEl.style.display='none'; sidebarEl.style.display='none'; return; }
       if (window.matchMedia('(min-width: 1024px)').matches){
-        sidebarEl.classList.remove('hidden');
-        tocMbEl.classList.add('hidden');
+        sidebarEl.style.display='block'; tocMbEl.style.display='none';
       } else {
-        sidebarEl.classList.add('hidden');
-        tocMbEl.classList.remove('hidden');
-        const sel = document.getElementById('tocSelect');
-        if (sel) sel.value = "";
+        sidebarEl.style.display='none'; tocMbEl.style.display='block';
       }
       updateLayoutVars();
     }
     function scrollToSectionStart(sectionId){
-      const section = document.getElementById(sectionId);
-      if(!section) return;
-      const y = section.getBoundingClientRect().top + window.scrollY - (isMobile() ? (getHeaderH() + getTocH() + 10) : (getHeaderH() + 8));
-      window.scrollTo({ top: y, behavior: 'smooth' });
+      const section=document.getElementById(sectionId); if(!section) return;
+      const y = section.getBoundingClientRect().top + window.scrollY - (isMobile()? (getHeaderH()+getTocH()+10):(getHeaderH()+8));
+      window.scrollTo({ top:y, behavior:'smooth' });
     }
 
     /* ===== LOGIN ===== */
@@ -401,21 +366,16 @@
     const dateInput = document.getElementById('dateInput');
     const loginBtn  = loginForm.querySelector('button');
 
-    // chờ dữ liệu
-    loginBtn.disabled = true; loginBtn.textContent = 'Đang tải dữ liệu...';
-    dataReady.finally(()=>{ loginBtn.disabled = false; loginBtn.textContent = 'Đăng nhập'; });
+    loginBtn.disabled=true; loginBtn.textContent='Đang tải dữ liệu...';
+    dataReady.finally(()=>{ loginBtn.disabled=false; loginBtn.textContent='Đăng nhập'; });
 
-    let lastMsdl = "", lastJoin = "";
+    let lastMsdl="", lastJoin="";
 
-    loginForm.onsubmit = async function(e) {
+    loginForm.onsubmit = async (e)=>{
       e.preventDefault();
-      hideAll();
+      hideErrors();
       await dataReady;
-
-      if (!Array.isArray(dataRows) || dataRows.length === 0) {
-        showError("Không tải được dữ liệu. Đặt file data.json cùng thư mục và chạy qua HTTP server.");
-        return;
-      }
+      if (!Array.isArray(dataRows) || dataRows.length===0){ showError("Không tải được dữ liệu. Hãy kiểm tra data.json."); return; }
 
       const msdlNorm = normalizeMSDL(msdlInput.value);
       const dateNorm = normalizeDate(dateInput.value);
@@ -423,38 +383,35 @@
       const msdlCols = ["MSDL","AGEN CODE","AGENT CODE","Agent Code","Mã Số Đại Lý","MÃ SỐ ĐẠI LÝ"];
       const joinCols = ["JOIN DATE","Join Date","NGÀY GIA NHẬP","Ngày gia nhập"];
 
-      const row = dataRows.find(r => normalizeMSDL(pick(r, msdlCols)) === msdlNorm &&
-                                     normalizeDate(pick(r, joinCols)) === dateNorm);
+      const row = dataRows.find(r => normalizeMSDL(pick(r,msdlCols))===msdlNorm &&
+                                     normalizeDate(pick(r,joinCols))===dateNorm);
 
-      if (!row) {
-        const rowByMsdl = dataRows.find(r => normalizeMSDL(pick(r, msdlCols)) === msdlNorm);
-        if (rowByMsdl) {
-          const expected = normalizeDate(pick(rowByMsdl, joinCols)) || (pick(rowByMsdl, joinCols) || '').trim();
-          showError(`MSĐL đúng nhưng ngày gia nhập chưa khớp. Ngày đúng là: ${expected || '(không có trong dữ liệu)'}`);
-        } else showError("Không tìm thấy đại lý phù hợp với thông tin bạn nhập!");
+      if (!row){
+        const rowByMsdl = dataRows.find(r=>normalizeMSDL(pick(r,msdlCols))===msdlNorm);
+        if(rowByMsdl){ const expected=normalizeDate(pick(rowByMsdl,joinCols)) || (pick(rowByMsdl,joinCols)||'').trim(); showError(`MSĐL đúng nhưng ngày gia nhập chưa khớp. Ngày đúng là: ${expected||'(không có trong dữ liệu)'}`); }
+        else showError("Không tìm thấy đại lý phù hợp với thông tin bạn nhập!");
         return;
       }
 
-      // lưu để truyền qua "Tính thu nhập"
       lastMsdl = pick(row, msdlCols);
       lastJoin = pick(row, joinCols);
 
       renderReport(row);
       buildSidebarNav();
-      activateSection('sectionInfo');
+      loggedIn = true;
+      toggleNavByViewport();  // show sidebar/toc theo viewport
+      window.addEventListener('resize', toggleNavByViewport);
 
-      document.getElementById('report').classList.remove('hidden');
-      document.getElementById('hint').classList.add('hidden');
-      toggleNavForViewport();
-      window.addEventListener('resize', toggleNavForViewport);
+      // hiện nội dung, update bản quyền
+      reportEl.classList.remove('hidden');
+      hintEl.textContent = "Bản quyền trang web thuộc về Vùng Hằng Lâm®";
+      hintEl.classList.remove('hidden');
 
-      // clear inputs
-      msdlInput.value = "";
-      dateInput.value = "";
-      msdlInput.blur(); dateInput.blur();
+      // clear form
+      msdlInput.value=""; dateInput.value=""; msdlInput.blur(); dateInput.blur();
     };
 
-    /* ===== INFO ===== */
+    /* ===== INFO SECTION ===== */
     function infoItem(label, value){
       if(!exists(value)) return '';
       return `<div class="info-item"><div class="label">${label}:</div><div class="val">${value}</div></div>`;
@@ -499,7 +456,7 @@
     }
 
     /* ===== RENDER REPORT ===== */
-    function renderReport(row) {
+    function renderReport(row){
       const Info = renderInfoSection(row);
 
       const A = `
@@ -670,9 +627,7 @@
               <li>P13 cấp báo cáo trực tiếp: <span class="hl">${addPercent(row["MBA.TH P13 BCTT"])}</span></li>
               <li>Danh hiệu MBA Pro tạm tính theo kết quả xét thăng hạng: <span class="hl">${formatNumber(row["MBA.TH DH TAM TINH QUY SAU"])}</span></li>
             </ul>
-            <ul class="mb-2 list-dot lvl-2">
-              <li><span class="thin">Theo dõi duy trì hạng:</span></li>
-            </ul>
+            <ul class="mb-2 list-dot lvl-2"><li><span class="thin">Theo dõi duy trì hạng:</span></li></ul>
             <ul class="mb-2 list-dot lvl-3">
               <li>Kết quả xét duy trì tạm tính: <span class="hl">${formatNumber(row["MBA.KQ DT DH HTAI"])}</span></li>
               <li>Số quý liên tục giữ danh hiệu MBA Pro hiện tại: <span class="hl">${formatNumber(row["MBA.DT SO QUY LIEN TUC"])}</span></li>
@@ -680,9 +635,7 @@
               <li>FYC cá nhân UM+ và ĐL trực tiếp L12M sau luật 50%: <span class="hl">${fmt(row["MBA.TH FYC TO TT SAU 50"], "MBA.TH FYC TO TT SAU 50", "FYC cá nhân UM+ và ĐL trực tiếp L12M sau luật 50%")}</span></li>
               <li>Số UM+ mới thăng cấp L12M: <span class="hl">${formatNumber(row["MBA.TH UM+ MOI L12M"])}</span></li>
             </ul>
-            <ul class="mb-2 list-dot lvl-2">
-              <li>Danh hiệu tạm tính quý sau (sau thăng hạng & duy trì): <span class="hl">${formatNumber(row["MBA.DH TAM TINH QUY SAU"])}</span></li>
-            </ul>
+            <ul class="mb-2 list-dot lvl-2"><li>Danh hiệu tạm tính quý sau (sau thăng hạng & duy trì): <span class="hl">${formatNumber(row["MBA.DH TAM TINH QUY SAU"])}</span></li></ul>
           </div>
 
           <div id="c5" class="sub-block">
@@ -708,34 +661,27 @@
         </div>
       `;
 
-      // Tính thu nhập: pass sẵn msdl & join qua query
+      // Tính thu nhập: không thụt dòng, mở rộng tối đa, không ghi chú
       const ms = encodeURIComponent(lastMsdl || '');
       const jd = encodeURIComponent(normalizeDate(lastJoin || ''));
       const incomeURL = `https://dutinhthunhap.vunghanglam.com/?msdl=${ms}&join=${jd}`;
       const Income = `
         <div id="sectionIncome" class="section">
           <div class="section-title">Tính thu nhập</div>
-          <div class="lvl-2">
-            <div class="mb-2 text-sm text-gray-600">Đã điền sẵn: <b>MSĐL</b> = <span class="val">${lastMsdl || "-"}</span>,
-              <b>Ngày gia nhập</b> = <span class="val">${lastJoin || "-"}</span></div>
-            <iframe id="incomeFrame" src="${incomeURL}" class="w-full h-[70vh] border rounded-lg"></iframe>
+          <div>
+            <iframe id="incomeFrame" src="${incomeURL}" class="w-full h-[78vh] border rounded-lg"></iframe>
           </div>
         </div>
       `;
 
       reportEl.innerHTML = Info + A + B + C + Income;
 
-      // TOC mobile
+      // TOC mobile change section
       const sel = document.getElementById('tocSelect');
       sel.onchange = (e)=>{
-        const v = e.target.value;
-        if (!v) return;
-        if (v.includes('#')) {
-          const [parent, anchor] = v.split('#');
-          activateSection(parent, '#'+anchor);
-        } else {
-          activateSection(v);
-        }
+        const v=e.target.value; if(!v) return;
+        if(v.includes('#')){ const [parent,anchor]=v.split('#'); activateSection(parent,'#'+anchor); }
+        else { activateSection(v); }
       };
     }
 
@@ -771,16 +717,15 @@
 
         <a href="#" data-type="section" data-target="sectionIncome" class="menu-item">Tính thu nhập</a>
       `;
-
       navEl.querySelectorAll('a').forEach(a=>{
-        a.addEventListener('click', (e)=>{
+        a.addEventListener('click',(e)=>{
           e.preventDefault();
-          const type   = a.getAttribute('data-type');
-          const target = a.getAttribute('data-target');
-          const parent = a.getAttribute('data-parent');
-          const anchor = a.getAttribute('data-anchor');
-          if (type === 'section') activateSection(target);
-          else if (type === 'sub') activateSection(parent, anchor);
+          const type=a.getAttribute('data-type');
+          const target=a.getAttribute('data-target');
+          const parent=a.getAttribute('data-parent');
+          const anchor=a.getAttribute('data-anchor');
+          if(type==='section') activateSection(target);
+          else if(type==='sub') activateSection(parent,anchor);
         });
       });
     }
@@ -788,44 +733,39 @@
     /* ===== ACTIVATE SECTION ===== */
     function activateSection(sectionId, anchor){
       document.querySelectorAll('#report .section').forEach(sec=>sec.classList.add('hide'));
-      const section = document.getElementById(sectionId);
-      if (!section) return;
+      const section = document.getElementById(sectionId); if(!section) return;
       section.classList.remove('hide');
 
-      if (anchor) {
+      if(anchor){
         section.querySelectorAll('.sub-block').forEach(sb=>sb.classList.add('hide'));
-        const sub = section.querySelector(anchor);
-        if (sub) sub.classList.remove('hide');
+        const sub = section.querySelector(anchor); if(sub) sub.classList.remove('hide');
       } else {
         section.querySelectorAll('.sub-block').forEach(sb=>sb.classList.remove('hide'));
       }
 
       document.querySelectorAll('#nav .menu-item, #nav .submenu a').forEach(el=>el.classList.remove('active'));
-      if (!anchor) {
-        const top = document.querySelector(`#nav .menu-item[data-target="${sectionId}"]`);
-        if (top) top.classList.add('active');
-      } else {
-        const sublink = document.querySelector(`#nav .submenu a[data-parent="${sectionId}"][data-anchor="${anchor}"]`);
-        if (sublink) sublink.classList.add('active');
-      }
+      if(!anchor){ const top=document.querySelector(`#nav .menu-item[data-target="${sectionId}"]`); if(top) top.classList.add('active'); }
+      else { const sublink=document.querySelector(`#nav .submenu a[data-parent="${sectionId}"][data-anchor="${anchor}"]`); if(sublink) sublink.classList.add('active'); }
 
-      const select = document.getElementById('tocSelect');
-      if (select && select.value !== "") {
-        const value = anchor ? `${sectionId}${anchor}` : sectionId;
-        const opt = Array.from(select.options).find(o => o.value === value);
-        if (opt) select.value = value;
+      const select=document.getElementById('tocSelect');
+      if (select && getComputedStyle(tocMbEl).display!=='none'){
+        const value=anchor?`${sectionId}${anchor}`:sectionId;
+        const opt=Array.from(select.options).find(o=>o.value===value);
+        if(opt) select.value=value;
       }
-
       scrollToSectionStart(sectionId);
     }
 
     /* ===== INIT ===== */
     function init(){
+      fitTitles();
       updateLayoutVars();
-      toggleNavForViewport();
+      // trước đăng nhập: sidebar & dropdown đều ẩn
+      sidebarEl.style.display='none';
+      tocMbEl.style.display='none';
     }
     window.addEventListener('load', init);
-    window.addEventListener('resize', updateLayoutVars);
+    window.addEventListener('resize', ()=>{ fitTitles(); updateLayoutVars(); toggleNavByViewport(); });
   </script>
 </body>
 </html>
