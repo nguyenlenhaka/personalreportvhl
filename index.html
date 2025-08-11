@@ -362,10 +362,51 @@
     }
     function formatF3(val){ const n=parseLocaleNumber(val); if(isNaN(n)) return val??""; return formatThousand(n,3); }
     function formatNumber(val){ return (val ?? ""); }
-    function shouldF3Label(label=""){
-      const norm=String(label||"").toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-      return (norm.includes('fyp')||norm.includes('fyc'));
+
+    /* === BỔ SUNG: ép định dạng 000.000,000 cho danh sách nhãn yêu cầu === */
+    // Chuẩn hoá nhãn để so khớp ổn định (không dấu, lowercase, gọn khoảng trắng)
+    function normalizeLabel(label=""){
+      return String(label||"")
+        .toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+        .replace(/\s+/g,' ').trim();
     }
+
+    // Danh sách NHÃN cần ép định dạng 000.000,000 (F3)
+    const FORCE_F3_LABELS = new Set([
+      'Doanh thu FYP thực cấp',
+      'Tổng doanh thu FYP',
+      'FYP phát sinh tính thưởng',
+      'Mức thưởng tạm đạt',
+      'Cần thêm để đạt mức thưởng tiếp theo',
+      'Mức thưởng tiếp theo',
+      'FYP cần thêm để thăng hạng',
+      'FYP thực đạt (YTD)',
+      'FYP cần thêm để đạt tiến độ quý hiện tại',
+      'FYP cần thêm để đạt danh hiệu MDRT+',
+      'FYP phát sinh trong thời gian thi đua',
+      'Tổng FYP cần thêm để đạt thi đua',
+      'Tổng FYP phát sinh (YTD)',
+      'FYC Whole team L6M sau luật 50% cần thêm',
+      'fYP Whole team L6M sau luật 50% cần thêm',
+      'FYC cá nhân UM+ và ĐL trực tiếp L12M sau luật 50%',
+      'FYC cá nhân UM+ và ĐL trực tiếp L12M sau luật 50%',
+      'Tổng FYP phát sinh trong tháng của bản thân UM+ (A)',
+      'FYP của bản thân UM+ (A) và nhóm trực tiếp sau luật 50%',
+      'FYP của bản thân UM+ (B) báo cáo trực tiếp cho UM+ (A)',
+      'Tổng FYP sau luật 50% dùng để tính thưởng (cấp UM)',
+      'Tổng FYP WT trước luật 50% (cấp SUM+)',
+      'Tổng FYP WT sau luật 50% để tính thưởng (cấp SUM+)',
+      'Thưởng dự tính sau khi đã nhân hệ số TLDTHD'
+    ].map(normalizeLabel));
+
+    // Quyết định có ép F3 không: nếu thuộc danh sách trên, hoặc chứa "fyp"/"fyc" (hành vi cũ)
+    function shouldF3Label(label=""){
+      const norm = normalizeLabel(label);
+      if (FORCE_F3_LABELS.has(norm)) return true;
+      return (norm.includes('fyp') || norm.includes('fyc'));
+    }
+
     function fmt(val,key="",label=""){ return shouldF3Label(label)?formatF3(val):(val??""); }
     function addPercent(val){ return (val ?? ""); }
     function exists(v){ return !(v===null||v===undefined||(typeof v==='string'&&v.trim()==='')); }
@@ -567,7 +608,7 @@
               <li>Danh hiệu tạm tính cao nhất: <span class="hl">${formatNumber(row["PRO.DH TAM TINH CAO NHAT"])}</span></li>
               <li>Tiến độ duy trì danh hiệu: <span class="hl">${addPercent(row["PRO % MOC"])}</span></li>
               <li>Giai đoạn đánh giá: <span class="hl">${formatNumber(row["PRO.GD MOC"])}</span></li>
-              <li>FYP đã đạt so với yêu cầu: <span class="hl">${fmt(row["PRO.MOC FYP"], "PRO.MOC FYP", "FYP đã đạt so với yêu cầu")}</span></li>
+              <li>FYP đã đạt so với yêu cầu: <span class="hl">${row["PRO.MOC FYP"]}</span></li>
               <li>Số tháng có hoạt động so với yêu cầu: <span class="hl">${formatNumber(row["PRO.MOC THANG HĐ"])}</span></li>
               <li>Cảnh báo 3 tháng cuối kỳ xét: <span class="hl">${formatNumber(row["PRO.MOC 3 THANG"])}</span></li>
             </ul>
@@ -713,7 +754,7 @@
       const incomeURL = `https://dutinhthunhap.vunghanglam.com/?msdl=${ms}&join=${jd}`;
       const Income = `
         <div id="sectionIncome" class="section hide">
-          <div class="section-title">Tính thu nhập</div>
+          <div class="section-title">CÔNG CỤ DỰ TÍNH THU NHẬP</div>
           <div>
             <iframe id="incomeFrame" src="${incomeURL}" class="w-full h-[78vh] border rounded-lg"></iframe>
           </div>
