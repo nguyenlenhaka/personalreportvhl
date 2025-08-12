@@ -2,189 +2,465 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
-  <title>CÔNG CỤ DỰ TÍNH THU NHẬP</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DỰ TÍNH THU NHẬP – Vùng Hằng Lâm</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+
+  <!-- Font của dự án -->
   <link rel="stylesheet" href="fonts/fonts.css" />
+  <!-- Tailwind (chỉ dùng utility nhỏ) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
   <style>
-/* ===== RESET / TOKENS ===== */
-*{box-sizing:border-box;min-width:0}
-html,body{height:100%;margin:0;padding:0}
-:root{
-  --pad:18px; --pad-sm:12px;
-  --brand:#0051c1; --accent:#00a758; --mint:#e9fff3;
-  --head-h:72px;         /* sẽ đo động bằng JS */
-  --note-h:48px;         /* sẽ đo động bằng JS */
-  --footer-h:66px;       /* sẽ đo động bằng JS */
-}
+    :root{
+      --sidebar-width: 360px;
+      --header-h: 64px;
+      --footer-h: 66px;
+      --toc-h: 0px;          /* chiều cao dropdown mobile (tự tính bằng JS) */
+      --brand:#0051c1; 
+      --accent:#00a758;
+    }
+    /* đảm bảo không tràn ngang trên mọi thiết bị */
+    html,body{height:100%;margin:0;background:#f3f4f6;overflow-x:hidden}
+    *{box-sizing:border-box;min-width:0}
 
-/* ===== AUTH STATES ===== */
-body.logged-out .below-head{display:none}
-body.logged-in  .below-head{display:grid}
+    /* ===== HEADER (FIXED) ===== */
+    .app-header{
+      position:fixed; top:0; left:0; right:0; z-index:1000;
+      background:#e8fff3; border-bottom:1px solid #d9f7e6;
+      padding-top:env(safe-area-inset-top,0px);
+    }
+    /* header chia 2 khu: brand (logo+tên) và login */
+    .header-grid{
+      display:grid; grid-template-columns: 1fr auto;
+      align-items:center; gap:12px; padding:10px 12px;
+    }
+    .brand-row{
+      display:flex; align-items:center; gap:10px; min-width:0;
+    }
+    .logo-d{ height:48px; width:auto; display:block; flex:0 0 auto; }
 
-/* ===== HEADER (STICKY LUÔN) ===== */
-.masthead{
-  position:sticky; top:0; z-index:1000;
-  display:grid; grid-template-columns:1fr 420px; gap:18px; align-items:center;
-  background:var(--mint); padding:14px var(--pad);
-  border-bottom:1px solid #d9f7e6; box-shadow:0 2px 8px rgba(0,0,0,.06)
-}
-@media (max-width:900px){.masthead{grid-template-columns:1fr}}
-.head-left{display:flex;align-items:center;gap:12px;min-width:0}
-.head-left img{height:44px;width:auto;display:block}
-.head-text{display:flex;flex-direction:column;min-width:0}
-.head-text small{color:#09753e;font-weight:800;letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.head-text h1{margin:0;color:#008a53;font-size:clamp(1.2rem,.7rem + 2.6vw,2rem);font-weight:900;letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    /* Tiêu đề: cho phép xuống dòng, không cắt dấu */
+    .title-wrap{ display:flex; flex-direction:column; gap:2px; min-width:0; }
+    .title-top,.title-main{
+      font-family:'Manulife JH Sans','ManulifeJHSans',system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+      color:#059669; font-weight:800;
+      white-space:normal; overflow:visible; text-overflow:clip;
+      word-break:keep-all; line-height:1.25; padding-block:2px;
+    }
+    .title-top{  font-size:clamp(14px, 1vw + 10px, 22px); }
+    .title-main{ font-size:clamp(18px, 1.8vw + 12px, 34px); }
 
-/* ===== LOGIN CLUSTER ===== */
-.login-cluster{
-  display:grid;
-  grid-template-columns: 1fr auto;
-  grid-template-rows: auto auto;
-  grid-template-areas: "id btn" "date btn";
-  gap:10px; align-items:center; justify-items:stretch; min-width:0;
-}
-#agent-id{grid-area:id}
-#ngay-gia-nhap{grid-area:date}
-.login-cluster button{grid-area:btn; align-self:stretch}
-.login-cluster input{
-  height:46px;padding:0 12px;font-size:16px;border:1.3px solid #b7e7ce;border-radius:10px;background:#fff;font-weight:600;color:#0d7233;outline:none;width:100%;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis
-}
-.login-cluster input::placeholder{color:#7aa08f}
-.login-cluster button{
-  background:#008a53;color:#fff;border:none;border-radius:10px;padding:12px 18px;font-weight:800;cursor:pointer;white-space:nowrap
-}
-.login-cluster button:hover{background:#066a42}
-@media (max-width:900px){
-  .login-cluster{display:flex;gap:10px;align-items:center;justify-content:flex-end;flex-wrap:wrap}
-  .login-cluster>*{flex:1 1 140px;min-width:0}
-}
+    /* ===== LOGIN / LOGOUT ===== */
+    .login-cluster{
+      display:grid; gap:.5rem; align-items:center;
+      grid-template-columns: 1fr; /* MỖI DÒNG 1 TRƯỜNG TRÊN MOBILE */
+      width:min(560px, 100%);
+      justify-self:end;
+    }
+    .login-cluster input{
+      height:44px; padding:0 12px; font-size:16px; border:1.3px solid #b7e7ce; border-radius:10px;
+      background:#effaf3; font-weight:600; color:#0d7233; outline:none; width:100%;
+    }
+    .login-btn{
+      height:44px; padding:0 18px; background:#008a53; color:#fff; border:none; border-radius:10px;
+      font-weight:800; cursor:pointer; touch-action:manipulation;
+    }
+    .login-btn:hover{ background:#066a42; }
+    .logout-only{ display:none !important; }
+    body.logged-in .login-only{ display:none !important; }
+    body.logged-in .logout-only{ display:block !important; }
 
-/* ===== STICKY NOTE ngay dưới HEAD (LUÔN Ở VỊ TRÍ CỐ ĐỊNH) ===== */
-.info-bar{
-  position:sticky;
-  top:var(--head-h);             /* luôn dính ngay dưới head */
-  z-index:990;
-  background:#fff; border:1px solid #e6eef5; border-radius:10px; padding:8px 12px; margin:8px var(--pad);
-  display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap;
-}
-.info-left,.info-right{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:800}
-.info-left{color:var(--accent);font-style:italic}
-.info-right{color:#333b;font-style:italic}
+    /* ===== SIDEBAR (DESKTOP) ===== */
+    #sidebar{
+      position:fixed; left:0; top:var(--header-h); bottom:var(--footer-h);
+      width:var(--sidebar-width); background:#fff; border-right:1px solid #e5e7eb; z-index:900;
+      overflow-y:auto; overflow-x:hidden; display:none;
+    }
+    .sidebar-inner{ padding:12px; }
+    .menu-title{ font-weight:900; color:#065f46; margin:6px 8px 8px; white-space:normal; line-height:1.25; }
+    .menu-group{ margin:12px 0 6px 8px; font-weight:900; color:#0b3d2c; white-space:normal; line-height:1.25; }
+    .menu-item{
+      display:block; padding:.55rem .75rem; border-radius:.55rem; font-weight:800; color:#0b3d2c;
+      white-space:normal; overflow-wrap:anywhere; word-break:break-word; line-height:1.25; font-size:0.96rem;
+    }
+    .menu-item:hover{ background:#e5f7ee; }
+    .menu-item.active{ background:#0ea35b; color:#fff; }
+    .submenu{ margin:.25rem 0 .5rem .75rem; }
+    .submenu .menu-item{ padding:.45rem .6rem; }
 
-/* ===== MOBILE NAV (dropdown; STICKY dưới NOTE) ===== */
-#mobile-nav{
-  display:none; margin:8px var(--pad);
-  position:sticky; top:calc(var(--head-h) + var(--note-h)); z-index:980;
-}
-#mobile-support{display:block;margin-bottom:8px;background:#00a758;color:#fff;padding:10px;border-radius:8px;text-align:center;text-decoration:none;font-weight:800;white-space:nowrap}
-#mobile-nav select{
-  width:100%;padding:10px;font-weight:700;border-radius:8px;border:1px solid #c7d5e6;background:#fff;color:#00519c;max-width:100%
-}
-#mobile-nav option[disabled]{color:#7a8aa0}
-@media (min-width:901px){#mobile-nav{display:none !important}}
+    /* ===== MOBILE TOC (DANH MỤC DROPDOWN) =====
+       Luôn treo dưới header -> fixed + top = --header-h */
+    #tocMobile{
+      position:fixed; top:var(--header-h); left:0; right:0; z-index:880;
+      background:#fff; padding:10px 10px 6px;
+      border-bottom:1px solid #e5e7eb; display:none;
+      will-change:top;
+    }
+    #tocMobile .row{ display:flex; gap:8px; }
+    #tocSelect{
+      flex:1 1 auto; height:44px; border:1px solid #c7d5e6; border-radius:10px; padding:0 10px; font-weight:800; color:#00519c; background:#eff5ff;
+      font-size:16px;
+    }
+    #supportMobile{ flex:0 0 auto; display:inline-flex; align-items:center; justify-content:center; height:44px;
+      padding:0 14px; background:#00a758; color:#fff; border-radius:10px; text-decoration:none; font-weight:900; white-space:nowrap; }
 
-/* ===== LAYOUT DƯỚI HEADER ===== */
-.below-head{
-  display:grid; grid-template-columns:260px 1fr;
-  min-height:calc(100vh - var(--head-h) - var(--note-h) - var(--footer-h));
-  width:100%;
-}
-@media (max-width:900px){.below-head{grid-template-columns:1fr}}
+    /* ===== CONTENT ===== */
+    /* chừa chỗ dưới header + dropdown mobile (nếu có) */
+    body{ padding-top: calc(var(--header-h) + var(--toc-h) + 8px); }
+    /* chừa chỗ cho footer */
+    body{ padding-bottom: calc(2.25 * var(--footer-h) + env(safe-area-inset-bottom,0px)); }
 
-/* ===== SIDEBAR (desktop) ===== */
-aside.app-sidebar{
-  background:#0d7233;color:#fff;padding:14px 12px 18px;
-  position:sticky; top:calc(var(--head-h) + var(--note-h)); height:fit-content
-}
-.app-sidebar.hidden{display:none}
-.nav-list{list-style:none;padding:0;margin:0}
-.nav-list li{margin:4px 0}
-.nav-btn{
-  width:100%;background:transparent;color:#fff;border:1px solid #ffffff22;border-radius:10px;
-  padding:10px 12px;text-align:left;cursor:pointer;font-weight:600;white-space:nowrap;overflow:visible;text-overflow:initial
-}
-.nav-btn:hover{background:#ffffff12}
-.nav-btn.active{background:#ffffff1f;border-color:#ffffff3a}
-.nav-group{
-  margin:10px 4px 6px;font-size:.86rem;opacity:.9;font-weight:800;letter-spacing:.02em;
-  white-space:nowrap;overflow:visible;text-overflow:initial
-}
+    #contentWrap{ margin-left:0; }
+    body.sidebar-open #contentWrap{ margin-left:var(--sidebar-width); }
+    main{ max-width:1200px; margin:0 auto; padding:14px; }
 
-/* ===== SUPPORT FLOATING (desktop/ipad rộng) ===== */
-#support-btn{position:fixed;right:20px;bottom:calc(var(--footer-h) + 12px);background:#00a758;color:#fff;padding:12px 16px;border-radius:50px;font-weight:bold;text-decoration:none;box-shadow:0 4px 12px rgba(0,0,0,.2);z-index:999}
-@media (max-width:900px){#support-btn{display:none}}
+    /* Ẩn toàn bộ phần ngoài header khi chưa login */
+    body.logged-out #sidebar,
+    body.logged-out #tocMobile,
+    body.logged-out #contentWrap,
+    body.logged-out #supportDesk { display:none !important; }
 
-/* ===== MAIN ===== */
-.main-area{width:100%}
-.container{width:100%;background:#fff;margin:0;border-radius:0;box-shadow:none;padding:10px 0 30px;position:relative;z-index:1}
+    .section-title{
+      background:#fff; padding:12px 16px; border-left:6px solid #0ea35b; border-radius:8px;
+      font-weight:900; color:#0b3d2c; margin:6px 0 14px;
+    }
 
-/* ===== TITLES (sticky section title) ===== */
-h2{font-size:clamp(1rem,.9rem + .8vw,1.3rem);text-align:center;color:#0051c1;font-weight:700;margin:14px 0 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-h2.sticky-title{position:sticky;top:calc(var(--head-h) + var(--note-h));z-index:800;background:#fff;margin-top:8px;padding:6px 0;border-bottom:1px solid #e9edf2;cursor:pointer}
+    :root{ --pad:18px; }
+    .top-fields,.top-fields-2{display:grid;grid-template-columns:repeat(12,1fr);gap:16px;align-items:end;margin:10px var(--pad)}
+    .top-fields-2{margin-bottom:8px}
+    .field{grid-column:span 4;display:flex;flex-direction:column;min-width:0}
+    .field label{font-size:1.05rem;font-weight:800;color:#24364a;margin:0 0 6px 2px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .field input,.field select{
+      height:46px;padding:0 12px;font-size:16px;border:1.3px solid #c7d5e6;border-radius:8px;background-color:#effaf3;
+      font-weight:800;color:var(--brand);text-align:center
+    }
+    .field input[readonly]{background:#f5fffb;color:#0b8a62;border-color:#bfc7d1}
+    .gd-stage>b{display:block;margin:6px var(--pad);font-weight:900;}
+    .summary-row{display:grid;grid-template-columns:repeat(12,1fr);gap:18px;align-items:end;margin:16px var(--pad) 8px}
+    .summary-block{grid-column:span 6;text-align:center;min-width:0}
+    .summary-block label{color:#0051c1;font-weight:900;letter-spacing:.02em;display:block;margin-bottom:6px;text-transform:uppercase;font-size:.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .summary-block input{background:#f5fffb;color:#048f60;border:2px solid #00a578;border-radius:10px;font-size:16px;font-weight:900;height:56px;text-align:center;width:100%}
+    .calc-wrap{display:flex;align-items:center;gap:10px}
+    #calc-btn{background:#0d72b5;color:#fff;border:none;border-radius:12px;padding:14px 24px;font-size:18px;font-weight:800;box-shadow:0 6px 18px rgba(13,114,181,.25);white-space:nowrap;cursor:pointer;touch-action:manipulation}
+    #calc-btn:hover{background:#085a93}
 
-/* Forms */
-.top-fields,.top-fields-2{display:grid;grid-template-columns:repeat(12,1fr);gap:16px;align-items:end;margin:10px var(--pad)}
-.top-fields-2{margin-bottom:8px}
-.field{grid-column:span 4;display:flex;flex-direction:column;min-width:0}
-.field label{font-size:.98rem;font-weight:600;color:#24364a;margin:0 0 6px 2px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.field input,.field select{height:46px;padding:0 12px;font-size:16px;border:1.3px solid #c7d5e6;border-radius:8px;background-color:rgba(214,255,237,.3);font-weight:600;color:var(--brand);text-align:center;white-space:nowrap}
-.field input[readonly]{background:#fafbfd;color:#0b8a62;font-weight:700;border-color:#bfc7d1}
-@media (min-width:901px){
-  .field input,.field select,.summary-block input{overflow:auto !important;text-overflow:initial !important}
-}
+    /* ===== MOBILE: MỖI DÒNG 1 TRƯỜNG ===== */
+    @media (max-width:1023px){
+      /* BRAND & LOGIN: brand (logo + tên) cùng 1 dòng; login mỗi thành phần 1 dòng */
+      .header-grid{ grid-template-columns:1fr; }
+      .brand-row{ justify-content:flex-start; }
+      .login-cluster{ width:100%; justify-self:stretch; grid-template-columns:1fr; }
+      .logo-d{ height:44px; }
+      .title-top{ font-size:clamp(13px, 1.6vw + 10px, 18px); }
+      .title-main{ font-size:clamp(16px, 3vw + 10px, 24px); }
 
-/* Giai đoạn title */
-.gd-stage>b{display:block;margin:6px var(--pad);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+      .top-fields,.top-fields-2{grid-template-columns:1fr;gap:10px}
+      .field{grid-column:1/-1}
 
-/* Calc button */
-.calc-wrap{display:flex;align-items:center;gap:10px;margin:0 var(--pad)}
-#calc-btn{
-  background:#0d72b5;color:#fff;border:none;border-radius:12px;
-  padding:16px 28px;font-size:18px;font-weight:800;box-shadow:0 6px 18px rgba(13,114,181,.25);
-  width:100%; white-space:nowrap;
-}
-#calc-btn:hover{background:#085a93}
-#calc-btn:active{transform:translateY(1px)}
+      /* TẤT CẢ CÁC KHỐI TÓM TẮT cũng 1 cột */
+      .summary-row{grid-template-columns:1fr}
+      .summary-block{grid-column:1/-1}
 
-/* Summary */
-.summary-row{display:grid;grid-template-columns:repeat(12,1fr);gap:18px;align-items:end;margin:16px var(--pad) 8px}
-.summary-block{grid-column:span 6;text-align:center;min-width:0}
-.summary-block label{color:#0051c1;font-weight:800;letter-spacing:.02em;display:block;margin-bottom:6px;text-transform:uppercase;font-size:.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.summary-block input{background:#fff;color:#048f60;border:2px solid #00a578;border-radius:10px;font-size:16px;font-weight:900;height:56px;text-align:center;width:100%;white-space:nowrap}
+      body.sidebar-open #contentWrap{ margin-left:0 } /* mobile không chừa chỗ sidebar */
+      body.logged-in #tocMobile{ display:block; }     /* dropdown luôn hiện khi đã đăng nhập */
+    }
+    @media (min-width:1024px){
+      body.logged-in #sidebar{ display:block; }
+      body.logged-in.sidebar-open #supportDesk{ display:inline-flex; }
+    }
 
-/* Mobile tweaks */
-@media (max-width:900px){
-  .top-fields,.top-fields-2{grid-template-columns:1fr;gap:10px}
-  .field{grid-column:1/-1}
-  .calc-wrap{position:fixed;left:14px;right:14px;bottom:calc(var(--footer-h) + 12px);z-index:30}
-}
+    /* ===== FOOTER ===== */
+    #pageFooter{
+      position:fixed; left:0; right:0; bottom:0;
+      min-height:var(--footer-h);
+      display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;
+      background:#f4f6f8; color:#0b3a2a; border-top:1px solid #e3e7eb; z-index:950;
+      padding:8px 10px 10px; text-align:center; font-weight:800;
+    }
+    #pageFooter img{ height:22px; width:auto; display:block; }
+    #contentWrap::after{ content:""; display:block; height: calc(0.75 * var(--footer-h) + 24px); }
 
-/* Export HTML link (ẩn trên mobile) */
-#export-link{position:fixed;left:20px;bottom:calc(var(--footer-h) + 12px);z-index:998;background:#0051c1;color:#fff;padding:10px 14px;border-radius:8px;text-decoration:none;font-weight:700}
-@media (max-width:900px){#export-link{display:none !important}}
-
-/* ===== SINGLE-VIEW ===== */
-.app-section{display:none}
-.app-section.active{display:block}
-
-/* ===== FOOTER (luôn hiển thị; logo xuống dòng & căn giữa) ===== */
-#page-footer{
-  position:fixed; left:0; right:0; bottom:0; height:auto; min-height:var(--footer-h);
-  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;
-  background:#f4f6f8; color:#0b3a2a; border-top:1px solid #e3e7eb; z-index:950;
-  padding:8px 10px 10px; text-align:center; font-weight:700;
-}
-#page-footer .footer-text{white-space:nowrap}
-#page-footer img{height:22px;width:auto;display:block}
-
-/* ===== CHỪA CHỖ CHO FOOTER TRÊN DESKTOP ===== */
-@media (min-width:901px){
-  body{ padding-bottom: calc(var(--footer-h) + env(safe-area-inset-bottom,0px) + 20px); }
-  .calc-wrap{ margin-bottom: calc(var(--footer-h) + 20px); }
-}
+    /* Hỗ trợ desktop */
+    #supportDesk{
+      position:fixed; right:18px; bottom:calc(var(--footer-h) + 14px);
+      background:#00a758;color:#fff;padding:12px 16px;border-radius:28px;font-weight:900;text-decoration:none;box-shadow:0 4px 12px rgba(0,0,0,.18); z-index:940; display:none;
+    }
   </style>
+</head>
+<body class="logged-out">
+  <!-- ===== HEADER ===== -->
+  <header id="pageHeader" class="app-header">
+    <div class="header-grid">
+      <!-- Hàng brand: logo & tên trang cùng 1 dòng -->
+      <div class="brand-row">
+        <img src="logo.webp" alt="logo" class="logo-d" />
+        <div class="title-wrap">
+          <div class="title-top">CỔNG THÔNG TIN VÙNG HẰNG LÂM</div>
+          <div class="title-main">DỰ TÍNH THU NHẬP</div>
+        </div>
+      </div>
+      <!-- Cụm đăng nhập: LUÔN theo từng dòng trên mobile; desktop gọn gàng bên phải -->
+      <div class="login-cluster">
+        <input class="login-only" type="text" id="agent-id" placeholder="Nhập MSĐL" />
+        <input class="login-only" type="text" id="ngay-gia-nhap" placeholder="Ngày gia nhập (dd/mm/yyyy hoặc ddmmyyyy)" />
+        <button class="login-btn login-only" type="button" onclick="searchAgent()"><b>Đăng nhập</b></button>
+        <button id="logoutBtn" class="login-btn logout-only" type="button" onclick="location.reload()">Đăng xuất</button>
+      </div>
+    </div>
+  </header>
 
+  <!-- ===== MOBILE TOC (treo dưới header) ===== -->
+  <div id="tocMobile">
+    <div class="row">
+      <select id="tocSelect" aria-label="Chọn mục"></select>
+      <a id="supportMobile" href="http://zalo.me/0376763390" target="_blank" rel="noopener">Hỗ trợ</a>
+    </div>
+  </div>
+
+  <!-- ===== SIDEBAR (desktop) ===== -->
+  <aside id="sidebar">
+    <div class="sidebar-inner">
+      <div class="menu-title">Danh mục</div>
+
+      <a href="#" class="menu-item active" data-target="sec-daily">THÔNG TIN ĐẠI LÝ</a>
+
+      <div class="menu-group">A. THU NHẬP TỪ BÁN HÀNG CÁ NHÂN</div>
+      <div class="submenu">
+        <a href="#" class="menu-item" data-target="sec-muctieu">1. Mục tiêu tháng</a>
+        <a href="#" class="menu-item" data-target="sec-khoanthu">2. Các khoản thu nhập</a>
+        <a href="#" class="menu-item" data-target="sec-ban-hang">3. Thu nhập</a>
+      </div>
+
+      <div class="menu-group">B. THU NHẬP TỪ HOẠT ĐỘNG TUYỂN DỤNG</div>
+      <a href="#" class="menu-item" data-target="sec-tuyendung">Coming Soon</a>
+
+      <div class="menu-group">C. THU NHẬP TỪ HOẠT ĐỘNG QUẢN LÝ</div>
+      <a href="#" class="menu-item" data-target="sec-quan-ly">Coming Soon</a>
+
+      <a href="#" class="menu-item" data-target="sec-tong">D. TỔNG THU NHẬP</a>
+    </div>
+  </aside>
+
+  <!-- ===== CONTENT ===== -->
+  <a id="supportDesk" href="http://zalo.me/0376763390" target="_blank" rel="noopener">Hỗ trợ</a>
+
+  <div id="contentWrap">
+    <main>
+      <!-- 1) THÔNG TIN ĐẠI LÝ -->
+      <section id="sec-daily" class="app-section">
+        <div class="section-title">THÔNG TIN ĐẠI LÝ</div>
+        <div class="top-fields">
+          <div class="field" style="flex:6">
+            <label for="ho-ten"><b>Họ và tên</b></label>
+            <input type="text" id="ho-ten" readonly />
+          </div>
+          <div class="field" style="flex:2">
+            <label for="khu-vuc"><b>Khu vực</b></label>
+            <input type="text" id="khu-vuc" readonly />
+          </div>
+        </div>
+        <div class="top-fields">
+          <div class="field" style="flex:1.5">
+            <label for="thang-lam-viec"><b>Thâm niên (tháng)</b></label>
+            <input type="text" id="thang-lam-viec" readonly />
+          </div>
+          <div class="field" style="flex:4">
+            <label for="nhom-dai-ly"><b>Phân nhóm đại lý</b></label>
+            <input type="text" id="nhom-dai-ly" readonly />
+          </div>
+        </div>
+        <div class="top-fields">
+          <div class="field" style="flex:1">
+            <label for="p13-ca-nhan"><b>P13 cá nhân</b></label>
+            <input type="text" id="p13-ca-nhan" readonly />
+          </div>
+          <div class="field" style="flex:1">
+            <label for="he-so-thuong"><b>Hệ số tính thưởng</b></label>
+            <input type="text" id="he-so-thuong" readonly />
+          </div>
+        </div>
+        <div class="top-fields">
+          <div class="field" style="flex:1">
+            <label for="mdrt-fyp"><b>∑ FYP DH MDRT</b></label>
+            <input type="text" id="mdrt-fyp" readonly />
+          </div>
+          <div class="field" style="flex:1">
+            <label for="tong-fyc"><b>∑ FYC T-1 và T-2</b></label>
+            <input type="text" id="tong-fyc" readonly />
+          </div>
+          <div class="field" style="flex:1">
+            <label for="tong-fyc-quy"><b>∑ FYC Quý hiện tại</b></label>
+            <input type="text" id="tong-fyc-quy" readonly />
+          </div>
+        </div>
+        <div class="top-fields">
+          <div class="field" style="flex:1">
+            <label for="active-months"><b>Số tháng có hoạt động trong Quý</b></label>
+            <input type="text" id="active-months" readonly />
+          </div>
+        </div>
+      </section>
+
+      <!-- 2) A.1 MỤC TIÊU THÁNG -->
+      <section id="sec-muctieu" class="app-section" style="display:none">
+        <div class="section-title">A.1 MỤC TIÊU THÁNG</div>
+        <div class="top-fields" style="margin-bottom:10px">
+          <div class="field">
+            <label for="month-select"><b>Tháng dự tính</b></label>
+            <select id="month-select"></select>
+          </div>
+        </div>
+
+        <div id="memo-giai-doan">
+          <div class="gd-stage">
+            <b>Giai đoạn 1 (1-11/8)</b>
+            <div class="top-fields-2">
+              <div class="field"><label for="fypchinh-gd1"><b>FYP SP chính</b></label><input type="text" id="fypchinh-gd1"/></div>
+              <div class="field"><label for="fypkem-gd1"><b>FYP SP gắn kèm</b></label><input type="text" id="fypkem-gd1"/></div>
+            </div>
+            <div class="top-fields-2">
+              <div class="field"><label for="sohd-gd1"><b>Số HĐ</b></label><input type="text" id="sohd-gd1"/></div>
+              <div class="field"><label for="fyp-gd1"><b>∑ FYP</b></label><input type="text" id="fyp-gd1" readonly/></div>
+            </div>
+            <div class="top-fields-2">
+              <div class="field"><label for="thuongmemo-gd1"><b>Thưởng Memo Giai đoạn 1</b></label><input type="text" id="thuongmemo-gd1" readonly/><span id="alert-gd1" style="color:red;display:none"></span></div>
+            </div>
+          </div>
+
+          <div class="gd-stage">
+            <b>Giai đoạn 2 (12-25/8)</b>
+            <div class="top-fields-2">
+              <div class="field"><label for="fypchinh-gd2"><b>FYP SP chính</b></label><input type="text" id="fypchinh-gd2"/></div>
+              <div class="field"><label for="fypkem-gd2"><b>FYP SP gắn kèm</b></label><input type="text" id="fypkem-gd2"/></div>
+            </div>
+            <div class="top-fields-2">
+              <div class="field"><label for="sohd-gd2"><b>Số HĐ</b></label><input type="text" id="sohd-gd2"/></div>
+              <div class="field"><label for="fyp-gd2"><b>∑ FYP</b></label><input type="text" id="fyp-gd2" readonly/></div>
+            </div>
+            <div class="top-fields-2">
+              <div class="field"><label for="thuongmemo-gd2"><b>Thưởng Memo Giai đoạn 2</b></label><input type="text" id="thuongmemo-gd2" readonly/><span id="alert-gd2" style="color:red;display:none"></span></div>
+            </div>
+          </div>
+
+          <div class="gd-stage">
+            <b>Giai đoạn 3 (26-31/8)</b>
+            <div class="top-fields-2">
+              <div class="field"><label for="fypchinh-gd3"><b>FYP SP chính</b></label><input type="text" id="fypchinh-gd3"/></div>
+              <div class="field"><label for="fypkem-gd3"><b>FYP SP gắn kèm</b></label><input type="text" id="fypkem-gd3"/></div>
+            </div>
+            <div class="top-fields-2">
+              <div class="field"><label for="sohd-gd3"><b>Số HĐ</b></label><input type="text" id="sohd-gd3"/></div>
+              <div class="field"><label for="fyp-gd3"><b>∑ FYP</b></label><input type="text" id="fyp-gd3" readonly/></div>
+            </div>
+            <div class="top-fields-2">
+              <div class="field"><label for="thuongmemo-gd3"><b>Thưởng Memo Giai đoạn 3</b></label><input type="text" id="thuongmemo-gd3" readonly/><span id="alert-gd3" style="color:red;display:none"></span></div>
+            </div>
+          </div>
+
+          <br/>
+          <div>
+            <b style="margin-left:var(--pad)">TỔNG HỢP</b>
+            <div class="top-fields">
+              <div class="field"><label for="tong-cc"><b>∑ Số lượng Hợp đồng</b></label><input type="text" id="tong-cc" readonly/></div>
+              <div class="field"><label for="fyp-chinh"><b>∑ FYP SP chính</b></label><input type="text" id="fyp-chinh" readonly/></div>
+              <div class="field"><label for="fyp-kem"><b>∑ FYP SP gắn kèm</b></label><input type="text" id="fyp-kem" readonly/></div>
+            </div>
+            <div class="top-fields" style="align-items:center">
+              <div class="field" style="flex:3"><label for="tong-fyp"><b>∑ FYP Từ các HĐ</b></label><input type="text" id="tong-fyp" readonly/></div>
+              <div class="field" style="flex:3;display:flex;align-items:flex-end">
+                <div class="calc-wrap">
+                  <button id="calc-btn" onclick="calculateIncome(); showSection('sec-khoanthu')">Tính thu nhập</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3) A.2 CÁC KHOẢN THU NHẬP -->
+      <section id="sec-khoanthu" class="app-section" style="display:none">
+        <div class="section-title">A.2 CÁC KHOẢN THU NHẬP</div>
+        <div class="top-fields">
+          <div class="field"><label><b>FYC SP chính (30%)</b></label><input type="text" id="fyc-chinh" readonly/></div>
+          <div class="field"><label><b>FYC SP gắn kèm (20%)</b></label><input type="text" id="fyc-kem" readonly/></div>
+        </div>
+        <div class="top-fields">
+          <div class="field"><label><b>Thưởng thêm SP gắn kèm (20%)</b></label><input type="text" id="thuong-kem" readonly/></div>
+          <div class="field"><label><b>FYC Tính chính sách</b></label><input type="text" id="fyc-thuong" readonly/></div>
+        </div>
+        <div class="top-fields">
+          <div class="field"><label><b>Thưởng NSXS Manulife Pro</b></label><input type="text" id="thuong-nspro" readonly/></div>
+          <div class="field"><label><b>Thưởng Năng suất hàng tháng</b></label><input type="text" id="thuong-nst" readonly/></div>
+        </div>
+        <div class="top-fields">
+          <div class="field"><label><b>Thưởng Năng suất hàng Quý</b></label><input type="text" id="thuong-nsq" readonly/></div>
+          <div class="field">
+            <label><b>Thưởng Tiến độ MDRT</b></label>
+            <input type="text" id="thuong-mdrt" readonly/>
+            <span id="alert-mdrt" style="color:#d62929;display:none"></span>
+          </div>
+        </div>
+        <div class="top-fields">
+          <div class="field"><label for="thuong-memo" class="income-note"><b>0001M08/2025/ASBD</b></label><input type="text" id="thuong-memo" readonly/></div>
+        </div>
+      </section>
+
+      <!-- 4) A.3 THU NHẬP BÁN HÀNG -->
+      <section id="sec-ban-hang" class="app-section" style="display:none">
+        <div class="section-title">A.3 THU NHẬP BÁN HÀNG</div>
+        <div class="summary-row">
+          <div class="summary-block"><label for="tong-thu-nhap">Tổng thu nhập bán hàng (A)</label><input type="text" id="tong-thu-nhap" readonly/></div>
+          <div class="summary-block"><label for="ty-le-thu-nhap">Tỷ lệ thu nhập/doanh thu</label><input type="text" id="ty-le-thu-nhap" readonly/></div>
+        </div>
+        <hr><div class="section-title" style="position:static;border-left-color:#0d72b5">CHÚC BẠN SỞ HỮU TỐI ĐA THU NHẬP</div>
+      </section>
+
+      <!-- 5) B. TUYỂN DỤNG -->
+      <section id="sec-tuyendung" class="app-section" style="display:none">
+        <div class="section-title">B. THU NHẬP TỪ HOẠT ĐỘNG TUYỂN DỤNG</div>
+        <div class="top-fields">
+          <div class="field">
+            <label><b>Thu nhập tuyển dụng (B)</b></label>
+            <input type="text" id="thu-nhap-tuyen-dung" value="0" readonly />
+          </div>
+        </div>
+        <div class="top-fields"><div class="field"><div style="color:#0ea35b;font-weight:900">Coming soon</div></div></div>
+      </section>
+
+      <!-- 6) C. QUẢN LÝ -->
+      <section id="sec-quan-ly" class="app-section" style="display:none">
+        <div class="section-title">C. THU NHẬP TỪ HOẠT ĐỘNG QUẢN LÝ</div>
+        <div class="top-fields">
+          <div class="field">
+            <label><b>Thu nhập quản lý (C)</b></label>
+            <input type="text" id="thu-nhap-quan-ly" value="0" readonly />
+          </div>
+        </div>
+        <div class="top-fields"><div class="field"><div style="color:#0ea35b;font-weight:900">Coming soon</div></div></div>
+      </section>
+
+      <!-- 7) D. TỔNG THU NHẬP -->
+      <section id="sec-tong" class="app-section" style="display:none">
+        <div class="section-title">D. TỔNG THU NHẬP (A + B + C)</div>
+        <div class="summary-row">
+          <div class="summary-block"><label for="tong-A">A — Thu nhập bán hàng</label><input type="text" id="tong-A" readonly/></div>
+          <div class="summary-block"><label for="tong-B">B — Thu nhập tuyển dụng</label><input type="text" id="tong-B" readonly/></div>
+        </div>
+        <div class="summary-row">
+          <div class="summary-block"><label for="tong-C">C — Thu nhập quản lý</label><input type="text" id="tong-C" readonly/></div>
+          <div class="summary-block"><label for="tong-ABC">D — TỔNG THU NHẬP (A + B + C)</label><input type="text" id="tong-ABC" readonly/></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ===== FOOTER ===== -->
+  <footer id="pageFooter">
+    <div>Bản quyền trang web thuộc về</div>
+    <img src="logo_textr.webp" alt="Logo" />
+  </footer>
+
+  <!-- ===== LOGIC (GIỮ NGUYÊN, CHỈ CHỈNH HÀNH VI CUỘN TRÊN MOBILE) ===== -->
   <script>
 /* ===== GLOBAL VARS ===== */
 let data=[],nspro=[],nst6=[],nst7=[],nsq6=[],nsq7=[],hsdt=[],trackingMDRT=[];
@@ -230,10 +506,8 @@ async function loadData(){
 function getCurrentMonth(){return new Date().getMonth()+1;}
 function populateMonthSelect(){const sel=document.getElementById('month-select'); if(!sel)return; sel.innerHTML=''; const cur=getCurrentMonth(); for(let m=cur;m<=12;m++){const op=document.createElement('option');op.value=m;op.textContent=`Tháng ${m}`;sel.appendChild(op);}}
 
-/* ===== HE SO THUONG ===== */
+/* ===== THƯỞNG/MEMO/TỔNG HỢP ===== */
 function getHeSoThuong(p13){const n=Number(p13);if(!isFinite(n))return 1;let best=1;for(const row of hsdt){const moc=row["P13 cá nhân"];const tl=row["TỶ LỆ"];if(moc===null){best=tl||best;continue}if(n>=Number(moc))best=Number(tl)||best}return best}
-
-/* ===== MEMO OPTIMIZE ===== */
 function optimizeMemo(fyp,ccLimit,m1,t1,m2,t2){const F=Math.max(0,+fyp||0);const limit=(ccLimit==null||ccLimit<=0)?Infinity:Math.max(0,Math.floor(ccLimit));let best=0,used=0;const max25=Math.floor(F/m1);const maxLoop=Math.min(max25,limit);for(let i=0;i<=maxLoop;i++){const rem=F-i*m1;const cap=(limit===Infinity)?Infinity:(limit-i);const j=Math.min(Math.floor(rem/m2),cap);const u=i+j;const r=i*t1+j*t2;if(r>best || (r===best && u<used)){best=r;used=u}}return{reward:best,used}}
 function calcMemoStage(gd,sohd,tongFYP){let m1,t1,m2,t2;if(gd==='gd1'){m1=25000;t1=2500;m2=16000;t2=1500}else if(gd==='gd2'){m1=25000;t1=2000;m2=16000;t2=1000}else{m1=25000;t1=1500;m2=16000;t2=750}
   const optU=optimizeMemo(+tongFYP||0,Infinity,m1,t1,m2,t2);let res=optU,txt='';const cc=Math.max(0,+sohd||0);
@@ -241,8 +515,6 @@ function calcMemoStage(gd,sohd,tongFYP){let m1,t1,m2,t2;if(gd==='gd1'){m1=25000;
   document.getElementById('thuongmemo-'+gd).value=formatMoney3(res.reward);
   const el=document.getElementById('alert-'+gd); if(el){el.textContent=txt; el.style.display=txt?'block':'none'}
 }
-
-/* ===== COMBINE STAGES ===== */
 function updateTongHop(){
   const geti=id=>parseInt((document.getElementById(id).value||'').replace(/[^\d]/g,''),10)||0;
   const getn=id=>parseMoney3(document.getElementById(id).value);
@@ -343,72 +615,89 @@ function calculateThuongMDRT(){
   document.getElementById("thuong-mdrt").value = formatMoney3(thuong);
 }
 
-/* ===== TOTAL (A) & COMBINED (C) ===== */
+/* ===== TOTAL (A) & D (A+B+C) ===== */
 function calculateTongThuNhap(){
   const v=id=>parseMoney3(document.getElementById(id).value);
-  const sum=v("fyc-chinh")+v("fyc-kem")+v("thuong-kem")+v("thuong-nspro")+v("thuong-nst")+v("thuong-nsq")+v("thuong-memo")+v("thuong-mdrt");
+  const sum=v("fyc-chinh")+v("fyc-kem")+v("thuong-kem")+v("fyc-thuong")+v("thuong-nspro")+v("thuong-nst")+v("thuong-nsq")+v("thuong-memo")+v("thuong-mdrt");
   document.getElementById("tong-thu-nhap").value=formatMoney3(sum);
   const tongFYP=parseMoney3(document.getElementById("tong-fyp").value);
   document.getElementById("ty-le-thu-nhap").value=tongFYP>0?((sum/tongFYP)*100).toFixed(2)+" %":"";
-  updateCombinedTotals(); syncReadonlyTitles();
+  updateCombinedTotals(); reformatMoneyOutputs(); syncReadonlyTitles();
 }
 function updateCombinedTotals(){
-  const a=parseMoney3(document.getElementById("tong-thu-nhap").value);
-  const b=parseMoney3(document.getElementById("thu-nhap-quan-ly")?document.getElementById("thu-nhap-quan-ly").value:0);
-  const elA=document.getElementById("tong-A"); if(elA) elA.value=formatMoney3(a);
-  const elB=document.getElementById("tong-B"); if(elB) elB.value=formatMoney3(b);
-  const elAB=document.getElementById("tong-AB"); if(elAB) elAB.value=formatMoney3(a+b);
-}
-function calculateIncome(){
-  sanitizeAllNumericInputs(); updateTongHop();
-  const soCC=parseInt(document.getElementById("tong-cc").value,10)||0;
-  if(!soCC){alert("Bạn cần nhập ít nhất 1 hợp đồng đạt 16 triệu FYP để được thưởng!"); return;}
-  const fC=parseMoney3(document.getElementById("fyp-chinh").value);
-  const fK=parseMoney3(document.getElementById("fyp-kem").value);
-  const tong=fC+fK; document.getElementById("tong-fyp").value=formatMoney3(tong);
-  const fycC=fC*0.3, fycK=fK*0.2, thuK=fK*0.2, fycT=fycC+fycK;
-  document.getElementById("fyc-chinh").value=formatMoney3(fycC);
-  document.getElementById("fyc-kem").value=formatMoney3(fycK);
-  document.getElementById("thuong-kem").value=formatMoney3(thuK);
-  document.getElementById("fyc-thuong").value=formatMoney3(fycT);
-  calculateNSPro(); calculateNST(); calculateNSQ(); calculateThuongMDRT();
-  calculateTongThuNhap(); reformatMoneyOutputs(); syncReadonlyTitles();
+  const A = parseMoney3(document.getElementById("tong-thu-nhap").value);
+  const B = parseMoney3(document.getElementById("thu-nhap-tuyen-dung")?document.getElementById("thu-nhap-tuyen-dung").value:0);
+  const C = parseMoney3(document.getElementById("thu-nhap-quan-ly")?document.getElementById("thu-nhap-quan-ly").value:0);
+  const elA=document.getElementById("tong-A"); if(elA) elA.value=formatMoney3(A);
+  const elB=document.getElementById("tong-B"); if(elB) elB.value=formatMoney3(B);
+  const elC=document.getElementById("tong-C"); if(elC) elC.value=formatMoney3(C);
+  const elABC=document.getElementById("tong-ABC"); if(elABC) elABC.value=formatMoney3(A+B+C);
 }
 
 /* ===== INPUT MODES ===== */
 function autoFormatInputs(){
   MONEY_INPUT_IDS_EDITABLE.forEach(id=>{const el=document.getElementById(id); if(!el)return;
     el.addEventListener('input',()=>{el.value=el.value.replace(/[^\d\.,]/g,'')});
-    el.addEventListener('blur',()=>{const n=parseMoney3(el.value); el.value=n?formatMoney3(n):''});
+    el.addEventListener('blur',()=>{const n=parseMoney3(el.value); el.value=n?formatMoney3(n):''; updateTongHop(); calculateIncome();});
   });
   COUNT_INPUT_IDS_EDITABLE.forEach(id=>{const el=document.getElementById(id); if(!el)return;
     el.addEventListener('input',()=>{el.value=el.value.replace(/[^\d]/g,'')});
-    el.addEventListener('blur',()=>{el.value=el.value?String(parseInt(el.value,10)):''});
+    el.addEventListener('blur',()=>{el.value=el.value?String(parseInt(el.value,10)):''; updateTongHop(); calculateIncome();});
   });
 }
 function sanitizeAllNumericInputs(){ALL_MONEY_IDS.forEach(id=>{const el=document.getElementById(id); if(el)el.setAttribute('type','text')});}
 function reformatMoneyOutputs(){for(const id of MONEY_OUTPUT_IDS){const el=document.getElementById(id); if(!el)continue; const n=parseMoney3(el.value); el.value=formatMoney3(n||0)}}
 function syncReadonlyTitles(){document.querySelectorAll('input[readonly]').forEach(el=>el.title=el.value||'');}
 
-/* ===== NAV VISIBILITY ===== */
-function updateNavVisibility(){
-  const sidebar=document.querySelector('.app-sidebar');
-  const isMobile=window.matchMedia('(max-width:900px)').matches;
-  if(sidebar) sidebar.classList.toggle('hidden', !isLoggedIn || isMobile);
-  const mobileNav=document.getElementById('mobile-nav');
-  if(mobileNav) mobileNav.style.display=(isLoggedIn && isMobile)?'block':'none';
+/* ===== NAV + SECTION HIỂN THỊ ===== */
+function getOffsets(){
+  const head=document.getElementById('pageHeader');
+  const toc=document.getElementById('tocMobile');
+  const h = head ? Math.ceil(head.getBoundingClientRect().height) : 64;
+  let t = 0;
+  if(toc && getComputedStyle(toc).display!=='none'){
+    t = Math.ceil(toc.getBoundingClientRect().height);
+  }
+  return {h,t};
 }
-
-/* ===== SINGLE-VIEW ===== */
 function showSection(id){
-  document.querySelectorAll('.app-section').forEach(s=>s.classList.remove('active'));
-  const t=document.getElementById(id); if(t) t.classList.add('active');
-  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
-  const a=document.querySelector(`[data-target="${id}"]`); if(a) a.classList.add('active');
-  const dd=document.querySelector('#mobile-nav select');
-  if(dd && dd.dataset.touched==='1' && dd.value!==id) dd.value=id;
-  if(history.replaceState){ history.replaceState(null,'','#'+id); } else { location.hash = id; }
-  scheduleFit();
+  // 1) Ẩn/hiện section
+  document.querySelectorAll('.app-section').forEach(s=>s.style.display='none');
+  const target=document.getElementById(id);
+  if(target) target.style.display='block';
+
+  // 2) Active trên sidebar (desktop)
+  document.querySelectorAll('#sidebar .menu-item').forEach(a=>a.classList.remove('active'));
+  const a=document.querySelector(`#sidebar .menu-item[data-target="${id}"]`); if(a) a.classList.add('active');
+
+  // 3) Đồng bộ dropdown mobile
+  const sel=document.getElementById('tocSelect');
+  if(sel){ for(const o of sel.options){ if(o.value===id){ sel.value=id; break; } } }
+
+  // 4) Cập nhật chiều cao header/toc để tính offset
+  setLayoutVars();
+
+  // 5) CUỘN: luôn đưa đầu mục lên ngay dưới header + dropdown (trên điện thoại)
+  if(target){
+    const {h,t}=getOffsets();
+    const offset=h + t + 6; // 6px đệm
+    const y = target.getBoundingClientRect().top + window.scrollY - offset;
+    window.scrollTo({ top: Math.max(0,y), behavior:'smooth' });
+  }
+}
+function bindSidebar(){
+  document.querySelectorAll('#sidebar .menu-item[data-target]').forEach(a=>{
+    a.addEventListener('click',e=>{e.preventDefault(); const id=a.getAttribute('data-target'); if(id) showSection(id);});
+  });
+}
+function buildMobileTOC(){
+  const sel=document.getElementById('tocSelect'); if(!sel) return;
+  sel.innerHTML='';
+  document.querySelectorAll('#sidebar .menu-item[data-target]').forEach(a=>{
+    const id=a.getAttribute('data-target'), text=a.textContent.trim();
+    const op=document.createElement('option'); op.value=id; op.textContent=text; sel.appendChild(op);
+  });
+  sel.addEventListener('change',()=>{ showSection(sel.value); });
 }
 
 /* ===== SEARCH / LOGIN ===== */
@@ -442,36 +731,17 @@ function searchAgent(){
   sanitizeAllNumericInputs(); updateTongHop(); calculateNSPro(); calculateNST(); calculateNSQ(); calculateThuongMDRT(); calculateTongThuNhap();
   syncReadonlyTitles();
 
-  isLoggedIn=true; document.body.classList.add('logged-in'); document.body.classList.remove('logged-out');
-  updateNavVisibility();
-  setStickyVars();   // <<< đo lại head/note sau khi giao diện hiển thị
-
-  const initHash = location.hash && location.hash.slice(1);
-  if (initHash && document.getElementById(initHash)) { showSection(initHash); }
-  else { showSection('sec-daily'); }
+  isLoggedIn=true;
+  // Bật giao diện sau đăng nhập
+  document.body.classList.remove('logged-out');
+  document.body.classList.add('logged-in');
+  applySidebarMode(); // chỉ bật sidebar trên desktop
+  buildMobileTOC();
+  showSection('sec-daily');
+  setLayoutVars();          // cập nhật header/toc/footer height để đẩy nội dung xuống dưới đúng chuẩn
 }
 
-/* ===== FIT TEXT ===== */
-const FIT_SELECTORS=[
-  'h1','h2','h3','.info-left','.info-right','.summary-block label','.field label',
-  'button','.gd-stage>b','.nav-btn','.nav-group','#mobile-support','#mobile-nav select',
-  '#page-footer .footer-text','.head-text small'
-];
-function fitTextElement(el,minPx=10){if(!el)return; el.style.fontSize=''; const base=parseFloat(getComputedStyle(el).fontSize)||16; el.style.whiteSpace='nowrap'; if(el.clientWidth && el.scrollWidth>el.clientWidth){let s=base; while(el.scrollWidth>el.clientWidth && s>minPx){s-=0.5; el.style.fontSize=s+'px';}}}
-function fitAllText(){document.querySelectorAll(FIT_SELECTORS.join(',')).forEach(fitTextElement);}
-let fitRaf=null;function scheduleFit(){if(fitRaf)cancelAnimationFrame(fitRaf); fitRaf=requestAnimationFrame(()=>{fitAllText(); fitRaf=null;});}
-
-/* ===== EXPORT ===== */
-function exportHTML(){const blob=new Blob([document.documentElement.outerHTML],{type:"text/html"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="du-tinh-thu-nhap.html";a.click();URL.revokeObjectURL(url);}
-function toggleExportLink(){
-  const link=document.getElementById('export-link'); if(!link)return;
-  const isMobile=window.matchMedia('(max-width:900px)').matches;
-  if(isMobile){ link.style.display='none'; return; }
-  const need=document.body.scrollHeight>window.innerHeight+8;
-  link.style.display=need?'inline-block':'none';
-}
-
-/* ===== ENTER TO CALCULATE ===== */
+/* ===== ENTER TO CALC ===== */
 function enableEnterToCalc(){
   document.addEventListener('keydown', (e)=>{
     if(e.key!=='Enter') return;
@@ -484,324 +754,74 @@ function enableEnterToCalc(){
   });
 }
 
-/* ===== STICKY & FOOTER VARS (đo động, giữ NOTE luôn ngay dưới HEAD) ===== */
-function setStickyVars(){
-  const head=document.querySelector('.masthead');
-  const note=document.querySelector('.info-bar');
-  const footer=document.getElementById('page-footer');
-  const h = head ? Math.ceil(head.getBoundingClientRect().height) : 72;
-  const n = note ? Math.ceil(note.getBoundingClientRect().height) : 48;
+/* ===== LAYOUT VARS ===== */
+function setLayoutVars(){
+  const head=document.getElementById('pageHeader');
+  const footer=document.getElementById('pageFooter');
+  const toc=document.getElementById('tocMobile');
+  const h = head ? Math.ceil(head.getBoundingClientRect().height) : 64;
   const f = footer ? Math.ceil(footer.getBoundingClientRect().height) : 66;
-  document.documentElement.style.setProperty('--head-h', h+'px');
-  document.documentElement.style.setProperty('--note-h', n+'px');
+  let t = 0;
+  if(toc && getComputedStyle(toc).display!=='none'){
+    t = Math.ceil(toc.getBoundingClientRect().height);
+  }
+  document.documentElement.style.setProperty('--header-h', h+'px');
   document.documentElement.style.setProperty('--footer-h', f+'px');
+  document.documentElement.style.setProperty('--toc-h', t+'px');
+}
+function applySidebarMode(){
+  if(!document.body.classList.contains('logged-in')) return;
+  if(window.matchMedia('(min-width:1024px)').matches){
+    document.body.classList.add('sidebar-open');
+  }else{
+    document.body.classList.remove('sidebar-open');
+  }
+}
+
+/* ===== GỘP TÍNH THU NHẬP ===== */
+function calculateIncome(){
+  const tongFYP=parseMoney3(document.getElementById('tong-fyp').value);
+  const chinh=parseMoney3(document.getElementById('fyp-chinh').value);
+  const kem=parseMoney3(document.getElementById('fyp-kem').value);
+
+  const fycChinh=chinh*0.3;
+  const fycKem=kem*0.2;
+  const thuongKem=kem*0.2;
+  const fycThuong=fycChinh+fycKem+thuongKem;
+
+  document.getElementById('fyc-chinh').value=formatMoney3(fycChinh);
+  document.getElementById('fyc-kem').value=formatMoney3(fycKem);
+  document.getElementById('thuong-kem').value=formatMoney3(thuongKem);
+  document.getElementById('fyc-thuong').value=formatMoney3(fycThuong);
+
+  calculateNSPro();
+  calculateNST();
+  calculateNSQ();
+  calculateThuongMDRT();
+  calculateTongThuNhap();
 }
 
 /* ===== INIT ===== */
 window.addEventListener('load', async ()=>{
-  document.body.classList.add('logged-out');
-  await loadData(); populateMonthSelect(); sanitizeAllNumericInputs(); autoFormatInputs();
+  await loadData();
+  populateMonthSelect(); sanitizeAllNumericInputs(); autoFormatInputs();
+  enableEnterToCalc(); setLayoutVars(); applySidebarMode();
+  window.addEventListener('resize', ()=>{ setLayoutVars(); applySidebarMode(); });
 
+  // Chuẩn hoá nhập ngày
   const ngay=document.getElementById("ngay-gia-nhap");
   if(ngay){
     ngay.addEventListener('blur',()=>{const v=ngay.value.trim(); if(/^\d{8}$/.test(v)) ngay.value=standardizeDate(v);});
     document.getElementById("agent-id").addEventListener("keydown",e=>{if(e.key==="Enter")searchAgent()});
     ngay.addEventListener("keydown",e=>{if(e.key==="Enter")searchAgent()});
   }
-  const msel=document.getElementById("month-select");
-  if(msel){ msel.addEventListener('change',()=>{calculateNSQ(); calculateThuongMDRT(); calculateTongThuNhap();}); }
 
-  const mobileDD=document.querySelector('#mobile-nav select');
-  if(mobileDD){
-    mobileDD.addEventListener('change', function(){ this.dataset.touched='1'; if(this.value) showSection(this.value); });
-  }
+  // Sidebar click
+  bindSidebar();
 
-  document.querySelectorAll('.nav-btn').forEach(btn=>btn.addEventListener('click',()=>showSection(btn.dataset.target)));
-  document.querySelectorAll('section.app-section > h2').forEach(h=>{ h.addEventListener('click', ()=> showSection(h.parentElement.id)); });
-
-  enableEnterToCalc();
-  showSection('sec-daily');
-
-  if(document.fonts && document.fonts.ready){try{await document.fonts.ready;}catch{}}
-  scheduleFit();
-  setStickyVars();             // đo ngay khi load
-  window.addEventListener('resize',()=>{scheduleFit(); updateNavVisibility(); toggleExportLink(); setStickyVars();});
-  window.addEventListener('orientationchange', setStickyVars);
-
-  toggleExportLink();
+  // Mặc định ẩn tất cả section khi chưa login
+  document.querySelectorAll('.app-section').forEach(s=>s.style.display='none');
 });
   </script>
-</head>
-<body class="logged-out">
-  <!-- HEADER (Sticky) -->
-  <div class="masthead">
-    <div class="head-left">
-      <img id="logo-main" src=/logo.webp alt="Logo" />
-      <div class="head-text">
-        <small>CỔNG THÔNG TIN VÙNG HẰNG LÂM</small>
-        <h1>DỰ TÍNH THU NHẬP</h1>
-      </div>
-    </div>
-    <div class="login-cluster">
-      <input type="text" id="agent-id" placeholder="Nhập MSĐL" />
-      <input type="text" id="ngay-gia-nhap" placeholder="Ngày gia nhập (dd/mm/yyyy hoặc ddmmyyyy)" />
-      <button onclick="searchAgent()"><b>Đăng nhập</b></button>
-    </div>
-  </div>
-
-  <!-- NOTE (Sticky ngay dưới head, luôn cố định) -->
-  <div class="info-bar">
-    <div class="info-left">(Vui lòng nhập thông tin tại các ô tô màu)</div>
-    <div class="info-right">Dữ liệu tham chiếu được chốt đến 31/07/2025</div>
-  </div>
-
-  <!-- MOBILE NAV (Sticky dưới NOTE; hiện khi đã đăng nhập & màn hình nhỏ) -->
-  <div id="mobile-nav">
-    <a id="mobile-support" href="https://zalo.me/0376763390" target="_blank">💬 Hỗ trợ</a>
-    <select>
-      <option value="" selected disabled>Danh mục</option>
-      <option value="sec-daily">Thông tin đại lý</option>
-      <optgroup label="A. Thu nhập từ hoạt động bán hàng">
-        <option value="sec-muctieu">1. Mục tiêu tháng</option>
-        <option value="sec-khoanthu">2. Các khoản thu nhập</option>
-        <option value="sec-ban-hang">3. Thu nhập bán hàng</option>
-      </optgroup>
-      <optgroup label="B. Thu nhập dành cho quản lý">
-        <option value="sec-quan-ly">Coming soon</option>
-      </optgroup>
-      <optgroup label="C. Tổng thu nhập (A + B)">
-        <option value="sec-tong">Tổng thu nhập</option>
-      </optgroup>
-    </select>
-  </div>
-
-  <!-- LAYOUT CHÍNH -->
-  <div class="below-head">
-    <!-- SIDEBAR (desktop; ẩn khi chưa đăng nhập) -->
-    <aside class="app-sidebar hidden">
-      <ul class="nav-list">
-        <li><button class="nav-btn active" data-target="sec-daily">Thông tin đại lý</button></li>
-
-        <li class="nav-group">A. Thu nhập từ hoạt động bán hàng</li>
-        <li><button class="nav-btn" data-target="sec-muctieu">1. Mục tiêu tháng</button></li>
-        <li><button class="nav-btn" data-target="sec-khoanthu">2. Các khoản thu nhập</button></li>
-        <li><button class="nav-btn" data-target="sec-ban-hang">3. Thu nhập bán hàng</button></li>
-
-        <li class="nav-group">B. Thu nhập dành cho quản lý</li>
-        <li><button class="nav-btn" data-target="sec-quan-ly">Coming soon</button></li>
-
-        <li class="nav-group">C. Tổng thu nhập (A + B)</li>
-        <li><button class="nav-btn" data-target="sec-tong">Tổng thu nhập</button></li>
-      </ul>
-    </aside>
-
-    <!-- MAIN -->
-    <main class="main-area">
-      <div class="container" id="app-root">
-        <!-- 1) THÔNG TIN ĐẠI LÝ -->
-        <section id="sec-daily" class="app-section active">
-          <h2 class="sticky-title">THÔNG TIN ĐẠI LÝ</h2>
-          <div class="top-fields">
-            <div class="field" style="flex:6">
-              <label for="ho-ten"><b>Họ và tên</b></label>
-              <input type="text" id="ho-ten" readonly />
-            </div>
-            <div class="field" style="flex:.5">
-              <label for="khu-vuc"><b>Khu vực</b></label>
-              <input type="text" id="khu-vuc" readonly />
-            </div>
-          </div>
-          <div class="top-fields">
-            <div class="field" style="flex:1.5">
-              <label for="thang-lam-viec"><b>Thâm niên (tháng)</b></label>
-              <input type="text" id="thang-lam-viec" readonly />
-            </div>
-            <div class="field" style="flex:4">
-              <label for="nhom-dai-ly"><b>Phân nhóm đại lý</b></label>
-              <input type="text" id="nhom-dai-ly" readonly />
-            </div>
-          </div>
-          <div class="top-fields">
-            <div class="field" style="flex:1">
-              <label for="p13-ca-nhan"><b>P13 cá nhân</b></label>
-              <input type="text" id="p13-ca-nhan" readonly />
-            </div>
-            <div class="field" style="flex:1">
-              <label for="he-so-thuong"><b>Hệ số tính thưởng</b></label>
-              <input type="text" id="he-so-thuong" readonly />
-            </div>
-          </div>
-          <div class="top-fields">
-            <div class="field" style="flex:1">
-              <label for="mdrt-fyp"><b>∑ FYP DH MDRT</b></label>
-              <input type="text" id="mdrt-fyp" readonly />
-            </div>
-            <div class="field" style="flex:1">
-              <label for="tong-fyc"><b>∑ FYC T-1 và T-2</b></label>
-              <input type="text" id="tong-fyc" readonly />
-            </div>
-            <div class="field" style="flex:1">
-              <label for="tong-fyc-quy"><b>∑ FYC Quý hiện tại</b></label>
-              <input type="text" id="tong-fyc-quy" readonly />
-            </div>
-          </div>
-          <div class="top-fields">
-            <div class="field" style="flex:1">
-              <label for="active-months"><b>Số tháng có hoạt động trong Quý</b></label>
-              <input type="text" id="active-months" readonly />
-            </div>
-          </div>
-        </section>
-
-        <!-- 2) MỤC TIÊU THÁNG -->
-        <section id="sec-muctieu" class="app-section">
-          <h2 class="sticky-title">MỤC TIÊU THÁNG HIỆN TẠI</h2>
-          <div class="top-fields" style="margin-bottom:10px">
-            <div class="field">
-              <label for="month-select"><b>Tháng dự tính</b></label>
-              <select id="month-select"></select>
-            </div>
-          </div>
-
-          <div id="memo-giai-doan">
-            <div class="gd-stage">
-              <b>Giai đoạn 1 (1-11/8)</b>
-              <div class="top-fields-2">
-                <div class="field"><label for="fypchinh-gd1"><b>FYP SP chính</b></label><input type="number" id="fypchinh-gd1"/></div>
-                <div class="field"><label for="fypkem-gd1"><b>FYP SP gắn kèm</b></label><input type="number" id="fypkem-gd1"/></div>
-              </div>
-              <div class="top-fields-2">
-                <div class="field"><label for="sohd-gd1"><b>Số HĐ</b></label><input type="number" id="sohd-gd1"/></div>
-                <div class="field"><label for="fyp-gd1"><b>∑ FYP</b></label><input type="text" id="fyp-gd1" readonly/></div>
-              </div>
-              <div class="top-fields-2">
-                <div class="field"><label for="thuongmemo-gd1"><b>Thưởng Memo Giai đoạn 1</b></label><input type="text" id="thuongmemo-gd1" readonly/><span id="alert-gd1" style="color:red;display:none"></span></div>
-              </div>
-            </div>
-
-            <div class="gd-stage">
-              <b>Giai đoạn 2 (12-25/8)</b>
-              <div class="top-fields-2">
-                <div class="field"><label for="fypchinh-gd2"><b>FYP SP chính</b></label><input type="number" id="fypchinh-gd2"/></div>
-                <div class="field"><label for="fypkem-gd2"><b>FYP SP gắn kèm</b></label><input type="number" id="fypkem-gd2"/></div>
-              </div>
-              <div class="top-fields-2">
-                <div class="field"><label for="sohd-gd2"><b>Số HĐ</b></label><input type="number" id="sohd-gd2"/></div>
-                <div class="field"><label for="fyp-gd2"><b>∑ FYP</b></label><input type="text" id="fyp-gd2" readonly/></div>
-              </div>
-              <div class="top-fields-2">
-                <div class="field"><label for="thuongmemo-gd2"><b>Thưởng Memo Giai đoạn 2</b></label><input type="text" id="thuongmemo-gd2" readonly/><span id="alert-gd2" style="color:red;display:none"></span></div>
-              </div>
-            </div>
-
-            <div class="gd-stage">
-              <b>Giai đoạn 3 (26-31/8)</b>
-              <div class="top-fields-2">
-                <div class="field"><label for="fypchinh-gd3"><b>FYP SP chính</b></label><input type="number" id="fypchinh-gd3"/></div>
-                <div class="field"><label for="fypkem-gd3"><b>FYP SP gắn kèm</b></label><input type="number" id="fypkem-gd3"/></div>
-              </div>
-              <div class="top-fields-2">
-                <div class="field"><label for="sohd-gd3"><b>Số HĐ</b></label><input type="number" id="sohd-gd3"/></div>
-                <div class="field"><label for="fyp-gd3"><b>∑ FYP</b></label><input type="text" id="fyp-gd3" readonly/></div>
-              </div>
-              <div class="top-fields-2">
-                <div class="field"><label for="thuongmemo-gd3"><b>Thưởng Memo Giai đoạn 3</b></label><input type="text" id="thuongmemo-gd3" readonly/><span id="alert-gd3" style="color:red;display:none"></span></div>
-              </div>
-            </div>
-
-            <br/>
-            <div>
-              <b style="margin-left:var(--pad)">TỔNG HỢP</b>
-              <div class="top-fields">
-                <div class="field"><label for="tong-cc"><b>∑ Số lượng Hợp đồng</b></label><input type="number" id="tong-cc" readonly/></div>
-                <div class="field"><label for="fyp-chinh"><b>∑ FYP SP chính</b></label><input type="number" id="fyp-chinh" readonly/></div>
-                <div class="field"><label for="fyp-kem"><b>∑ FYP SP gắn kèm</b></label><input type="number" id="fyp-kem" readonly/></div>
-              </div>
-              <div class="top-fields">
-                <div class="field" style="flex:3"><label for="tong-fyp"><b>∑ FYP Từ các HĐ</b></label><input type="text" id="tong-fyp" readonly/></div>
-                <div class="field" style="flex:3;display:flex;align-items:flex-end">
-                  <div class="calc-wrap"><button id="calc-btn" onclick="calculateIncome()">Tính thu nhập</button></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- 3) CÁC KHOẢN THU NHẬP -->
-        <section id="sec-khoanthu" class="app-section">
-          <h2 class="sticky-title">CÁC KHOẢN THU NHẬP</h2>
-          <div class="top-fields">
-            <div class="field"><label><b>FYC SP chính (30%)</b></label><input type="text" id="fyc-chinh" readonly/></div>
-            <div class="field"><label><b>FYC SP gắn kèm (20%)</b></label><input type="text" id="fyc-kem" readonly/></div>
-          </div>
-          <div class="top-fields">
-            <div class="field"><label><b>Thưởng thêm SP gắn kèm (20%)</b></label><input type="text" id="thuong-kem" readonly/></div>
-            <div class="field"><label><b>FYC Tính chính sách</b></label><input type="text" id="fyc-thuong" readonly/></div>
-          </div>
-          <div class="top-fields">
-            <div class="field"><label><b>Thưởng NSXS Manulife Pro</b></label><input type="text" id="thuong-nspro" readonly/></div>
-            <div class="field"><label><b>Thưởng Năng suất hàng tháng</b></label><input type="text" id="thuong-nst" readonly/></div>
-          </div>
-          <div class="top-fields">
-            <div class="field"><label><b>Thưởng Năng suất hàng Quý</b></label><input type="text" id="thuong-nsq" readonly/></div>
-            <div class="field">
-              <label><b>Thưởng Tiến độ MDRT</b></label>
-              <input type="text" id="thuong-mdrt" readonly/>
-              <span id="alert-mdrt" style="color:#d62929;display:none"></span>
-            </div>
-          </div>
-          <div class="top-fields">
-            <div class="field"><label for="thuong-memo" class="income-note"><b>0001M08/2025/ASBD</b></label><input type="text" id="thuong-memo" readonly/></div>
-          </div>
-        </section>
-
-        <!-- 4) THU NHẬP BÁN HÀNG (A) -->
-        <section id="sec-ban-hang" class="app-section">
-          <h2 class="sticky-title">THU NHẬP BÁN HÀNG</h2>
-          <div class="summary-row">
-            <div class="summary-block"><label for="tong-thu-nhap">Tổng thu nhập bán hàng (A)</label><input type="text" id="tong-thu-nhap" readonly/></div>
-            <div class="summary-block"><label for="ty-le-thu-nhap">Tỷ lệ thu nhập/doanh thu</label><input type="text" id="ty-le-thu-nhap" readonly/></div>
-          </div>
-          <hr><h2>CHÚC BẠN SỞ HỮU TỐI ĐA THU NHẬP</h2>
-        </section>
-
-        <!-- B) THU NHẬP DÀNH CHO QUẢN LÝ -->
-        <section id="sec-quan-ly" class="app-section">
-          <h2 class="sticky-title">THU NHẬP DÀNH CHO QUẢN LÝ</h2>
-          <div class="top-fields">
-            <div class="field">
-              <label><b>Thu nhập quản lý (B)</b></label>
-              <input type="text" id="thu-nhap-quan-ly" value="0" readonly />
-            </div>
-          </div>
-          <div class="info-left" style="margin-left:var(--pad)">Coming soon</div>
-        </section>
-
-        <!-- C) TỔNG THU NHẬP (A + B) -->
-        <section id="sec-tong" class="app-section">
-          <h2 class="sticky-title">TỔNG THU NHẬP (A + B)</h2>
-          <div class="summary-row">
-            <div class="summary-block"><label for="tong-A">A — Thu nhập bán hàng</label><input type="text" id="tong-A" readonly/></div>
-            <div class="summary-block"><label for="tong-B">B — Thu nhập quản lý</label><input type="text" id="tong-B" readonly/></div>
-          </div>
-          <div class="summary-row">
-            <div class="summary-block" style="grid-column:1/-1">
-              <label for="tong-AB">C — TỔNG THU NHẬP (A + B)</label>
-              <input type="text" id="tong-AB" readonly/>
-            </div>
-          </div>
-        </section>
-      </div>
-    </main>
-  </div>
-
-  <!-- Floating support (desktop/ipad rộng) -->
-  <a id="support-btn" href="https://zalo.me/0376763390" target="_blank">💬 Hỗ trợ</a>
-
-  <!-- FOOTER: luôn hiển thị, logo xuống dòng & căn giữa -->
-  <div id="page-footer">
-    <div class="footer-text">Bản quyền trang web thuộc về</div>
-    <img src="/logo_textr.webp" alt="Logo" />
-  </div>
 </body>
 </html>
