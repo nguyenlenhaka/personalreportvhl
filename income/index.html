@@ -4,12 +4,16 @@
   <meta charset="UTF-8" />
   <title>CÔNG CỤ DỰ TÍNH THU NHẬP</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="fonts/fonts.css" />
+  <link rel="stylesheet" href="font/fonts.css" />
   <style>
 /* ===== RESET / TOKENS ===== */
 *{box-sizing:border-box;min-width:0}
 html,body{height:100%;margin:0;padding:0}
-:root{--pad:18px;--pad-sm:12px;--brand:#0051c1;--accent:#00a758;--mint:#e9fff3;--sticky-offset:72px;--footer-h:48px}
+:root{
+  --pad:18px; --pad-sm:12px;
+  --brand:#0051c1; --accent:#00a758; --mint:#e9fff3;
+  --sticky-offset:72px; --footer-h:66px;
+}
 
 /* ===== AUTH STATES ===== */
 body.logged-out .below-head{display:none}
@@ -24,41 +28,75 @@ body.logged-in  .below-head{display:grid}
 }
 @media (max-width:900px){.masthead{grid-template-columns:1fr}}
 .head-left{display:flex;align-items:center;gap:12px;min-width:0}
-.head-left picture{display:block}
 .head-left img{height:44px;width:auto;display:block}
 .head-text{display:flex;flex-direction:column;min-width:0}
 .head-text small{color:#09753e;font-weight:800;letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .head-text h1{margin:0;color:#008a53;font-size:clamp(1.2rem,.7rem + 2.6vw,2rem);font-weight:900;letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
-/* Login cluster */
-.login-cluster{display:flex;gap:10px;align-items:center;justify-content:flex-end;min-width:0}
-.login-cluster>*{min-width:0}
-.login-cluster input{height:46px;padding:0 12px;font-size:16px;border:1.3px solid #b7e7ce;border-radius:10px;background:#fff;font-weight:600;color:#0d7233;outline:none;width:100%}
+/* ===== LOGIN CLUSTER ===== */
+/* Desktop: 2 hàng 2 cột (MSĐL trên, Ngày gia nhập dưới, cột phải là nút) */
+.login-cluster{
+  display:grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto auto;
+  grid-template-areas: "id btn" "date btn";
+  gap:10px; align-items:center; justify-items:stretch; min-width:0;
+}
+#agent-id{grid-area:id}
+#ngay-gia-nhap{grid-area:date}
+.login-cluster button{grid-area:btn; align-self:stretch}
+.login-cluster input{
+  height:46px;padding:0 12px;font-size:16px;border:1.3px solid #b7e7ce;border-radius:10px;background:#fff;font-weight:600;color:#0d7233;outline:none;width:100%;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis
+}
 .login-cluster input::placeholder{color:#7aa08f}
-.login-cluster button{background:#008a53;color:#fff;border:none;border-radius:10px;padding:12px 18px;font-weight:700;cursor:pointer;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.login-cluster button{
+  background:#008a53;color:#fff;border:none;border-radius:10px;padding:12px 18px;font-weight:800;cursor:pointer;white-space:nowrap
+}
 .login-cluster button:hover{background:#066a42}
-@media (max-width:900px){.login-cluster{flex-wrap:wrap}.login-cluster>*{flex:1 1 140px}}
+/* Mobile: flex */
+@media (max-width:900px){
+  .login-cluster{display:flex;gap:10px;align-items:center;justify-content:flex-end;flex-wrap:wrap}
+  .login-cluster>*{flex:1 1 140px;min-width:0}
+}
 
-/* ===== LAYOUT DƯỚI HEADER ===== */
-.below-head{display:grid;grid-template-columns:260px 1fr;min-height:calc(100vh - var(--sticky-offset) - var(--footer-h))}
+/* ===== LAYOUT DƯỚI HEADER (FULL WIDTH) ===== */
+.below-head{
+  display:grid; grid-template-columns:260px 1fr;
+  min-height:calc(100vh - var(--sticky-offset) - var(--footer-h));
+  width:100%;
+}
 @media (max-width:900px){.below-head{grid-template-columns:1fr}}
 
 /* ===== SIDEBAR (desktop) ===== */
 aside.app-sidebar{
-  background:#0d7233;color:#fff;padding:14px 12px 18px;position:sticky;top:var(--sticky-offset);height:fit-content
+  background:#0d7233;color:#fff;padding:14px 12px 18px;
+  position:sticky; top:var(--sticky-offset); height:fit-content
 }
 .app-sidebar.hidden{display:none}
 .nav-list{list-style:none;padding:0;margin:0}
 .nav-list li{margin:4px 0}
-.nav-btn{width:100%;background:transparent;color:#fff;border:1px solid #ffffff22;border-radius:10px;padding:10px 12px;text-align:left;cursor:pointer;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nav-btn{
+  width:100%;background:transparent;color:#fff;border:1px solid #ffffff22;border-radius:10px;
+  padding:10px 12px;text-align:left;cursor:pointer;font-weight:600;white-space:nowrap;overflow:visible;text-overflow:initial
+}
 .nav-btn:hover{background:#ffffff12}
 .nav-btn.active{background:#ffffff1f;border-color:#ffffff3a}
-.nav-group{margin:10px 4px 6px;font-size:.86rem;opacity:.9;font-weight:800;letter-spacing:.02em}
+.nav-group{
+  margin:10px 4px 6px;font-size:.86rem;opacity:.9;font-weight:800;letter-spacing:.02em;
+  white-space:nowrap;overflow:visible;text-overflow:initial
+}
 
 /* ===== MOBILE NAV (dropdown; sticky; chỉ mobile & đã login) ===== */
-#mobile-nav{display:none;margin:8px var(--pad);position:sticky;top:var(--sticky-offset);z-index:900}
-#mobile-support{display:block;margin-bottom:8px;background:#00a758;color:#fff;padding:10px;border-radius:8px;text-align:center;text-decoration:none;font-weight:800}
-#mobile-nav select{width:100%;padding:10px;font-weight:700;border-radius:8px;border:1px solid #c7d5e6;background:#fff;color:#00519c;max-width:100%}
+#mobile-nav{
+  display:none; margin:8px var(--pad);
+  position:sticky; top:var(--sticky-offset); z-index:980; /* cao hơn info-bar */
+}
+#mobile-support{display:block;margin-bottom:8px;background:#00a758;color:#fff;padding:10px;border-radius:8px;text-align:center;text-decoration:none;font-weight:800;white-space:nowrap}
+#mobile-nav select{
+  width:100%;padding:10px;font-weight:700;border-radius:8px;border:1px solid #c7d5e6;background:#fff;color:#00519c;max-width:100%
+}
+#mobile-nav option[disabled]{color:#7a8aa0}
 @media (min-width:901px){#mobile-nav{display:none !important}}
 
 /* ===== SUPPORT FLOATING (desktop/ipad rộng) ===== */
@@ -69,38 +107,46 @@ aside.app-sidebar{
 .main-area{width:100%}
 .container{width:100%;background:#fff;margin:0;border-radius:0;box-shadow:none;padding:20px var(--pad) 30px;position:relative;z-index:1}
 
-/* ===== INFO BAR (sticky trên mọi thiết bị) ===== */
+/* ===== INFO BAR (note-green + note-right) sticky mọi thiết bị ===== */
 .info-bar{
   position:sticky; top:calc(var(--sticky-offset) + 6px); z-index:850;
   background:#fff; border:1px solid #e6eef5; border-radius:10px; padding:8px 12px; margin:8px 0 10px;
   display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap;
 }
-.info-left{color:var(--accent);font-weight:800;font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.info-right{color:#333b;font-weight:700;font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-@media (max-width:900px){.info-bar{top:calc(var(--sticky-offset) + 58px)}}
+.info-left,.info-right{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:800}
+.info-left{color:var(--accent);font-style:italic}
+.info-right{color:#333b;font-style:italic}
+@media (max-width:900px){
+  /* Khi có dropdown sticky, info-bar “nhường” phía trên */
+  .info-bar{top:calc(var(--sticky-offset) + 52px)}
+}
 
 /* ===== TITLES (sticky section title) ===== */
 h2{font-size:clamp(1rem,.9rem + .8vw,1.3rem);text-align:center;color:#0051c1;font-weight:700;margin:14px 0 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 h2.sticky-title{position:sticky;top:calc(var(--sticky-offset) + 6px);z-index:800;background:#fff;padding:6px 0;border-bottom:1px solid #e9edf2;cursor:pointer}
-@media (max-width:900px){h2.sticky-title{top:calc(var(--sticky-offset) + 58px)}}
+@media (max-width:900px){h2.sticky-title{top:calc(var(--sticky-offset) + 52px + 44px)}}
 
 /* Forms */
 .top-fields,.top-fields-2{display:grid;grid-template-columns:repeat(12,1fr);gap:16px;align-items:end;margin-bottom:10px}
 .top-fields-2{margin-bottom:8px}
 .field{grid-column:span 4;display:flex;flex-direction:column;min-width:0}
 .field label{font-size:.98rem;font-weight:600;color:#24364a;margin:0 0 6px 2px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.field input,.field select{height:46px;padding:0 12px;font-size:16px;border:1.3px solid #c7d5e6;border-radius:8px;background-color:rgba(214,255,237,.3);font-weight:600;color:var(--brand);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.field input,.field select{height:46px;padding:0 12px;font-size:16px;border:1.3px solid #c7d5e6;border-radius:8px;background-color:rgba(214,255,237,.3);font-weight:600;color:var(--brand);text-align:center;white-space:nowrap}
 .field input[readonly]{background:#fafbfd;color:#0b8a62;font-weight:700;border-color:#bfc7d1}
+/* Desktop hiển thị full chữ (kéo ngang nếu dài) */
+@media (min-width:901px){
+  .field input,.field select,.summary-block input{overflow:auto !important;text-overflow:initial !important}
+}
 
 /* Giai đoạn title */
 .gd-stage>b{display:block;margin:6px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
-/* Calc button wrap (to & bọc) */
+/* Calc button wrap */
 .calc-wrap{display:flex;align-items:center;gap:10px}
 #calc-btn{
   background:#0d72b5;color:#fff;border:none;border-radius:12px;
   padding:16px 28px;font-size:18px;font-weight:800;box-shadow:0 6px 18px rgba(13,114,181,.25);
-  width:100%; /* to ra và dễ bấm */
+  width:100%; white-space:nowrap;
 }
 #calc-btn:hover{background:#085a93}
 #calc-btn:active{transform:translateY(1px)}
@@ -109,8 +155,7 @@ h2.sticky-title{position:sticky;top:calc(var(--sticky-offset) + 6px);z-index:800
 .summary-row{display:grid;grid-template-columns:repeat(12,1fr);gap:18px;align-items:end;margin:16px 0 8px}
 .summary-block{grid-column:span 6;text-align:center;min-width:0}
 .summary-block label{color:#0051c1;font-weight:800;letter-spacing:.02em;display:block;margin-bottom:6px;text-transform:uppercase;font-size:.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.summary-block input{background:#fff;color:#048f60;border:2px solid #00a578;border-radius:10px;font-size:16px;font-weight:900;height:56px;text-align:center;width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.thu-nhap-note{text-align:center;font-style:italic;margin-bottom:8px;color:#444;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.summary-block input{background:#fff;color:#048f60;border:2px solid #00a578;border-radius:10px;font-size:16px;font-weight:900;height:56px;text-align:center;width:100%;white-space:nowrap}
 
 /* Mobile tweaks */
 @media (max-width:900px){
@@ -120,21 +165,23 @@ h2.sticky-title{position:sticky;top:calc(var(--sticky-offset) + 6px);z-index:800
   .calc-wrap{position:fixed;left:14px;right:14px;bottom:calc(var(--footer-h) + 12px);z-index:30}
 }
 
-/* Export HTML link (ẩn hẳn trên mobile) */
+/* Export HTML link (ẩn trên mobile) */
 #export-link{position:fixed;left:20px;bottom:calc(var(--footer-h) + 12px);z-index:998;background:#0051c1;color:#fff;padding:10px 14px;border-radius:8px;text-decoration:none;font-weight:700}
 @media (max-width:900px){#export-link{display:none !important}}
 
-/* ===== SINGLE-VIEW: chỉ hiển thị section active ===== */
+/* ===== SINGLE-VIEW ===== */
 .app-section{display:none}
 .app-section.active{display:block}
 
-/* ===== GLOBAL FOOTER (bottom centered) ===== */
+/* ===== FOOTER (luôn hiển thị; logo xuống dòng & căn giữa) ===== */
 #page-footer{
-  position:fixed; left:0; right:0; bottom:0; height:var(--footer-h);
-  display:flex; align-items:center; justify-content:center;
+  position:fixed; left:0; right:0; bottom:0; height:auto; min-height:var(--footer-h);
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;
   background:#f4f6f8; color:#0b3a2a; border-top:1px solid #e3e7eb; z-index:950;
-  padding:0 10px; text-align:center; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis
+  padding:8px 10px 10px; text-align:center; font-weight:700;
 }
+#page-footer .footer-text{white-space:nowrap}
+#page-footer img{height:22px;width:auto;display:block}
   </style>
 
   <script>
@@ -166,7 +213,7 @@ const datesEqual=(a,b)=>normalizeDateForCompare(a)===normalizeDateForCompare(b);
 async function fetchFirstJson(list){for(const url of list){try{const r=await fetch(url,{cache:'no-store'});if(r.ok)return await r.json();}catch{}}return null;}
 async function loadData(){
   const btn=document.querySelector('button[onclick="searchAgent()"]'); if(btn){btn.disabled=true;btn.textContent="Đang tải dữ liệu...";}
-  try{const r=await fetch('/income.json',{cache:'no-store'}); if(!r.ok)throw new Error('HTTP '+r.status); data=await r.json();}catch(e){alert("Không tải được income.json."); data=[];}
+  try{const r=await fetch('income.json',{cache:'no-store'}); if(!r.ok)throw new Error('HTTP '+r.status); data=await r.json();}catch(e){alert("Không tải được income.json."); data=[];}
   isDataReady=Array.isArray(data)&&data.length>0;
   nspro=await fetchFirstJson(['nspro.json','NSPRO.json','Nspro.json'])||[];
   nst6 =await fetchFirstJson(['6nst.json','6NST.json'])||[];
@@ -271,7 +318,7 @@ function calculateNSQ(){
 }
 function calculateThuongMDRT(){
   const alertEl=document.getElementById('alert-mdrt');
-  function setAlert(msg){ if(alertEl){ alertEl.textContent=msg||''; alertEl.style.display=msg?'block':'none'; } }
+  const setAlert=msg=>{ if(alertEl){ alertEl.textContent=msg||''; alertEl.style.display=msg?'block':'none'; } };
 
   const m=parseInt(document.getElementById("month-select").value,10)||0;
   if(![3,6,9,12].includes(m)){ document.getElementById("thuong-mdrt").value=formatMoney3(0); setAlert(''); return; }
@@ -279,16 +326,8 @@ function calculateThuongMDRT(){
   const activeMonths=parseInt((document.getElementById("active-months").value||'').replace(/[^\d]/g,''),10)||0;
   const currentCC=parseInt((document.getElementById("tong-cc").value||'').replace(/[^\d]/g,''),10)||0;
 
-  if(activeMonths < 2){
-    document.getElementById("thuong-mdrt").value = formatMoney3(0);
-    setAlert('Không đủ tiêu chuẩn nhận thưởng tiến độ');
-    return;
-  }
-  if(currentCC < 1){
-    document.getElementById("thuong-mdrt").value = formatMoney3(0);
-    setAlert('Chưa có hợp đồng trong tháng xét');
-    return;
-  }
+  if(activeMonths < 2){ document.getElementById("thuong-mdrt").value = formatMoney3(0); setAlert('Không đủ tiêu chuẩn nhận thưởng tiến độ'); return; }
+  if(currentCC < 1){ document.getElementById("thuong-mdrt").value = formatMoney3(0); setAlert('Chưa có hợp đồng trong tháng xét'); return; }
   setAlert('');
 
   const toDate=parseMoney3(document.getElementById("mdrt-fyp").value);
@@ -310,7 +349,7 @@ function calculateTongThuNhap(){
   document.getElementById("tong-thu-nhap").value=formatMoney3(sum);
   const tongFYP=parseMoney3(document.getElementById("tong-fyp").value);
   document.getElementById("ty-le-thu-nhap").value=tongFYP>0?((sum/tongFYP)*100).toFixed(2)+" %":"";
-  updateCombinedTotals();
+  updateCombinedTotals(); syncReadonlyTitles();
 }
 function updateCombinedTotals(){
   const a=parseMoney3(document.getElementById("tong-thu-nhap").value);
@@ -332,7 +371,7 @@ function calculateIncome(){
   document.getElementById("thuong-kem").value=formatMoney3(thuK);
   document.getElementById("fyc-thuong").value=formatMoney3(fycT);
   calculateNSPro(); calculateNST(); calculateNSQ(); calculateThuongMDRT();
-  calculateTongThuNhap(); reformatMoneyOutputs();
+  calculateTongThuNhap(); reformatMoneyOutputs(); syncReadonlyTitles();
 }
 
 /* ===== INPUT MODES ===== */
@@ -348,8 +387,9 @@ function autoFormatInputs(){
 }
 function sanitizeAllNumericInputs(){ALL_MONEY_IDS.forEach(id=>{const el=document.getElementById(id); if(el)el.setAttribute('type','text')});}
 function reformatMoneyOutputs(){for(const id of MONEY_OUTPUT_IDS){const el=document.getElementById(id); if(!el)continue; const n=parseMoney3(el.value); el.value=formatMoney3(n||0)}}
+function syncReadonlyTitles(){document.querySelectorAll('input[readonly]').forEach(el=>el.title=el.value||'');}
 
-/* ===== NAV VISIBILITY & FOOTER TEXT ===== */
+/* ===== NAV VISIBILITY ===== */
 function updateNavVisibility(){
   const sidebar=document.querySelector('.app-sidebar');
   const isMobile=window.matchMedia('(max-width:900px)').matches;
@@ -357,30 +397,16 @@ function updateNavVisibility(){
   const mobileNav=document.getElementById('mobile-nav');
   if(mobileNav) mobileNav.style.display=(isLoggedIn && isMobile)?'block':'none';
 }
-function setFooterText(){
-  const footer=document.getElementById('page-footer');
-  if(!footer) return;
-  footer.textContent = isLoggedIn ? "Bản quyền trang web thuộc về"<br> <picture>
-        <source srcset="/logo_textr.webp" media="(max-width: 900px)">
-        <img id="logo-main" src="/logo_textr.webp" alt="Logo" />
-      </picture>
-                                  : "Vui lòng đăng nhập để tính thu nhập";
-}
-function setAuthState(loggedIn){
-  isLoggedIn=!!loggedIn;
-  document.body.classList.toggle('logged-in', isLoggedIn);
-  document.body.classList.toggle('logged-out', !isLoggedIn);
-  updateNavVisibility();
-  setFooterText();
-}
 
-/* ===== SINGLE-VIEW: hiển thị một mục ===== */
+/* ===== SINGLE-VIEW ===== */
 function showSection(id){
   document.querySelectorAll('.app-section').forEach(s=>s.classList.remove('active'));
   const t=document.getElementById(id); if(t) t.classList.add('active');
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   const a=document.querySelector(`[data-target="${id}"]`); if(a) a.classList.add('active');
-  const dd=document.querySelector('#mobile-nav select'); if(dd && dd.value!==id) dd.value=id;
+  const dd=document.querySelector('#mobile-nav select');
+  // Chỉ đồng bộ dropdown khi người dùng đã chọn lần đầu (giữ placeholder "Danh mục")
+  if(dd && dd.dataset.touched==='1' && dd.value!==id) dd.value=id;
   if(history.replaceState){ history.replaceState(null,'','#'+id); } else { location.hash = id; }
   scheduleFit();
 }
@@ -410,19 +436,26 @@ function searchAgent(){
   const fycT2=parseMoney3(getByKeyLoose(found,"FYC tháng T-2"));
   document.getElementById("tong-fyc").value=formatMoney3(fycT1+fycT2);
   document.getElementById("tong-fyc-quy").value=formatMoney3(parseMoney3(getByKeyLoose(found,"Tổng FYC trong Qúy hiện tại")));
-  document.getElementById("active-months").value = String(getByKeyLoose(found,"Active months")||'').toString().trim();
+  document.getElementById("active-months").value=String(getByKeyLoose(found,"Active months")||'').toString().trim();
 
   ["sohd-gd1","sohd-gd2","sohd-gd3","fypchinh-gd1","fypchinh-gd2","fypchinh-gd3","fypkem-gd1","fypkem-gd2","fypkem-gd3"].forEach(id=>{const el=document.getElementById(id); if(el) el.value='';});
   sanitizeAllNumericInputs(); updateTongHop(); calculateNSPro(); calculateNST(); calculateNSQ(); calculateThuongMDRT(); calculateTongThuNhap();
+  syncReadonlyTitles();
 
-  setAuthState(true);
+  isLoggedIn=true; document.body.classList.add('logged-in'); document.body.classList.remove('logged-out');
+  updateNavVisibility();
+
   const initHash = location.hash && location.hash.slice(1);
   if (initHash && document.getElementById(initHash)) { showSection(initHash); }
   else { showSection('sec-daily'); }
 }
 
 /* ===== FIT TEXT ===== */
-const FIT_SELECTORS=['h1','h2','h3','.info-left','.info-right','.summary-block label','.field label','button','.gd-stage>b'];
+const FIT_SELECTORS=[
+  'h1','h2','h3','.info-left','.info-right','.summary-block label','.field label',
+  'button','.gd-stage>b','.nav-btn','.nav-group','#mobile-support','#mobile-nav select',
+  '#page-footer .footer-text','.head-text small'
+];
 function fitTextElement(el,minPx=10){if(!el)return; el.style.fontSize=''; const base=parseFloat(getComputedStyle(el).fontSize)||16; el.style.whiteSpace='nowrap'; if(el.clientWidth && el.scrollWidth>el.clientWidth){let s=base; while(el.scrollWidth>el.clientWidth && s>minPx){s-=0.5; el.style.fontSize=s+'px';}}}
 function fitAllText(){document.querySelectorAll(FIT_SELECTORS.join(',')).forEach(fitTextElement);}
 let fitRaf=null;function scheduleFit(){if(fitRaf)cancelAnimationFrame(fitRaf); fitRaf=requestAnimationFrame(()=>{fitAllText(); fitRaf=null;});}
@@ -441,7 +474,6 @@ function toggleExportLink(){
 function enableEnterToCalc(){
   document.addEventListener('keydown', (e)=>{
     if(e.key!=='Enter') return;
-    // Nếu chưa đăng nhập, ưu tiên Enter để đăng nhập (giữ nguyên hành vi hiện tại)
     if(!isLoggedIn) return;
     const ae=document.activeElement;
     if(ae && (ae.id==='agent-id' || ae.id==='ngay-gia-nhap')) return;
@@ -465,25 +497,21 @@ window.addEventListener('load', async ()=>{
   const msel=document.getElementById("month-select");
   if(msel){ msel.addEventListener('change',()=>{calculateNSQ(); calculateThuongMDRT(); calculateTongThuNhap();}); }
 
-  document.querySelectorAll('.nav-btn').forEach(btn=>btn.addEventListener('click',()=>showSection(btn.dataset.target)));
+  // Mobile dropdown: set touched flag khi người dùng chọn
+  const mobileDD=document.querySelector('#mobile-nav select');
+  if(mobileDD){
+    mobileDD.addEventListener('change', function(){ this.dataset.touched='1'; showSection(this.value); });
+  }
 
-  document.querySelectorAll('section.app-section > h2').forEach(h=>{
-    h.addEventListener('click', ()=> showSection(h.parentElement.id));
-  });
+  document.querySelectorAll('.nav-btn').forEach(btn=>btn.addEventListener('click',()=>showSection(btn.dataset.target)));
+  document.querySelectorAll('section.app-section > h2').forEach(h=>{ h.addEventListener('click', ()=> showSection(h.parentElement.id)); });
 
   enableEnterToCalc();
-
   showSection('sec-daily');
-  setFooterText();
-
-  window.addEventListener('hashchange', ()=>{
-    const id = location.hash.slice(1);
-    if (isLoggedIn && id && document.getElementById(id)) showSection(id);
-  });
 
   if(document.fonts && document.fonts.ready){try{await document.fonts.ready;}catch{}}
   scheduleFit();
-  window.addEventListener('resize',()=>{scheduleFit(); updateNavVisibility(); toggleExportLink(); setFooterText();});
+  window.addEventListener('resize',()=>{scheduleFit(); updateNavVisibility(); toggleExportLink();});
 
   toggleExportLink();
 });
@@ -493,10 +521,7 @@ window.addEventListener('load', async ()=>{
   <!-- HEADER -->
   <div class="masthead">
     <div class="head-left">
-      <picture>
-        <source srcset="/logo_text.webp" media="(max-width: 900px)">
-        <img id="logo-main" src="/logo_text.webp" alt="Logo" />
-      </picture>
+      <img id="logo-main" src="/logo.webp" alt="Logo" />
       <div class="head-text">
         <small>CỔNG THÔNG TIN VÙNG HẰNG LÂM</small>
         <h1>DỰ TÍNH THU NHẬP</h1>
@@ -509,10 +534,11 @@ window.addEventListener('load', async ()=>{
     </div>
   </div>
 
-  <!-- MOBILE NAV (chỉ hiện khi đã đăng nhập & mobile; sticky) -->
+  <!-- MOBILE NAV (placeholder “Danh mục”) -->
   <div id="mobile-nav">
     <a id="mobile-support" href="https://zalo.me/0376763390" target="_blank">💬 Hỗ trợ</a>
-    <select onchange="showSection(this.value)">
+    <select>
+      <option value="" selected disabled>Danh mục</option>
       <optgroup label="A. Thu nhập từ hoạt động bán hàng">
         <option value="sec-daily">1. Thông tin đại lý</option>
         <option value="sec-muctieu">2. Mục tiêu tháng</option>
@@ -550,7 +576,7 @@ window.addEventListener('load', async ()=>{
     <!-- MAIN -->
     <main class="main-area">
       <div class="container" id="app-root">
-        <!-- INFO BAR sticky -->
+        <!-- NOTE STICKY -->
         <div class="info-bar">
           <div class="info-left">(Vui lòng nhập thông tin tại các ô tô màu)</div>
           <div class="info-right">Dữ liệu tham chiếu được chốt đến 31/07/2025</div>
@@ -758,8 +784,13 @@ window.addEventListener('load', async ()=>{
   <!-- Floating support (desktop/ipad rộng) -->
   <a id="support-btn" href="https://zalo.me/0376763390" target="_blank">💬 Hỗ trợ</a>
 
- 
-  <!-- GLOBAL FOOTER: centered bottom -->
-  <div id="page-footer">Vui lòng đăng nhập để tính thu nhập</div>
+  <!-- Link xuất HTML (ẩn trên mobile, tự hiện trên desktop khi trang dài) -->
+  <a id="export-link" href="#" onclick="exportHTML();return false;">📄 Xuất HTML</a>
+
+  <!-- FOOTER: luôn hiển thị, logo xuống dòng & căn giữa -->
+  <div id="page-footer">
+    <div class="footer-text">Bản quyền trang web thuộc về</div>
+    <img src="/logo_textr.webp" alt="Logo" />
+  </div>
 </body>
 </html>
