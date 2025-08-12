@@ -12,14 +12,16 @@ html,body{height:100%;margin:0;padding:0}
 :root{
   --pad:18px; --pad-sm:12px;
   --brand:#0051c1; --accent:#00a758; --mint:#e9fff3;
-  --sticky-offset:72px; --footer-h:66px;
+  --head-h:72px;         /* sẽ đo động bằng JS */
+  --note-h:48px;         /* sẽ đo động bằng JS */
+  --footer-h:66px;       /* sẽ đo động bằng JS */
 }
 
 /* ===== AUTH STATES ===== */
 body.logged-out .below-head{display:none}
 body.logged-in  .below-head{display:grid}
 
-/* ===== HEADER (sticky) ===== */
+/* ===== HEADER (STICKY LUÔN) ===== */
 .masthead{
   position:sticky; top:0; z-index:1000;
   display:grid; grid-template-columns:1fr 420px; gap:18px; align-items:center;
@@ -58,10 +60,34 @@ body.logged-in  .below-head{display:grid}
   .login-cluster>*{flex:1 1 140px;min-width:0}
 }
 
-/* ===== LAYOUT DƯỚI HEADER (FULL WIDTH) ===== */
+/* ===== STICKY NOTE ngay dưới HEAD (LUÔN Ở VỊ TRÍ CỐ ĐỊNH) ===== */
+.info-bar{
+  position:sticky;
+  top:var(--head-h);             /* luôn dính ngay dưới head */
+  z-index:990;
+  background:#fff; border:1px solid #e6eef5; border-radius:10px; padding:8px 12px; margin:8px var(--pad);
+  display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap;
+}
+.info-left,.info-right{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:800}
+.info-left{color:var(--accent);font-style:italic}
+.info-right{color:#333b;font-style:italic}
+
+/* ===== MOBILE NAV (dropdown; STICKY dưới NOTE) ===== */
+#mobile-nav{
+  display:none; margin:8px var(--pad);
+  position:sticky; top:calc(var(--head-h) + var(--note-h)); z-index:980;
+}
+#mobile-support{display:block;margin-bottom:8px;background:#00a758;color:#fff;padding:10px;border-radius:8px;text-align:center;text-decoration:none;font-weight:800;white-space:nowrap}
+#mobile-nav select{
+  width:100%;padding:10px;font-weight:700;border-radius:8px;border:1px solid #c7d5e6;background:#fff;color:#00519c;max-width:100%
+}
+#mobile-nav option[disabled]{color:#7a8aa0}
+@media (min-width:901px){#mobile-nav{display:none !important}}
+
+/* ===== LAYOUT DƯỚI HEADER ===== */
 .below-head{
   display:grid; grid-template-columns:260px 1fr;
-  min-height:calc(100vh - var(--sticky-offset) - var(--footer-h));
+  min-height:calc(100vh - var(--head-h) - var(--note-h) - var(--footer-h));
   width:100%;
 }
 @media (max-width:900px){.below-head{grid-template-columns:1fr}}
@@ -69,7 +95,7 @@ body.logged-in  .below-head{display:grid}
 /* ===== SIDEBAR (desktop) ===== */
 aside.app-sidebar{
   background:#0d7233;color:#fff;padding:14px 12px 18px;
-  position:sticky; top:var(--sticky-offset); height:fit-content
+  position:sticky; top:calc(var(--head-h) + var(--note-h)); height:fit-content
 }
 .app-sidebar.hidden{display:none}
 .nav-list{list-style:none;padding:0;margin:0}
@@ -85,44 +111,20 @@ aside.app-sidebar{
   white-space:nowrap;overflow:visible;text-overflow:initial
 }
 
-/* ===== MOBILE NAV (dropdown; sticky; chỉ mobile & đã login) ===== */
-#mobile-nav{
-  display:none; margin:8px var(--pad);
-  position:sticky; top:var(--sticky-offset); z-index:980;
-}
-#mobile-support{display:block;margin-bottom:8px;background:#00a758;color:#fff;padding:10px;border-radius:8px;text-align:center;text-decoration:none;font-weight:800;white-space:nowrap}
-#mobile-nav select{
-  width:100%;padding:10px;font-weight:700;border-radius:8px;border:1px solid #c7d5e6;background:#fff;color:#00519c;max-width:100%
-}
-#mobile-nav option[disabled]{color:#7a8aa0}
-@media (min-width:901px){#mobile-nav{display:none !important}}
-
 /* ===== SUPPORT FLOATING (desktop/ipad rộng) ===== */
 #support-btn{position:fixed;right:20px;bottom:calc(var(--footer-h) + 12px);background:#00a758;color:#fff;padding:12px 16px;border-radius:50px;font-weight:bold;text-decoration:none;box-shadow:0 4px 12px rgba(0,0,0,.2);z-index:999}
 @media (max-width:900px){#support-btn{display:none}}
 
 /* ===== MAIN ===== */
 .main-area{width:100%}
-.container{width:100%;background:#fff;margin:0;border-radius:0;box-shadow:none;padding:20px var(--pad) 30px;position:relative;z-index:1}
-
-/* ===== INFO BAR sticky (note-green + note-right) ===== */
-.info-bar{
-  position:sticky; top:calc(var(--sticky-offset) + 6px); z-index:850;
-  background:#fff; border:1px solid #e6eef5; border-radius:10px; padding:8px 12px; margin:8px 0 10px;
-  display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap;
-}
-.info-left,.info-right{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:800}
-.info-left{color:var(--accent);font-style:italic}
-.info-right{color:#333b;font-style:italic}
-@media (max-width:900px){.info-bar{top:calc(var(--sticky-offset) + 52px)}}
+.container{width:100%;background:#fff;margin:0;border-radius:0;box-shadow:none;padding:10px 0 30px;position:relative;z-index:1}
 
 /* ===== TITLES (sticky section title) ===== */
 h2{font-size:clamp(1rem,.9rem + .8vw,1.3rem);text-align:center;color:#0051c1;font-weight:700;margin:14px 0 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-h2.sticky-title{position:sticky;top:calc(var(--sticky-offset) + 6px);z-index:800;background:#fff;padding:6px 0;border-bottom:1px solid #e9edf2;cursor:pointer}
-@media (max-width:900px){h2.sticky-title{top:calc(var(--sticky-offset) + 52px + 44px)}}
+h2.sticky-title{position:sticky;top:calc(var(--head-h) + var(--note-h));z-index:800;background:#fff;margin-top:8px;padding:6px 0;border-bottom:1px solid #e9edf2;cursor:pointer}
 
 /* Forms */
-.top-fields,.top-fields-2{display:grid;grid-template-columns:repeat(12,1fr);gap:16px;align-items:end;margin-bottom:10px}
+.top-fields,.top-fields-2{display:grid;grid-template-columns:repeat(12,1fr);gap:16px;align-items:end;margin:10px var(--pad)}
 .top-fields-2{margin-bottom:8px}
 .field{grid-column:span 4;display:flex;flex-direction:column;min-width:0}
 .field label{font-size:.98rem;font-weight:600;color:#24364a;margin:0 0 6px 2px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -133,10 +135,10 @@ h2.sticky-title{position:sticky;top:calc(var(--sticky-offset) + 6px);z-index:800
 }
 
 /* Giai đoạn title */
-.gd-stage>b{display:block;margin:6px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gd-stage>b{display:block;margin:6px var(--pad);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 /* Calc button */
-.calc-wrap{display:flex;align-items:center;gap:10px}
+.calc-wrap{display:flex;align-items:center;gap:10px;margin:0 var(--pad)}
 #calc-btn{
   background:#0d72b5;color:#fff;border:none;border-radius:12px;
   padding:16px 28px;font-size:18px;font-weight:800;box-shadow:0 6px 18px rgba(13,114,181,.25);
@@ -146,14 +148,13 @@ h2.sticky-title{position:sticky;top:calc(var(--sticky-offset) + 6px);z-index:800
 #calc-btn:active{transform:translateY(1px)}
 
 /* Summary */
-.summary-row{display:grid;grid-template-columns:repeat(12,1fr);gap:18px;align-items:end;margin:16px 0 8px}
+.summary-row{display:grid;grid-template-columns:repeat(12,1fr);gap:18px;align-items:end;margin:16px var(--pad) 8px}
 .summary-block{grid-column:span 6;text-align:center;min-width:0}
 .summary-block label{color:#0051c1;font-weight:800;letter-spacing:.02em;display:block;margin-bottom:6px;text-transform:uppercase;font-size:.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .summary-block input{background:#fff;color:#048f60;border:2px solid #00a578;border-radius:10px;font-size:16px;font-weight:900;height:56px;text-align:center;width:100%;white-space:nowrap}
 
 /* Mobile tweaks */
 @media (max-width:900px){
-  .container{padding:20px var(--pad-sm) calc(96px + var(--footer-h))}
   .top-fields,.top-fields-2{grid-template-columns:1fr;gap:10px}
   .field{grid-column:1/-1}
   .calc-wrap{position:fixed;left:14px;right:14px;bottom:calc(var(--footer-h) + 12px);z-index:30}
@@ -176,14 +177,11 @@ h2.sticky-title{position:sticky;top:calc(var(--sticky-offset) + 6px);z-index:800
 }
 #page-footer .footer-text{white-space:nowrap}
 #page-footer img{height:22px;width:auto;display:block}
-    @media (min-width: 901px) {
-  body{
-    padding-bottom: calc(var(--footer-h) + env(safe-area-inset-bottom, 0px) + 20px);
-  }
-  /* thêm biên dưới cho khu vực có nút tính để chắc chắn không bị đè */
-  .calc-wrap{
-    margin-bottom: calc(var(--footer-h) + 20px);
-  }
+
+/* ===== CHỪA CHỖ CHO FOOTER TRÊN DESKTOP ===== */
+@media (min-width:901px){
+  body{ padding-bottom: calc(var(--footer-h) + env(safe-area-inset-bottom,0px) + 20px); }
+  .calc-wrap{ margin-bottom: calc(var(--footer-h) + 20px); }
 }
   </style>
 
@@ -446,6 +444,7 @@ function searchAgent(){
 
   isLoggedIn=true; document.body.classList.add('logged-in'); document.body.classList.remove('logged-out');
   updateNavVisibility();
+  setStickyVars();   // <<< đo lại head/note sau khi giao diện hiển thị
 
   const initHash = location.hash && location.hash.slice(1);
   if (initHash && document.getElementById(initHash)) { showSection(initHash); }
@@ -485,6 +484,19 @@ function enableEnterToCalc(){
   });
 }
 
+/* ===== STICKY & FOOTER VARS (đo động, giữ NOTE luôn ngay dưới HEAD) ===== */
+function setStickyVars(){
+  const head=document.querySelector('.masthead');
+  const note=document.querySelector('.info-bar');
+  const footer=document.getElementById('page-footer');
+  const h = head ? Math.ceil(head.getBoundingClientRect().height) : 72;
+  const n = note ? Math.ceil(note.getBoundingClientRect().height) : 48;
+  const f = footer ? Math.ceil(footer.getBoundingClientRect().height) : 66;
+  document.documentElement.style.setProperty('--head-h', h+'px');
+  document.documentElement.style.setProperty('--note-h', n+'px');
+  document.documentElement.style.setProperty('--footer-h', f+'px');
+}
+
 /* ===== INIT ===== */
 window.addEventListener('load', async ()=>{
   document.body.classList.add('logged-out');
@@ -512,31 +524,19 @@ window.addEventListener('load', async ()=>{
 
   if(document.fonts && document.fonts.ready){try{await document.fonts.ready;}catch{}}
   scheduleFit();
-  window.addEventListener('resize',()=>{scheduleFit(); updateNavVisibility(); toggleExportLink();});
+  setStickyVars();             // đo ngay khi load
+  window.addEventListener('resize',()=>{scheduleFit(); updateNavVisibility(); toggleExportLink(); setStickyVars();});
+  window.addEventListener('orientationchange', setStickyVars);
 
   toggleExportLink();
 });
-    // FIX: đo footer và cập nhật biến --footer-h
-function setFooterVar(){
-  const f = document.getElementById('page-footer');
-  if(!f) return;
-  const h = f.getBoundingClientRect().height;
-  document.documentElement.style.setProperty('--footer-h', h + 'px');
-}
-window.addEventListener('load', setFooterVar);
-window.addEventListener('resize', setFooterVar);
-window.addEventListener('orientationchange', setFooterVar);
-if (document.fonts && document.fonts.ready) {
-  document.fonts.ready.then(setFooterVar).catch(()=>{});
-}
-
   </script>
 </head>
 <body class="logged-out">
-  <!-- HEADER -->
+  <!-- HEADER (Sticky) -->
   <div class="masthead">
     <div class="head-left">
-      <img id="logo-main" src="/logo.webp" alt="Logo" />
+      <img id="logo-main" src=/logo.webp alt="Logo" />
       <div class="head-text">
         <small>CỔNG THÔNG TIN VÙNG HẰNG LÂM</small>
         <h1>DỰ TÍNH THU NHẬP</h1>
@@ -549,12 +549,17 @@ if (document.fonts && document.fonts.ready) {
     </div>
   </div>
 
-  <!-- MOBILE NAV (placeholder “Danh mục”) -->
+  <!-- NOTE (Sticky ngay dưới head, luôn cố định) -->
+  <div class="info-bar">
+    <div class="info-left">(Vui lòng nhập thông tin tại các ô tô màu)</div>
+    <div class="info-right">Dữ liệu tham chiếu được chốt đến 31/07/2025</div>
+  </div>
+
+  <!-- MOBILE NAV (Sticky dưới NOTE; hiện khi đã đăng nhập & màn hình nhỏ) -->
   <div id="mobile-nav">
     <a id="mobile-support" href="https://zalo.me/0376763390" target="_blank">💬 Hỗ trợ</a>
     <select>
       <option value="" selected disabled>Danh mục</option>
-      <!-- NEW: Thông tin đại lý ở trên A -->
       <option value="sec-daily">Thông tin đại lý</option>
       <optgroup label="A. Thu nhập từ hoạt động bán hàng">
         <option value="sec-muctieu">1. Mục tiêu tháng</option>
@@ -570,12 +575,11 @@ if (document.fonts && document.fonts.ready) {
     </select>
   </div>
 
-  <!-- LAYOUT DƯỚI HEADER -->
+  <!-- LAYOUT CHÍNH -->
   <div class="below-head">
-    <!-- SIDEBAR (desktop) -->
+    <!-- SIDEBAR (desktop; ẩn khi chưa đăng nhập) -->
     <aside class="app-sidebar hidden">
       <ul class="nav-list">
-        <!-- NEW: Thông tin đại lý tách thành mục riêng, trên A -->
         <li><button class="nav-btn active" data-target="sec-daily">Thông tin đại lý</button></li>
 
         <li class="nav-group">A. Thu nhập từ hoạt động bán hàng</li>
@@ -594,13 +598,7 @@ if (document.fonts && document.fonts.ready) {
     <!-- MAIN -->
     <main class="main-area">
       <div class="container" id="app-root">
-        <!-- NOTE STICKY -->
-        <div class="info-bar">
-          <div class="info-left">(Vui lòng nhập thông tin tại các ô tô màu)</div>
-          <div class="info-right">Dữ liệu tham chiếu được chốt đến 31/07/2025</div>
-        </div>
-
-        <!-- NEW SECTION: THÔNG TIN ĐẠI LÝ (đứng trước A) -->
+        <!-- 1) THÔNG TIN ĐẠI LÝ -->
         <section id="sec-daily" class="app-section active">
           <h2 class="sticky-title">THÔNG TIN ĐẠI LÝ</h2>
           <div class="top-fields">
@@ -655,7 +653,7 @@ if (document.fonts && document.fonts.ready) {
           </div>
         </section>
 
-        <!-- A) MỤC TIÊU/THU NHẬP BÁN HÀNG -->
+        <!-- 2) MỤC TIÊU THÁNG -->
         <section id="sec-muctieu" class="app-section">
           <h2 class="sticky-title">MỤC TIÊU THÁNG HIỆN TẠI</h2>
           <div class="top-fields" style="margin-bottom:10px">
@@ -713,7 +711,7 @@ if (document.fonts && document.fonts.ready) {
 
             <br/>
             <div>
-              <b>TỔNG HỢP</b>
+              <b style="margin-left:var(--pad)">TỔNG HỢP</b>
               <div class="top-fields">
                 <div class="field"><label for="tong-cc"><b>∑ Số lượng Hợp đồng</b></label><input type="number" id="tong-cc" readonly/></div>
                 <div class="field"><label for="fyp-chinh"><b>∑ FYP SP chính</b></label><input type="number" id="fyp-chinh" readonly/></div>
@@ -729,7 +727,7 @@ if (document.fonts && document.fonts.ready) {
           </div>
         </section>
 
-        <!-- 2) CÁC KHOẢN THU NHẬP -->
+        <!-- 3) CÁC KHOẢN THU NHẬP -->
         <section id="sec-khoanthu" class="app-section">
           <h2 class="sticky-title">CÁC KHOẢN THU NHẬP</h2>
           <div class="top-fields">
@@ -757,10 +755,9 @@ if (document.fonts && document.fonts.ready) {
           </div>
         </section>
 
-        <!-- 3) THU NHẬP BÁN HÀNG (A) -->
+        <!-- 4) THU NHẬP BÁN HÀNG (A) -->
         <section id="sec-ban-hang" class="app-section">
           <h2 class="sticky-title">THU NHẬP BÁN HÀNG</h2>
-          <div class="thu-nhap-note">Thu nhập bán hàng = FYC chính + FYC kèm + Thưởng kèm + Thưởng NS Pro + Thưởng NST + Thưởng NSQ + Thưởng Memo + Thưởng MDRT</div>
           <div class="summary-row">
             <div class="summary-block"><label for="tong-thu-nhap">Tổng thu nhập bán hàng (A)</label><input type="text" id="tong-thu-nhap" readonly/></div>
             <div class="summary-block"><label for="ty-le-thu-nhap">Tỷ lệ thu nhập/doanh thu</label><input type="text" id="ty-le-thu-nhap" readonly/></div>
@@ -777,13 +774,12 @@ if (document.fonts && document.fonts.ready) {
               <input type="text" id="thu-nhap-quan-ly" value="0" readonly />
             </div>
           </div>
-          <div class="info-left">Coming soon</div>
+          <div class="info-left" style="margin-left:var(--pad)">Coming soon</div>
         </section>
 
         <!-- C) TỔNG THU NHẬP (A + B) -->
         <section id="sec-tong" class="app-section">
           <h2 class="sticky-title">TỔNG THU NHẬP (A + B)</h2>
-          <div class="thu-nhap-note">Tổng thu nhập = Thu nhập bán hàng (A) + Thu nhập quản lý (B)</div>
           <div class="summary-row">
             <div class="summary-block"><label for="tong-A">A — Thu nhập bán hàng</label><input type="text" id="tong-A" readonly/></div>
             <div class="summary-block"><label for="tong-B">B — Thu nhập quản lý</label><input type="text" id="tong-B" readonly/></div>
@@ -802,7 +798,10 @@ if (document.fonts && document.fonts.ready) {
   <!-- Floating support (desktop/ipad rộng) -->
   <a id="support-btn" href="https://zalo.me/0376763390" target="_blank">💬 Hỗ trợ</a>
 
-   <!-- FOOTER: luôn hiển thị, logo xuống dòng & căn giữa -->
+  <!-- Link xuất HTML (ẩn trên mobile, tự hiện trên desktop khi trang dài) -->
+  <a id="export-link" href="#" onclick="exportHTML();return false;">📄 Xuất HTML</a>
+
+  <!-- FOOTER: luôn hiển thị, logo xuống dòng & căn giữa -->
   <div id="page-footer">
     <div class="footer-text">Bản quyền trang web thuộc về</div>
     <img src="/logo_textr.webp" alt="Logo" />
