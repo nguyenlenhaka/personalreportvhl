@@ -34,7 +34,6 @@ body.logged-in  .below-head{display:grid}
 .head-text h1{margin:0;color:#008a53;font-size:clamp(1.2rem,.7rem + 2.6vw,2rem);font-weight:900;letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 /* ===== LOGIN CLUSTER ===== */
-/* Desktop: 2 hàng 2 cột (MSĐL trên, Ngày gia nhập dưới, cột phải là nút) */
 .login-cluster{
   display:grid;
   grid-template-columns: 1fr auto;
@@ -54,7 +53,6 @@ body.logged-in  .below-head{display:grid}
   background:#008a53;color:#fff;border:none;border-radius:10px;padding:12px 18px;font-weight:800;cursor:pointer;white-space:nowrap
 }
 .login-cluster button:hover{background:#066a42}
-/* Mobile: flex */
 @media (max-width:900px){
   .login-cluster{display:flex;gap:10px;align-items:center;justify-content:flex-end;flex-wrap:wrap}
   .login-cluster>*{flex:1 1 140px;min-width:0}
@@ -90,7 +88,7 @@ aside.app-sidebar{
 /* ===== MOBILE NAV (dropdown; sticky; chỉ mobile & đã login) ===== */
 #mobile-nav{
   display:none; margin:8px var(--pad);
-  position:sticky; top:var(--sticky-offset); z-index:980; /* cao hơn info-bar */
+  position:sticky; top:var(--sticky-offset); z-index:980;
 }
 #mobile-support{display:block;margin-bottom:8px;background:#00a758;color:#fff;padding:10px;border-radius:8px;text-align:center;text-decoration:none;font-weight:800;white-space:nowrap}
 #mobile-nav select{
@@ -107,7 +105,7 @@ aside.app-sidebar{
 .main-area{width:100%}
 .container{width:100%;background:#fff;margin:0;border-radius:0;box-shadow:none;padding:20px var(--pad) 30px;position:relative;z-index:1}
 
-/* ===== INFO BAR (note-green + note-right) sticky mọi thiết bị ===== */
+/* ===== INFO BAR sticky (note-green + note-right) ===== */
 .info-bar{
   position:sticky; top:calc(var(--sticky-offset) + 6px); z-index:850;
   background:#fff; border:1px solid #e6eef5; border-radius:10px; padding:8px 12px; margin:8px 0 10px;
@@ -116,10 +114,7 @@ aside.app-sidebar{
 .info-left,.info-right{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:800}
 .info-left{color:var(--accent);font-style:italic}
 .info-right{color:#333b;font-style:italic}
-@media (max-width:900px){
-  /* Khi có dropdown sticky, info-bar “nhường” phía trên */
-  .info-bar{top:calc(var(--sticky-offset) + 52px)}
-}
+@media (max-width:900px){.info-bar{top:calc(var(--sticky-offset) + 52px)}}
 
 /* ===== TITLES (sticky section title) ===== */
 h2{font-size:clamp(1rem,.9rem + .8vw,1.3rem);text-align:center;color:#0051c1;font-weight:700;margin:14px 0 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -133,7 +128,6 @@ h2.sticky-title{position:sticky;top:calc(var(--sticky-offset) + 6px);z-index:800
 .field label{font-size:.98rem;font-weight:600;color:#24364a;margin:0 0 6px 2px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .field input,.field select{height:46px;padding:0 12px;font-size:16px;border:1.3px solid #c7d5e6;border-radius:8px;background-color:rgba(214,255,237,.3);font-weight:600;color:var(--brand);text-align:center;white-space:nowrap}
 .field input[readonly]{background:#fafbfd;color:#0b8a62;font-weight:700;border-color:#bfc7d1}
-/* Desktop hiển thị full chữ (kéo ngang nếu dài) */
 @media (min-width:901px){
   .field input,.field select,.summary-block input{overflow:auto !important;text-overflow:initial !important}
 }
@@ -141,7 +135,7 @@ h2.sticky-title{position:sticky;top:calc(var(--sticky-offset) + 6px);z-index:800
 /* Giai đoạn title */
 .gd-stage>b{display:block;margin:6px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
-/* Calc button wrap */
+/* Calc button */
 .calc-wrap{display:flex;align-items:center;gap:10px}
 #calc-btn{
   background:#0d72b5;color:#fff;border:none;border-radius:12px;
@@ -213,7 +207,7 @@ const datesEqual=(a,b)=>normalizeDateForCompare(a)===normalizeDateForCompare(b);
 async function fetchFirstJson(list){for(const url of list){try{const r=await fetch(url,{cache:'no-store'});if(r.ok)return await r.json();}catch{}}return null;}
 async function loadData(){
   const btn=document.querySelector('button[onclick="searchAgent()"]'); if(btn){btn.disabled=true;btn.textContent="Đang tải dữ liệu...";}
-  try{const r=await fetch('/income.json',{cache:'no-store'}); if(!r.ok)throw new Error('HTTP '+r.status); data=await r.json();}catch(e){alert("Không tải được income.json."); data=[];}
+  try{const r=await fetch('income.json',{cache:'no-store'}); if(!r.ok)throw new Error('HTTP '+r.status); data=await r.json();}catch(e){alert("Không tải được income.json."); data=[];}
   isDataReady=Array.isArray(data)&&data.length>0;
   nspro=await fetchFirstJson(['nspro.json','NSPRO.json','Nspro.json'])||[];
   nst6 =await fetchFirstJson(['6nst.json','6NST.json'])||[];
@@ -405,7 +399,6 @@ function showSection(id){
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   const a=document.querySelector(`[data-target="${id}"]`); if(a) a.classList.add('active');
   const dd=document.querySelector('#mobile-nav select');
-  // Chỉ đồng bộ dropdown khi người dùng đã chọn lần đầu (giữ placeholder "Danh mục")
   if(dd && dd.dataset.touched==='1' && dd.value!==id) dd.value=id;
   if(history.replaceState){ history.replaceState(null,'','#'+id); } else { location.hash = id; }
   scheduleFit();
@@ -497,10 +490,9 @@ window.addEventListener('load', async ()=>{
   const msel=document.getElementById("month-select");
   if(msel){ msel.addEventListener('change',()=>{calculateNSQ(); calculateThuongMDRT(); calculateTongThuNhap();}); }
 
-  // Mobile dropdown: set touched flag khi người dùng chọn
   const mobileDD=document.querySelector('#mobile-nav select');
   if(mobileDD){
-    mobileDD.addEventListener('change', function(){ this.dataset.touched='1'; showSection(this.value); });
+    mobileDD.addEventListener('change', function(){ this.dataset.touched='1'; if(this.value) showSection(this.value); });
   }
 
   document.querySelectorAll('.nav-btn').forEach(btn=>btn.addEventListener('click',()=>showSection(btn.dataset.target)));
@@ -539,11 +531,12 @@ window.addEventListener('load', async ()=>{
     <a id="mobile-support" href="https://zalo.me/0376763390" target="_blank">💬 Hỗ trợ</a>
     <select>
       <option value="" selected disabled>Danh mục</option>
+      <!-- NEW: Thông tin đại lý ở trên A -->
+      <option value="sec-daily">Thông tin đại lý</option>
       <optgroup label="A. Thu nhập từ hoạt động bán hàng">
-        <option value="sec-daily">1. Thông tin đại lý</option>
-        <option value="sec-muctieu">2. Mục tiêu tháng</option>
-        <option value="sec-khoanthu">3. Các khoản thu nhập</option>
-        <option value="sec-ban-hang">4. Thu nhập bán hàng</option>
+        <option value="sec-muctieu">1. Mục tiêu tháng</option>
+        <option value="sec-khoanthu">2. Các khoản thu nhập</option>
+        <option value="sec-ban-hang">3. Thu nhập bán hàng</option>
       </optgroup>
       <optgroup label="B. Thu nhập dành cho quản lý">
         <option value="sec-quan-ly">Coming soon</option>
@@ -559,11 +552,13 @@ window.addEventListener('load', async ()=>{
     <!-- SIDEBAR (desktop) -->
     <aside class="app-sidebar hidden">
       <ul class="nav-list">
+        <!-- NEW: Thông tin đại lý tách thành mục riêng, trên A -->
+        <li><button class="nav-btn active" data-target="sec-daily">Thông tin đại lý</button></li>
+
         <li class="nav-group">A. Thu nhập từ hoạt động bán hàng</li>
-        <li><button class="nav-btn active" data-target="sec-daily">1. Thông tin đại lý</button></li>
-        <li><button class="nav-btn" data-target="sec-muctieu">2. Mục tiêu tháng</button></li>
-        <li><button class="nav-btn" data-target="sec-khoanthu">3. Các khoản thu nhập</button></li>
-        <li><button class="nav-btn" data-target="sec-ban-hang">4. Thu nhập bán hàng</button></li>
+        <li><button class="nav-btn" data-target="sec-muctieu">1. Mục tiêu tháng</button></li>
+        <li><button class="nav-btn" data-target="sec-khoanthu">2. Các khoản thu nhập</button></li>
+        <li><button class="nav-btn" data-target="sec-ban-hang">3. Thu nhập bán hàng</button></li>
 
         <li class="nav-group">B. Thu nhập dành cho quản lý</li>
         <li><button class="nav-btn" data-target="sec-quan-ly">Coming soon</button></li>
@@ -582,7 +577,7 @@ window.addEventListener('load', async ()=>{
           <div class="info-right">Dữ liệu tham chiếu được chốt đến 31/07/2025</div>
         </div>
 
-        <!-- 1) THÔNG TIN ĐẠI LÝ -->
+        <!-- NEW SECTION: THÔNG TIN ĐẠI LÝ (đứng trước A) -->
         <section id="sec-daily" class="app-section active">
           <h2 class="sticky-title">THÔNG TIN ĐẠI LÝ</h2>
           <div class="top-fields">
@@ -637,7 +632,7 @@ window.addEventListener('load', async ()=>{
           </div>
         </section>
 
-        <!-- 2) MỤC TIÊU THÁNG -->
+        <!-- A) MỤC TIÊU/THU NHẬP BÁN HÀNG -->
         <section id="sec-muctieu" class="app-section">
           <h2 class="sticky-title">MỤC TIÊU THÁNG HIỆN TẠI</h2>
           <div class="top-fields" style="margin-bottom:10px">
@@ -711,7 +706,7 @@ window.addEventListener('load', async ()=>{
           </div>
         </section>
 
-        <!-- 3) CÁC KHOẢN THU NHẬP -->
+        <!-- 2) CÁC KHOẢN THU NHẬP -->
         <section id="sec-khoanthu" class="app-section">
           <h2 class="sticky-title">CÁC KHOẢN THU NHẬP</h2>
           <div class="top-fields">
@@ -739,7 +734,7 @@ window.addEventListener('load', async ()=>{
           </div>
         </section>
 
-        <!-- 4) THU NHẬP BÁN HÀNG (A) -->
+        <!-- 3) THU NHẬP BÁN HÀNG (A) -->
         <section id="sec-ban-hang" class="app-section">
           <h2 class="sticky-title">THU NHẬP BÁN HÀNG</h2>
           <div class="thu-nhap-note">Thu nhập bán hàng = FYC chính + FYC kèm + Thưởng kèm + Thưởng NS Pro + Thưởng NST + Thưởng NSQ + Thưởng Memo + Thưởng MDRT</div>
