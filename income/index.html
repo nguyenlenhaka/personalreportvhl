@@ -213,7 +213,7 @@ const datesEqual=(a,b)=>normalizeDateForCompare(a)===normalizeDateForCompare(b);
 async function fetchFirstJson(list){for(const url of list){try{const r=await fetch(url,{cache:'no-store'});if(r.ok)return await r.json();}catch{}}return null;}
 async function loadData(){
   const btn=document.querySelector('button[onclick="searchAgent()"]'); if(btn){btn.disabled=true;btn.textContent="Đang tải dữ liệu...";}
-  try{const r=await fetch('income.json',{cache:'no-store'}); if(!r.ok)throw new Error('HTTP '+r.status); data=await r.json();}catch(e){alert("Không tải được income.json."); data=[];}
+  try{const r=await fetch('/income.json',{cache:'no-store'}); if(!r.ok)throw new Error('HTTP '+r.status); data=await r.json();}catch(e){alert("Không tải được income.json."); data=[];}
   isDataReady=Array.isArray(data)&&data.length>0;
   nspro=await fetchFirstJson(['nspro.json','NSPRO.json','Nspro.json'])||[];
   nst6 =await fetchFirstJson(['6nst.json','6NST.json'])||[];
