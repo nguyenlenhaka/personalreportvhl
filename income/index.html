@@ -516,6 +516,20 @@ window.addEventListener('load', async ()=>{
 
   toggleExportLink();
 });
+    // FIX: đo footer và cập nhật biến --footer-h
+function setFooterVar(){
+  const f = document.getElementById('page-footer');
+  if(!f) return;
+  const h = f.getBoundingClientRect().height;
+  document.documentElement.style.setProperty('--footer-h', h + 'px');
+}
+window.addEventListener('load', setFooterVar);
+window.addEventListener('resize', setFooterVar);
+window.addEventListener('orientationchange', setFooterVar);
+if (document.fonts && document.fonts.ready) {
+  document.fonts.ready.then(setFooterVar).catch(()=>{});
+}
+
   </script>
 </head>
 <body class="logged-out">
