@@ -176,6 +176,15 @@ h2.sticky-title{position:sticky;top:calc(var(--sticky-offset) + 6px);z-index:800
 }
 #page-footer .footer-text{white-space:nowrap}
 #page-footer img{height:22px;width:auto;display:block}
+    @media (min-width: 901px) {
+  body{
+    padding-bottom: calc(var(--footer-h) + env(safe-area-inset-bottom, 0px) + 20px);
+  }
+  /* thêm biên dưới cho khu vực có nút tính để chắc chắn không bị đè */
+  .calc-wrap{
+    margin-bottom: calc(var(--footer-h) + 20px);
+  }
+}
   </style>
 
   <script>
