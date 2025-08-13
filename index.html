@@ -23,11 +23,89 @@
 
       --ml-font: 'Manulife JH Sans', 'ManulifeJHSans',
                  system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+      /* Bổ sung biến dùng cho header/footer mới */
+      --footer-h: 66px;
+      --brand:#0051c1; 
+      --accent:#00a758;
     }
 
     *{ box-sizing: border-box; }
     body{ background:#f3f4f6; }
     html, body{ font-size:17px; }
+
+    /* =====================
+       HEADER từ Code 1
+       ===================== */
+    .app-header{
+      position:fixed; top:0; left:0; right:0; z-index:1000;
+      background:#e8fff3; border-bottom:1px solid #d9f7e6;
+      padding-top:env(safe-area-inset-top,0px);
+    }
+    .header-grid{
+      display:grid; grid-template-columns: 1fr auto;
+      align-items:center; gap:12px; padding:10px 12px;
+    }
+    .brand-row{ display:flex; align-items:center; gap:10px; min-width:0; }
+    .logo-d{ height:48px; width:auto; display:block; flex:0 0 auto; }
+    .title-wrap{ display:flex; flex-direction:column; gap:2px; min-width:0; }
+    .title-top,.title-main{
+      font-family:var(--ml-font);
+      color:#059669; font-weight:800;
+      white-space:normal; overflow:visible; text-overflow:clip;
+      word-break:keep-all; line-height:1.25; padding-block:2px;
+    }
+    .title-top{  font-size:clamp(14px, 1vw + 10px, 22px); }
+    .title-main{ font-size:clamp(18px, 1.8vw + 12px, 34px); }
+
+    /* Cụm đăng nhập (style từ Code 1, nối với logic Code 2) */
+    .login-cluster{
+      display:grid; gap:.5rem; align-items:center;
+      grid-template-columns: 1fr; /* Mỗi dòng 1 trường trên mobile */
+      width:min(560px, 100%);
+      justify-self:end;
+    }
+    .login-cluster input{
+      height:44px; padding:0 12px; font-size:16px; border:1.3px solid #b7e7ce; border-radius:10px;
+      background:#effaf3; font-weight:600; color:#0d7233; outline:none; width:100%;
+    }
+    .login-btn{
+      height:44px; padding:0 18px; background:#008a53; color:#fff; border:none; border-radius:10px;
+      font-weight:800; cursor:pointer; touch-action:manipulation;
+    }
+    .login-btn:hover{ background:#066a42; }
+
+    /* Mobile header tweaks giống Code 1 */
+    @media (max-width:1023px){
+      .header-grid{ grid-template-columns:1fr; }
+      .brand-row{ justify-content:flex-start; }
+      .login-cluster{ width:100%; justify-self:stretch; grid-template-columns:1fr; }
+      .logo-d{ height:44px; }
+      .title-top{ font-size:clamp(13px, 1.6vw + 10px, 18px); }
+      .title-main{ font-size:clamp(16px, 3vw + 10px, 24px); }
+    }
+
+    /* Body chừa chỗ cho header cố định + (nếu có) TOC mobile */
+    body{ padding-top: calc(var(--header-h) + var(--toc-h) + 8px); }
+    /* Body chừa chỗ cho footer cố định */
+    body{ padding-bottom: calc(2.25 * var(--footer-h) + env(safe-area-inset-bottom,0px)); }
+
+    /* =====================
+       FOOTER từ Code 1
+       ===================== */
+    #pageFooter{
+      position:fixed; left:0; right:0; bottom:0;
+      min-height:var(--footer-h);
+      display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;
+      background:#f4f6f8; color:#0b3a2a; border-top:1px solid #e3e7eb; z-index:950;
+      padding:8px 10px 10px; text-align:center; font-weight:800;
+    }
+    #pageFooter img{ height:22px; width:auto; display:block; }
+    #contentWrap::after{ content:""; display:block; height: calc(0.75 * var(--footer-h) + 24px); }
+
+    /* =====================
+       Phần còn lại GIỮ NGUYÊN từ Code 2
+       ===================== */
     .sticky-header{ position: sticky; top: 0; z-index: 40; background:#e8fff3; overflow:hidden; }
 
     /* màu & nhấn */
@@ -38,56 +116,6 @@
     .hide{ display:none; }
     /* ép ẩn tuyệt đối khi xung đột specificity (vd: #loginForm) */
     .hidden{ display:none !important; }
-
-    /* ===== HEADER ===== */
-    .header-grid{
-      display:grid;
-      grid-template-columns: var(--sidebar-width) 1fr max-content; /* logo | title | login */
-      grid-template-areas: "logo title login";
-      align-items:center; gap:.75rem;
-    }
-    .logo-cell{ grid-area:logo; }
-    .logo-d{ height:100px; margin-left:20px; }
-    .logo-m{ display:none; }
-
-    .title-cell{ grid-area:title; min-width:0; }
-    .title-top, .title-main{
-      font-family: var(--ml-font);
-      white-space: nowrap; overflow:hidden; text-overflow: ellipsis;
-    }
-    .title-top{
-      font-weight: var(--w-title); letter-spacing:.5px; color:#059669;
-      font-size:1.55rem; line-height:1.1; text-transform:uppercase;
-    }
-    .title-main{
-      font-weight: var(--w-title); color:#059669;
-      font-size:3.2rem; line-height:1; margin-top:.25rem;
-    }
-
-    /* Cụm đăng nhập – desktop */
-    #loginForm{
-      grid-area:login;
-      justify-self:end;
-      width:440px; max-width:100%;
-      display:grid;
-      grid-template-columns: 1fr auto;
-      grid-template-rows: auto auto;
-      grid-template-areas:
-        "msdl msdl"
-        "date btn";
-      gap:.5rem; align-items:center;
-    }
-    #msdlInput{ grid-area:msdl; }
-    #dateInput{ grid-area:date; }
-    .login-btn{ grid-area:btn; height:44px; padding:0 18px; }
-
-    /* ===== Nút ĐĂNG XUẤT thay form sau khi login ===== */
-    #logoutBtn{
-      grid-area:login;
-      justify-self:end;
-      height:44px; padding:0 18px;
-      display:none; /* sẽ hiện bằng JS */
-    }
 
     /* ===== SIDEBAR (desktop, chỉ hiện sau login) ===== */
     #sidebar{
@@ -172,91 +200,62 @@
     /* ===== MOBILE ===== */
     @media (max-width:1023px){ #contentWrap{ margin-left:0; } }
     @media (max-width:640px){
-      .header-grid{
-        grid-template-columns: auto 1fr;
-        grid-template-areas: "logo title" "login login";
-        align-items:flex-start;
-      }
-      .logo-d{ display:none; }
-      .logo-m{ display:block; height:56px; margin-left:8px; }
-      .title-cell{ text-align:center; padding-top:.25rem; }
-      .title-top{ font-size:1.25rem; }
-      .title-main{ font-size:2.25rem; line-height:}
-
-      /* form mobile: 2 input cùng hàng, nút xuống dòng riêng */
-      #loginForm{
-        justify-self:stretch; width:100%;
-        grid-template-columns: minmax(0,1fr) minmax(0,1fr);
-        grid-template-rows: auto auto;
-        grid-template-areas:
-          "msdl date"
-          "btn  btn";
-      }
-      .login-btn{ height:46px; justify-self:stretch; }
-      #logoutBtn{ height:46px; justify-self:stretch; }
+      /* Giữ lại các tinh chỉnh mobile cũ cho tiêu đề (fitTitles sẽ xử lý) */
       .section-title{ position:sticky; top:calc(var(--header-h) + var(--toc-h) + 6px); z-index:20; background:#fff; }
       .section{ scroll-margin-top: calc(var(--header-h) + var(--toc-h) + 10px); }
     }
+
     /* KHÔNG cắt theo trục dọc để giữ dấu tiếng Việt */
-.title-top,
-.title-main{
-  overflow-x: hidden;   /* vẫn cho phép ellipsis ngang */
-  overflow-y: visible;  /* không cắt theo dọc -> không mất dấu */
-  white-space: nowrap;
-  text-overflow: ellipsis;
-    /* nới nhẹ cho an toàn (có thể 1.18–1.25) */
-}
-
-/* Nếu từng set chung overflow cho header, đừng để nó che dọc */
-.sticky-header{ overflow: visible; }
-/* KHÔNG cắt theo trục dọc, chỉ ẩn tràn ngang để có ellipsis */
-.title-top,
-.title-main{
-  overflow-x: hidden;
-  overflow-y: visible;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-/* Nới line-height riêng cho dòng "CỔNG THÔNG TIN..." */
-.title-top, .title-main{
-  line-height: 1.25 !important;  /* 1.30–1.40 tùy bạn, miễn không cắt dấu */
-  padding-top: 2px;               /* nới nhẹ đầu trên */
-  padding-bottom: 2px;            /* nới nhẹ đầu dưới */
-}
-
-/* Chắc chắn cha không chặn dọc */
-.title-cell,
-.sticky-header{
-  overflow: visible !important;
-}
-
+    .title-top,
+    .title-main{
+      overflow-x: hidden;   /* vẫn cho phép ellipsis ngang */
+      overflow-y: visible;  /* không cắt theo dọc -> không mất dấu */
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+    /* Nếu từng set chung overflow cho header, đừng để nó che dọc */
+    .sticky-header{ overflow: visible; }
+    .title-top,
+    .title-main{
+      overflow-x: hidden;
+      overflow-y: visible;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+    .title-top, .title-main{
+      line-height: 1.25 !important;  /* 1.30–1.40 tùy bạn, miễn không cắt dấu */
+      padding-top: 2px;               /* nới nhẹ đầu trên */
+      padding-bottom: 2px;            /* nới nhẹ đầu dưới */
+    }
+    .title-cell,
+    .sticky-header{
+      overflow: visible !important;
+    }
   </style>
 </head>
 <body class="min-h-screen font-sans">
-  <!-- ===== HEADER ===== -->
-  <header id="pageHeader" class="sticky-header shadow">
-    <div class="header-grid px-2 md:px-3 py-10">
-      <!-- Logo -->
-      <div class="logo-cell flex items-center">
-        &#160;<img src="logo.webp" alt="logo" class="logo-d">
-        <img src="logo.webp" alt="logo" class="logo-m">
+  <!-- ===== HEADER (ĐÃ THAY BẰNG HEADER CODE 1) ===== -->
+  <header id="pageHeader" class="app-header">
+    <div class="header-grid">
+      <!-- Brand: logo + tiêu đề -->
+      <div class="brand-row">
+        &#160;&#160;&#160;&#160;<img src="/logo.webp" alt="logo" class="logo-d" />
+        <img src="/logo.webp" alt="logo" class="logo-m" />
+        <div class="title-wrap">
+          <div id="tTop" class="title-top">CỔNG THÔNG TIN VÙNG HẰNG LÂM</div>
+          <div id="tMain" class="title-main">BÁO CÁO CÁ NHÂN</div>
+        </div>
       </div>
 
-      <!-- Tiêu đề 2 dòng (auto-fit mobile, không xuống dòng) -->
-      <div class="title-cell">
-        <div id="tTop"  class="title-top">CỔNG THÔNG TIN VÙNG HẰNG LÂM</div>
-        <div id="tMain" class="title-main">BÁO CÁO CÁ NHÂN</div>
-      </div>
-
-      <!-- Đăng nhập -->
-      <form id="loginForm">
-        <input id="msdlInput" class="border rounded px-3 py-2" placeholder="Nhập MSĐL" required />
-        <input id="dateInput" class="border rounded px-3 py-2" placeholder="Ngày gia nhập (dd/mm/yyyy hoặc ddmmyyyy)" required />
-        <button class="login-btn bg-emerald-700 text-white rounded font-semibold hover:bg-emerald-800 transition" type="submit">Đăng nhập</button>
+      <!-- Cụm đăng nhập: dùng id/logic của Code 2, style của Code 1 -->
+      <form id="loginForm" class="login-cluster">
+        <input id="msdlInput" class="border-0" placeholder="Nhập MSĐL" required />
+        <input id="dateInput" class="border-0" placeholder="Ngày gia nhập (dd/mm/yyyy hoặc ddmmyyyy)" required />
+        <button class="login-btn" type="submit"><b>Đăng nhập</b></button>
       </form>
-      <!-- Đăng xuất (hiện sau khi đăng nhập) -->
-      <button id="logoutBtn" class="bg-emerald-700 text-white rounded font-semibold hover:bg-emerald-800 transition">Đăng xuất</button>
+
+      <!-- Nút Đăng xuất (hiện sau khi đăng nhập theo logic Code 2) -->
+      <button id="logoutBtn" class="login-btn" type="button" style="display:none">Đăng xuất</button>
     </div>
   </header>
 
@@ -298,6 +297,12 @@
 
   <!-- Nút hỗ trợ nổi (desktop) -->
   <button id="helpBtnDesktop" class="help-fab" aria-label="Hỗ trợ">Hỗ trợ</button>
+
+  <!-- ===== FOOTER (ĐÃ THAY BẰNG FOOTER CODE 1) ===== -->
+  <footer id="pageFooter">
+    <div>Bản quyền trang web thuộc về</div>
+    <img src="/logo_textr.webp" alt="Logo" />
+  </footer>
 
   <script>
     /* ===== STATE ===== */
@@ -393,15 +398,7 @@
     function formatNumber(val){ return (val ?? ""); }
 
     /* === BỔ SUNG: ép định dạng 000.000,000 cho danh sách nhãn yêu cầu === */
-    // Chuẩn hoá nhãn để so khớp ổn định (không dấu, lowercase, gọn khoảng trắng)
-    function normalizeLabel(label=""){
-      return String(label||"")
-        .toLowerCase()
-        .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
-        .replace(/\s+/g,' ').trim();
-    }
-
-    // Danh sách NHÃN cần ép định dạng 000.000,000 (F3)
+    function normalizeLabel(label=""){ return String(label||"").toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' ').trim(); }
     const FORCE_F3_LABELS = new Set([
       'Doanh thu FYP thực cấp',
       'Tổng doanh thu FYP',
@@ -428,14 +425,7 @@
       'Tổng FYP WT sau luật 50% để tính thưởng (cấp SUM+)',
       'Thưởng dự tính sau khi đã nhân hệ số TLDTHD'
     ].map(normalizeLabel));
-
-    // Quyết định có ép F3 không: nếu thuộc danh sách trên, hoặc chứa "fyp"/"fyc" (hành vi cũ)
-    function shouldF3Label(label=""){
-      const norm = normalizeLabel(label);
-      if (FORCE_F3_LABELS.has(norm)) return true;
-      return (norm.includes('fyp') || norm.includes('fyc'));
-    }
-
+    function shouldF3Label(label=""){ const norm = normalizeLabel(label); if (FORCE_F3_LABELS.has(norm)) return true; return (norm.includes('fyp') || norm.includes('fyc')); }
     function fmt(val,key="",label=""){ return shouldF3Label(label)?formatF3(val):(val??""); }
     function addPercent(val){ return (val ?? ""); }
     function exists(v){ return !(v===null||v===undefined||(typeof v==='string'&&v.trim()==='')); }
@@ -525,7 +515,6 @@
 
       // Ẩn form đăng nhập, hiện nút Đăng xuất
       loginForm.classList.add('hidden');
-      // đề phòng xung đột CSS (#loginForm {display:grid})
       loginForm.style.display = 'none';
       logoutBtn.style.display = 'inline-flex';
 
@@ -546,10 +535,7 @@
     logoutBtn.addEventListener('click', ()=>{ window.location.reload(); });
 
     // ===== INFO SECTION =====
-    function infoItem(label, value){
-      if(!exists(value)) return '';
-      return `<div class="info-item"><div class="label">${label}:</div><div class="val">${value}</div></div>`;
-    }
+    function infoItem(label, value){ if(!exists(value)) return ''; return `<div class="info-item"><div class="label">${label}:</div><div class="val">${value}</div></div>`; }
     function renderInfoSection(row){
       const p13cn = addPercent(row["TLDTHD cá nhân"]);
       const p13nh = addPercent(row["TLDTHD toàn nhánh"]);
@@ -902,9 +888,7 @@
     }
 
     // ===== HỖ TRỢ =====
-    function openSupport(){
-      alert('Hỗ trợ: vui lòng liên hệ quản trị viên Vùng Hằng Lâm.');
-    }
+    function openSupport(){ alert('Hỗ trợ: vui lòng liên hệ quản trị viên Vùng Hằng Lâm.'); }
     helpDeskEl.addEventListener('click', openSupport);
     helpMobEl.addEventListener('click', openSupport);
 
