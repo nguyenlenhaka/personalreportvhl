@@ -36,6 +36,8 @@
     .val{ font-weight:900; }
     .thin{ font-weight:700; color:#0b3d2c; }
     .hide{ display:none; }
+    /* ép ẩn tuyệt đối khi xung đột specificity (vd: #loginForm) */
+    .hidden{ display:none !important; }
 
     /* ===== HEADER ===== */
     .header-grid{
@@ -79,6 +81,14 @@
     #dateInput{ grid-area:date; }
     .login-btn{ grid-area:btn; height:44px; padding:0 18px; }
 
+    /* ===== Nút ĐĂNG XUẤT thay form sau khi login ===== */
+    #logoutBtn{
+      grid-area:login;
+      justify-self:end;
+      height:44px; padding:0 18px;
+      display:none; /* sẽ hiện bằng JS */
+    }
+
     /* ===== SIDEBAR (desktop, chỉ hiện sau login) ===== */
     #sidebar{
       width:var(--sidebar-width);
@@ -114,7 +124,7 @@
       border-radius:.5rem; margin:18px 0 12px; font-size:1.25rem;
     }
     .subsec{
-      margin:12px 0 10px; font-weight:var(--w-section); color:#0b3d2c;
+      margin:12px 0 10px; font-weight: var(--w-section); color:#0b3d2c;
       padding-left:.75rem; border-left:6px solid #0ea35b; font-size:1.15rem;
     }
     .section{ scroll-margin-top: calc(var(--header-h) + 8px); }
@@ -150,6 +160,15 @@
     .lvl-3{ margin-left:2.25rem; padding-left:.75rem; border-left:2px dashed #c7f9e9; border-radius:.25rem; }
     .lvl-4{ margin-left:3.25rem; padding-left:.75rem; border-left:2px dotted #def7ef; border-radius:.25rem; }
 
+    /* ===== NÚT HỖ TRỢ ===== */
+    .help-fab{
+      position:fixed; right:16px; bottom:16px; z-index:60;
+      padding:.6rem .9rem; border-radius:9999px; border:1px solid #065f46;
+      background:#059669; color:#fff; font-weight:700; box-shadow:0 10px 15px rgba(0,0,0,.1);
+      display:none; /* hiện bằng JS khi đăng nhập & ở desktop */
+    }
+    .help-fab:hover{ background:#047857; }
+
     /* ===== MOBILE ===== */
     @media (max-width:1023px){ #contentWrap{ margin-left:0; } }
     @media (max-width:640px){
@@ -174,6 +193,7 @@
           "btn  btn";
       }
       .login-btn{ height:46px; justify-self:stretch; }
+      #logoutBtn{ height:46px; justify-self:stretch; }
       .section-title{ position:sticky; top:calc(var(--header-h) + var(--toc-h) + 6px); z-index:20; background:#fff; }
       .section{ scroll-margin-top: calc(var(--header-h) + var(--toc-h) + 10px); }
     }
@@ -219,7 +239,7 @@
     <div class="header-grid px-2 md:px-3 py-10">
       <!-- Logo -->
       <div class="logo-cell flex items-center">
-        <img src="logo_text.webp" alt="logo" class="logo-d">
+        <img src="logo.webp" alt="logo" class="logo-d">
         <img src="logo.webp" alt="logo" class="logo-m">
       </div>
 
@@ -235,6 +255,8 @@
         <input id="dateInput" class="border rounded px-3 py-2" placeholder="Ngày gia nhập (dd/mm/yyyy hoặc ddmmyyyy)" required />
         <button class="login-btn bg-emerald-700 text-white rounded font-semibold hover:bg-emerald-800 transition" type="submit">Đăng nhập</button>
       </form>
+      <!-- Đăng xuất (hiện sau khi đăng nhập) -->
+      <button id="logoutBtn" class="bg-emerald-700 text-white rounded font-semibold hover:bg-emerald-800 transition">Đăng xuất</button>
     </div>
   </header>
 
@@ -250,6 +272,7 @@
 
       <!-- TOC mobile (ẩn đến khi login) -->
       <div id="tocMobile" class="toc-mobile">
+        <button id="helpBtnMobile" class="w-full mb-2 bg-emerald-700 text-white rounded font-semibold hover:bg-emerald-800 transition px-3 py-2">Hỗ trợ</button>
         <select id="tocSelect" class="w-full border rounded px-3 py-2">
           <option value="" selected disabled>Danh mục báo cáo</option>
           <option value="sectionInfo">Thông tin đại lý</option>
@@ -272,6 +295,9 @@
       <div id="hint" class="mt-6 text-center text-gray-500 text-sm">Nhập thông tin để xem báo cáo đại lý</div>
     </main>
   </div>
+
+  <!-- Nút hỗ trợ nổi (desktop) -->
+  <button id="helpBtnDesktop" class="help-fab" aria-label="Hỗ trợ">Hỗ trợ</button>
 
   <script>
     /* ===== STATE ===== */
@@ -303,6 +329,9 @@
     const headerEl  = document.getElementById('pageHeader');
     const tTopEl    = document.getElementById('tTop');
     const tMainEl   = document.getElementById('tMain');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const helpDeskEl= document.getElementById('helpBtnDesktop');
+    const helpMobEl = document.getElementById('helpBtnMobile');
 
     function isMobile(){ return window.matchMedia('(max-width: 640px)').matches; }
 
@@ -416,15 +445,24 @@
     function hideErrors(){ errorEl.classList.add('hidden'); }
 
     function getHeaderH(){ return headerEl?.offsetHeight || 64; }
-    function getTocH(){ const sel=document.getElementById('tocSelect'); return (sel && getComputedStyle(tocMbEl).display!=='none') ? (sel.offsetHeight+16) : 0; }
+    function getTocH(){ return (tocMbEl && getComputedStyle(tocMbEl).display!=='none') ? tocMbEl.offsetHeight : 0; }
     function updateLayoutVars(){ const r=document.documentElement; r.style.setProperty('--header-h', getHeaderH()+'px'); r.style.setProperty('--fixed-top', getHeaderH()+'px'); r.style.setProperty('--toc-h', getTocH()+'px'); }
 
     function toggleNavByViewport(){
-      if (!loggedIn){ tocMbEl.style.display='none'; sidebarEl.style.display='none'; return; }
+      if (!loggedIn){ 
+        tocMbEl.style.display='none'; sidebarEl.style.display='none';
+        if (helpDeskEl) helpDeskEl.style.display='none';
+        if (helpMobEl) helpMobEl.style.display='none';
+        return; 
+      }
       if (window.matchMedia('(min-width: 1024px)').matches){
         sidebarEl.style.display='block'; tocMbEl.style.display='none';
+        if (helpDeskEl) helpDeskEl.style.display='inline-flex';
+        if (helpMobEl) helpMobEl.style.display='none';
       } else {
         sidebarEl.style.display='none'; tocMbEl.style.display='block';
+        if (helpDeskEl) helpDeskEl.style.display='none';
+        if (helpMobEl) helpMobEl.style.display='block';
       }
       updateLayoutVars();
     }
@@ -485,7 +523,13 @@
       // Sau đăng nhập: chỉ hiển thị "Thông tin đại lý"
       activateSection('sectionInfo');
 
-      // Show sidebar/toc theo viewport
+      // Ẩn form đăng nhập, hiện nút Đăng xuất
+      loginForm.classList.add('hidden');
+      // đề phòng xung đột CSS (#loginForm {display:grid})
+      loginForm.style.display = 'none';
+      logoutBtn.style.display = 'inline-flex';
+
+      // Show sidebar/toc theo viewport + nút hỗ trợ phù hợp
       toggleNavByViewport();
       window.addEventListener('resize', toggleNavByViewport);
 
@@ -498,7 +542,10 @@
       msdlInput.value=""; dateInput.value=""; msdlInput.blur(); dateInput.blur();
     };
 
-    /* ===== INFO SECTION ===== */
+    // Đăng xuất: refresh trang
+    logoutBtn.addEventListener('click', ()=>{ window.location.reload(); });
+
+    // ===== INFO SECTION =====
     function infoItem(label, value){
       if(!exists(value)) return '';
       return `<div class="info-item"><div class="label">${label}:</div><div class="val">${value}</div></div>`;
@@ -753,10 +800,10 @@
       const jd = encodeURIComponent(normalizeDate(lastJoin || ''));
       const incomeURL = `https://tracuubaocao.vunghanglam.com/income`;
       const Income = `
-        <div id="sectionIncome" class="section hide">
-          <div class="section-title">CÔNG CỤ DỰ TÍNH THU NHẬP</div>
+        <div id=\"sectionIncome\" class=\"section hide\">
+          <div class=\"section-title\">CÔNG CỤ DỰ TÍNH THU NHẬP</div>
           <div>
-            <iframe id="incomeFrame" src="${incomeURL}" class="w-full h-[78vh] border rounded-lg"></iframe>
+            <iframe id=\"incomeFrame\" src=\"${incomeURL}\" class=\"w-full h-[78vh] border rounded-lg\"></iframe>
           </div>
         </div>
       `;
@@ -854,15 +901,24 @@
       scrollToSectionStart(sectionId);
     }
 
+    // ===== HỖ TRỢ =====
+    function openSupport(){
+      alert('Hỗ trợ: vui lòng liên hệ quản trị viên Vùng Hằng Lâm.');
+    }
+    helpDeskEl.addEventListener('click', openSupport);
+    helpMobEl.addEventListener('click', openSupport);
+
     /* ===== INIT ===== */
     function init(){
       fitTitles();
       updateLayoutVars();
 
-      // Trước đăng nhập: ẩn sidebar & dropdown, ẩn report
+      // Trước đăng nhập: ẩn sidebar & dropdown, ẩn report và các nút hỗ trợ
       sidebarEl.style.display='none';
       tocMbEl.style.display='none';
       reportEl.classList.add('hidden');
+      helpDeskEl.style.display='none';
+      helpMobEl.style.display='none';
     }
     window.addEventListener('load', init);
     window.addEventListener('resize', ()=>{ fitTitles(); updateLayoutVars(); toggleNavByViewport(); });
