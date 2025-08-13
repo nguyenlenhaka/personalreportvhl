@@ -2,318 +2,223 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
-  <title>Báo cáo Cá nhân – Vùng Hằng Lâm</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>BÁO CÁO CÁ NHÂN – Vùng Hằng Lâm</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 
-  <!-- DÙNG ĐÚNG FONT TỪ THƯ MỤC fonts -->
-  <link rel="stylesheet" href="./fonts/fonts.css" />
-
+  <!-- Font của dự án -->
+  <link rel="stylesheet" href="fonts/fonts.css" />
+  <!-- Tailwind (dùng utility nhỏ) -->
   <script src="https://cdn.tailwindcss.com"></script>
+
   <style>
     :root{
-      --sidebar-width: 260px;
+      --sidebar-width: 360px;
       --header-h: 64px;
-      --fixed-top: 64px;
-      --toc-h: 0px;
-
-      /* ==== ĐIỀU CHỈNH WEIGHT CHO KHỚP fonts.css ==== */
-      --w-title: 700;   /* 700 nếu chỉ có Bold; nếu có ExtraBold/Black => 800/900 */
-      --w-section: 700; /* weight cho tiêu đề section A/B/C/Thông tin/Tính thu nhập */
-      --w-menu: 700;    /* weight cho menu & submenu */
-
-      --ml-font: 'Manulife JH Sans', 'ManulifeJHSans',
-                 system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-
-      /* Bổ sung biến dùng cho header/footer mới */
       --footer-h: 66px;
-      --brand:#0051c1; 
+      --toc-h: 0px;          /* chiều cao dropdown mobile (tự tính bằng JS) */
+      --brand:#059669; 
       --accent:#00a758;
     }
+    /* đảm bảo không tràn ngang trên mọi thiết bị */
+    html,body{height:100%;margin:0;background:#f3f4f6;overflow-x:hidden}
+    *{box-sizing:border-box;min-width:0}
 
-    *{ box-sizing: border-box; }
-    body{ background:#f3f4f6; }
-    html, body{ font-size:17px; }
-
-    /* =====================
-       HEADER từ Code 1
-       ===================== */
+    /* ===== HEADER (FIXED) ===== */
     .app-header{
       position:fixed; top:0; left:0; right:0; z-index:1000;
       background:#e8fff3; border-bottom:1px solid #d9f7e6;
       padding-top:env(safe-area-inset-top,0px);
     }
+    /* header chia 2 khu: brand (logo+tên) và login */
     .header-grid{
       display:grid; grid-template-columns: 1fr auto;
       align-items:center; gap:12px; padding:10px 12px;
     }
     .brand-row{ display:flex; align-items:center; gap:10px; min-width:0; }
-    .logo-d{ height:80px; width:auto; display:block; flex:0 0 auto; }
-    .title-wrap{ display:flex; flex-direction:column; gap:2px; min-width:0; 
-    .title-wrap {
-  overflow: visible !important;
-  height: auto !important;
-}
-}
+    .logo-d{ height:48px; width:auto; display:block; flex:0 0 auto; }
+
+    /* Tiêu đề: cho phép xuống dòng, không cắt dấu */
+    .title-wrap{ display:flex; flex-direction:column; gap:2px; min-width:0; }
     .title-top,.title-main{
-      font-family:var(--ml-font);
-      color:#059669; font-weight:800;
+      font-family:'Manulife JH Sans','ManulifeJHSans',system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+      color:var(--brand); font-weight:800;
       white-space:normal; overflow:visible; text-overflow:clip;
-      word-break:keep-all; line-height:1.2; padding-block:2px;
+      word-break:keep-all; line-height:1.25; padding-block:2px;
     }
-    .title-top{  font-size:clamp(14px, 1vw + 10px, 22px); }
-    .title-main{ font-size:clamp(12px, 1.8vw + 12px, 34px); }
+    .title-top{  font-size:clamp(14px, 1vw + 10px, 22px); text-transform:uppercase; }
+    .title-main{ font-size:clamp(18px, 1.8vw + 12px, 34px); }
 
-    /* Cụm đăng nhập (style từ Code 1, nối với logic Code 2) */
-    .login-cluster{
-      display:grid; gap:.5rem; align-items:center;
-      grid-template-columns: 1fr; /* Mỗi dòng 1 trường trên mobile */
-      width:min(560px, 100%);
-      justify-self:end;
-    }
-    .login-cluster input{
-      height:44px; padding:0 12px; font-size:16px; border:1.3px solid #b7e7ce; border-radius:10px;
-      background:#effaf3; font-weight:600; color:#0d7233; outline:none; width:100%;
-    }
-    .login-btn{
-      height:44px; padding:0 18px; background:#008a53; color:#fff; border:none; border-radius:10px;
-      font-weight:800; cursor:pointer; touch-action:manipulation;
-    }
+    /* ===== LOGIN / LOGOUT ===== */
+    .login-cluster{ display:grid; gap:.5rem; align-items:center; grid-template-columns: 1fr; width:min(560px, 100%); justify-self:end; }
+    .login-cluster input{ height:44px; padding:0 12px; font-size:16px; border:1.3px solid #b7e7ce; border-radius:10px; background:#effaf3; font-weight:600; color:#0d7233; outline:none; width:100%; }
+    .login-btn{ height:44px; padding:0 18px; background:#008a53; color:#fff; border:none; border-radius:10px; font-weight:800; cursor:pointer; touch-action:manipulation; }
     .login-btn:hover{ background:#066a42; }
+    .logout-only{ display:none !important; }
+    body.logged-in .login-only{ display:none !important; }
+    body.logged-in .logout-only{ display:block !important; }
 
-    /* Mobile header tweaks giống Code 1 */
+    /* ===== SIDEBAR (DESKTOP) ===== */
+    #sidebar{ position:fixed; left:0; top:var(--header-h); bottom:var(--footer-h); width:var(--sidebar-width); background:#fff; border-right:1px solid #e5e7eb; z-index:900; overflow-y:auto; overflow-x:hidden; display:none; }
+    .sidebar-inner{ padding:12px; }
+    .menu-title{ font-weight:900; color:#065f46; margin:6px 8px 8px; white-space:normal; line-height:1.25; }
+    .menu-group{ margin:12px 0 6px 8px; font-weight:900; color:#0b3d2c; white-space:normal; line-height:1.25; }
+    .menu-item{ display:block; padding:.55rem .75rem; border-radius:.55rem; font-weight:800; color:#0b3d2c; white-space:normal; overflow-wrap:anywhere; word-break:break-word; line-height:1.25; font-size:0.96rem; }
+    .menu-item:hover{ background:#e5f7ee; }
+    .menu-item.active{ background:#0ea35b; color:#fff; }
+    .submenu{ margin:.25rem 0 .5rem .75rem; }
+    .submenu .menu-item{ padding:.45rem .6rem; }
+
+    /* ===== MOBILE TOC (DANH MỤC DROPDOWN) ===== */
+    #tocMobile{ position:fixed; top:var(--header-h); left:0; right:0; z-index:880; background:#fff; padding:10px 10px 6px; border-bottom:1px solid #e5e7eb; display:none; will-change:top; }
+    #tocMobile .row{ display:flex; gap:8px; }
+    #tocSelect{ flex:1 1 auto; height:44px; border:1px solid #c7d5e6; border-radius:10px; padding:0 10px; font-weight:800; color:#00519c; background:#eff5ff; font-size:16px; }
+    #supportMobile{ flex:0 0 auto; display:inline-flex; align-items:center; justify-content:center; height:44px; padding:0 14px; background:#00a758; color:#fff; border-radius:10px; text-decoration:none; font-weight:900; white-space:nowrap; }
+
+    /* ===== CONTENT ===== */
+    body{ padding-top: calc(var(--header-h) + var(--toc-h) + 8px); }
+    body{ padding-bottom: calc(2.25 * var(--footer-h) + env(safe-area-inset-bottom,0px)); }
+
+    #contentWrap{ margin-left:0; }
+    body.sidebar-open #contentWrap{ margin-left:var(--sidebar-width); }
+    main{ max-width:1200px; margin:0 auto; padding:14px; }
+
+    /* Ẩn toàn bộ phần ngoài header khi chưa login */
+    body.logged-out #sidebar,
+    body.logged-out #tocMobile,
+    body.logged-out #contentWrap,
+    body.logged-out #supportDesk { display:none !important; }
+
+    .section-title{ background:#fff; padding:12px 16px; border-left:6px solid #0ea35b; border-radius:8px; font-weight:900; color:#0b3d2c; margin:6px 0 14px; }
+
+    /* ===== INFO GRID của báo cáo (giữ nguyên style chính) ===== */
+    .info-grid{ display:grid; grid-template-columns: repeat(auto-fit, minmax(240px,1fr)); gap:.85rem; }
+    .info-item{ display:flex; flex-direction:column; gap:.3rem; background:#fff; border:1px solid #e5e7eb; border-left:4px solid #0ea35b; border-radius:.6rem; padding:.7rem .85rem; }
+    .info-item .val{ font-size:1.05rem; line-height:1.3; word-break:break-word; }
+    .pro-alert{ margin-top:.4rem; padding:.7rem .9rem; border:2px solid #dc2626; border-left-width:6px; border-radius:.6rem; background:#fff; color:#b91c1c; font-weight:900; font-size:1.05rem; }
+
+    .list-dot li, .bullet-strong li{ list-style:none; padding-left:0; display:grid; grid-template-columns:minmax(170px,max-content) 1fr; column-gap:1rem; align-items:start; margin:.3rem 0; }
+    .bullet-strong li{ border-left:3px solid #0ea35b; padding-left:.75rem; }
+    .hl{ grid-column:2; font-weight:900; font-size:1.02rem; line-height:1.3; color:#10b981; }
+    .thin{ font-weight:700; color:#0b3d2c; }
+    .subsec{ margin:12px 0 10px; font-weight:900; color:#0b3d2c; padding-left:.75rem; border-left:6px solid #0ea35b; font-size:1.05rem; }
+    .sub-block{ margin-bottom:8px; }
+
+    /* ===== MOBILE ===== */
     @media (max-width:1023px){
       .header-grid{ grid-template-columns:1fr; }
       .brand-row{ justify-content:flex-start; }
       .login-cluster{ width:100%; justify-self:stretch; grid-template-columns:1fr; }
       .logo-d{ height:44px; }
-      .title-top{ font-size:clamp(13px, 1.6vw + 10px, 18px); }
-      .title-main{ font-size:clamp(16px, 3vw + 10px, 24px); }
+      body.sidebar-open #contentWrap{ margin-left:0 } /* mobile không chừa chỗ sidebar */
+      body.logged-in #tocMobile{ display:block; }     /* dropdown luôn hiện khi đã đăng nhập */
+    }
+    @media (min-width:1024px){
+      body.logged-in #sidebar{ display:block; }
+      body.logged-in.sidebar-open #supportDesk{ display:inline-flex; }
     }
 
-    /* Body chừa chỗ cho header cố định + (nếu có) TOC mobile */
-    body{ padding-top: calc(var(--header-h) + var(--toc-h) + 8px); }
-    /* Body chừa chỗ cho footer cố định */
-    body{ padding-bottom: calc(2.25 * var(--footer-h) + env(safe-area-inset-bottom,0px)); }
-
-    /* =====================
-       FOOTER từ Code 1
-       ===================== */
-    #pageFooter{
-      position:fixed; left:0; right:0; bottom:0;
-      min-height:var(--footer-h);
-      display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;
-      background:#f4f6f8; color:#0b3a2a; border-top:1px solid #e3e7eb; z-index:950;
-      padding:8px 10px 10px; text-align:center; font-weight:800;
-    }
+    /* ===== FOOTER ===== */
+    #pageFooter{ position:fixed; left:0; right:0; bottom:0; min-height:var(--footer-h); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; background:#f4f6f8; color:#0b3a2a; border-top:1px solid #e3e7eb; z-index:950; padding:8px 10px 10px; text-align:center; font-weight:800; }
     #pageFooter img{ height:22px; width:auto; display:block; }
     #contentWrap::after{ content:""; display:block; height: calc(0.75 * var(--footer-h) + 24px); }
 
-    /* =====================
-       Phần còn lại GIỮ NGUYÊN từ Code 2
-       ===================== */
-    .sticky-header{ position: sticky; top: 0; z-index: 40; background:#e8fff3; overflow:hidden; }
+    /* Hỗ trợ desktop */
+    #supportDesk{ position:fixed; right:18px; bottom:calc(var(--footer-h) + 14px); background:#00a758;color:#fff;padding:12px 16px;border-radius:28px;font-weight:900;text-decoration:none;box-shadow:0 4px 12px rgba(0,0,0,.18); z-index:940; display:none; }
 
-    /* màu & nhấn */
-    b,strong,.val,.hl{ color:#10b981; }
-    .label{ font-weight:700; color:#0b3d2c; }
-    .val{ font-weight:900; }
-    .thin{ font-weight:700; color:#0b3d2c; }
-    .hide{ display:none; }
-    /* ép ẩn tuyệt đối khi xung đột specificity (vd: #loginForm) */
-    .hidden{ display:none !important; }
-
-    /* ===== SIDEBAR (desktop, chỉ hiện sau login) ===== */
-    #sidebar{
-      width:var(--sidebar-width);
-      position:fixed; top:var(--fixed-top); left:0; bottom:0;
-      overflow:auto; z-index:35; background:#fff;
-      border-right:1px solid #e5e7eb; border-top-right-radius:12px;
-      display:none; /* ẩn đến khi đăng nhập */
-    }
-    .sidebar-inner{ padding:12px; }
-    .menu-item,.menu-head{
-      display:block; font-weight: var(--w-menu); color:#0b3d2c; font-family:var(--ml-font);
-    }
-    .menu-item{ padding:.5rem .75rem; border-radius:.5rem; }
-    .menu-item:hover{ background:#e5f7ee; }
-    .menu-item.active{ background:#0ea35b; color:#fff; }
-    .menu-head{ padding:.5rem .75rem; }
-    .submenu{ margin:.25rem 0 .5rem .75rem; }
-    .submenu a{ display:block; padding:.35rem .5rem; border-radius:.375rem; color:#0b3d2c; font-weight:var(--w-menu); }
-    .submenu a:hover{ background:#edfdf6; }
-    .submenu a.active{ background:#0ea35b; color:#fff; }
-
-    /* CONTENT chừa sidebar */
-    #contentWrap{ margin-left: var(--sidebar-width); }
-
-    /* TOC mobile (ẩn đến khi login) */
-    .toc-mobile{ position:sticky; top:calc(var(--header-h)); z-index:30; background:#fff; padding:8px 0; display:none; }
-
-    /* SECTION */
-    .section-title{
-      font-family: var(--ml-font);
-      font-weight: var(--w-section); color:#0b3d2c; background:#fff;
-      padding:10px 16px; border-left:6px solid #0ea35b;
-      border-radius:.5rem; margin:18px 0 12px; font-size:1.25rem;
-    }
-    .subsec{
-      margin:12px 0 10px; font-weight: var(--w-section); color:#0b3d2c;
-      padding-left:.75rem; border-left:6px solid #0ea35b; font-size:1.15rem;
-    }
-    .section{ scroll-margin-top: calc(var(--header-h) + 8px); }
-
-    /* INFO GRID */
-    .info-grid{ display:grid; grid-template-columns: repeat(auto-fit, minmax(240px,1fr)); gap:.85rem; }
-    .info-item{
-      display:flex; flex-direction:column; gap:.3rem;
-      background:#fff; border:1px solid #e5e7eb; border-left:4px solid #0ea35b;
-      border-radius:.6rem; padding:.7rem .85rem;
-    }
-    .info-item .val{ font-size:1.15rem; line-height:1.25; word-break:break-word; }
-
-    /* Cảnh báo Pro */
-    .pro-alert{
-      margin-top:.4rem; padding:.7rem .9rem;
-      border:2px solid #dc2626; border-left-width:6px; border-radius:.6rem;
-      background:#fff; color:#b91c1c; font-weight:900; font-size:1.15rem;
-    }
-    .info-alert{ grid-column:1 / -1; }
-
-    /* list label|value */
-    .list-dot li, .bullet-strong li{
-      list-style:none; padding-left:0;
-      display:grid; grid-template-columns:minmax(170px,max-content) 1fr;
-      column-gap:1rem; align-items:start; margin:.3rem 0;
-    }
-    .bullet-strong li{ border-left:3px solid #0ea35b; padding-left:.75rem; }
-    .hl{ grid-column:2; font-weight:900; font-size:1.05rem; line-height:1.3; }
-
-    /* thụt dòng trực quan */
-    .lvl-2{ margin-left:1.25rem; padding-left:.75rem; border-left:3px solid #a7f3d0; border-radius:.25rem; }
-    .lvl-3{ margin-left:2.25rem; padding-left:.75rem; border-left:2px dashed #c7f9e9; border-radius:.25rem; }
-    .lvl-4{ margin-left:3.25rem; padding-left:.75rem; border-left:2px dotted #def7ef; border-radius:.25rem; }
-
-    /* ===== NÚT HỖ TRỢ ===== */
-    .help-fab{
-      position:fixed; right:16px; bottom:16px; z-index:60;
-      padding:.6rem .9rem; border-radius:9999px; border:1px solid #065f46;
-      background:#059669; color:#fff; font-weight:700; box-shadow:0 10px 15px rgba(0,0,0,.1);
-      display:none; /* hiện bằng JS khi đăng nhập & ở desktop */
-    }
-    .help-fab:hover{ background:#047857; }
-
-    /* ===== MOBILE ===== */
-    @media (max-width:1023px){ #contentWrap{ margin-left:0; } }
-    @media (max-width:640px){
-      /* Giữ lại các tinh chỉnh mobile cũ cho tiêu đề (fitTitles sẽ xử lý) */
-      .section-title{ position:sticky; top:calc(var(--header-h) + var(--toc-h) + 6px); z-index:20; background:#fff; }
-      .section{ scroll-margin-top: calc(var(--header-h) + var(--toc-h) + 10px); }
-    }
-
-    /* KHÔNG cắt theo trục dọc để giữ dấu tiếng Việt */
-    .title-top,
-    .title-main{
-      overflow-x: hidden;   /* vẫn cho phép ellipsis ngang */
-      overflow-y: visible;  /* không cắt theo dọc -> không mất dấu */
-      white-space: nowrap;
-      text-overflow: ellipsis;
-    }
-    /* Nếu từng set chung overflow cho header, đừng để nó che dọc */
-    .sticky-header{ overflow: visible; }
-    .title-top,
-    .title-main{
-      overflow-x: hidden;
-      overflow-y: visible;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-    }
-    .title-top, .title-main{
-      line-height: 1.25 !important;  /* 1.30–1.40 tùy bạn, miễn không cắt dấu */
-      padding-top: 2px;               /* nới nhẹ đầu trên */
-      padding-bottom: 2px;            /* nới nhẹ đầu dưới */
-    }
-    .title-cell,
-    .sticky-header{
-      overflow: visible !important;
-    }
+    /* Thông báo lỗi dưới header */
+    #errorTop{ display:none; margin:0; border-top:1px solid #f5c2c7; background:#fff5f5; color:#b91c1c; font-weight:800; padding:8px 12px; }
+    #errorTop.show{ display:block; }
   </style>
 </head>
-<body class="min-h-screen font-sans">
-  <!-- ===== HEADER (ĐÃ THAY BẰNG HEADER CODE 1) ===== -->
+<body class="logged-out">
+  <!-- ===== HEADER ===== -->
   <header id="pageHeader" class="app-header">
     <div class="header-grid">
-      <!-- Brand: logo + tiêu đề -->
+      <!-- Hàng brand: logo & tên trang cùng 1 dòng -->
       <div class="brand-row">
         <img src="/logo.webp" alt="logo" class="logo-d" />
         <div class="title-wrap">
-          <div id="tTop" class="title-top">CỔNG THÔNG TIN VÙNG HẰNG LÂM</div>
-          <div id="tMain" class="title-main">BÁO CÁO CÁ NHÂN</div>
+          <div class="title-top">CỔNG THÔNG TIN VÙNG HẰNG LÂM</div>
+          <div class="title-main">BÁO CÁO CÁ NHÂN</div>
         </div>
       </div>
 
-      <!-- Cụm đăng nhập: dùng id/logic của Code 2, style của Code 1 -->
+      <!-- Cụm đăng nhập / đăng xuất -->
       <form id="loginForm" class="login-cluster">
-        <input id="msdlInput" class="border-0" placeholder="Nhập MSĐL" required />
-        <input id="dateInput" class="border-0" placeholder="Ngày gia nhập (dd/mm/yyyy hoặc ddmmyyyy)" required />
-        <button class="login-btn" type="submit"><b>Đăng nhập</b></button>
+        <input class="login-only" type="text" id="msdlInput" placeholder="Nhập MSĐL" required />
+        <input class="login-only" type="text" id="dateInput" placeholder="Ngày gia nhập (dd/mm/yyyy hoặc ddmmyyyy)" required />
+        <button id="loginBtn" class="login-btn login-only" type="submit"><b>Đăng nhập</b></button>
+        <button id="logoutBtn" class="login-btn logout-only" type="button">Đăng xuất</button>
       </form>
-
-      <!-- Nút Đăng xuất (hiện sau khi đăng nhập theo logic Code 2) -->
-      <button id="logoutBtn" class="login-btn" type="button" style="display:none">Đăng xuất</button>
     </div>
+    <div id="errorTop"></div>
   </header>
 
-  <!-- ===== SIDEBAR (desktop, chỉ hiện sau login) ===== -->
+  <!-- ===== MOBILE TOC (treo dưới header) ===== -->
+  <div id="tocMobile">
+    <div class="row">
+      <select id="tocSelect" aria-label="Chọn mục"></select>
+      <a id="supportMobile" href="http://zalo.me/0376763390" target="_blank" rel="noopener">Hỗ trợ</a>
+    </div>
+  </div>
+
+  <!-- ===== SIDEBAR (desktop) ===== -->
   <aside id="sidebar">
-    <div class="sidebar-inner"><nav id="nav"></nav></div>
+    <div class="sidebar-inner">
+      <div class="menu-title">Danh mục</div>
+
+      <a href="#" class="menu-item active" data-target="sectionInfo">THÔNG TIN ĐẠI LÝ</a>
+      <a href="#" class="menu-item" data-target="sectionA">A. TỔNG QUAN (MTD)</a>
+
+      <div class="menu-group">B. HOẠT ĐỘNG CÁ NHÂN</div>
+      <div class="submenu">
+        <a href="#" class="menu-item" data-target="sectionB" data-anchor="#b1">B.1 Bán hàng</a>
+        <a href="#" class="menu-item" data-target="sectionB" data-anchor="#b2">B.2 Manulife Pro</a>
+        <a href="#" class="menu-item" data-target="sectionB" data-anchor="#b3">B.3 MDRT+</a>
+        <a href="#" class="menu-item" data-target="sectionB" data-anchor="#b4">B.4 M-Star / Japan</a>
+        <a href="#" class="menu-item" data-target="sectionB" data-anchor="#b5">B.5 Thưởng năm</a>
+      </div>
+
+      <div class="menu-group">C. TUYỂN DỤNG & HỆ THỐNG</div>
+      <div class="submenu">
+        <a href="#" class="menu-item" data-target="sectionC" data-anchor="#c1">C.1 Tuyển dụng</a>
+        <a href="#" class="menu-item" data-target="sectionC" data-anchor="#c2">C.2 Thăng cấp</a>
+        <a href="#" class="menu-item" data-target="sectionC" data-anchor="#c3">C.3 Duy trì chức danh</a>
+        <a href="#" class="menu-item" data-target="sectionC" data-anchor="#c4">C.4 MBA Pro</a>
+        <a href="#" class="menu-item" data-target="sectionC" data-anchor="#c5">C.5 Thưởng nhóm ưu tú</a>
+      </div>
+
+      <!-- Mở tab mới -->
+      <a href="https://tracuubaocao.vunghanglam.com/income/" target="_blank" rel="noopener" class="menu-item">TÍNH THU NHẬP</a>
+    </div>
   </aside>
 
   <!-- ===== CONTENT ===== -->
+  <a id="supportDesk" href="http://zalo.me/0376763390" target="_blank" rel="noopener">Hỗ trợ</a>
+
   <div id="contentWrap">
-    <main class="max-w-6xl mx-auto px-3 md:px-4 py-5">
-      <div id="errorMsg" class="hidden bg-red-50 border border-red-300 text-red-700 px-4 py-2 mb-4 rounded"></div>
-
-      <!-- TOC mobile (ẩn đến khi login) -->
-      <div id="tocMobile" class="toc-mobile">
-        <button id="helpBtnMobile" class="w-full mb-2 bg-emerald-700 text-white rounded font-semibold hover:bg-emerald-800 transition px-3 py-2">Hỗ trợ</button>
-        <select id="tocSelect" class="w-full border rounded px-3 py-2">
-          <option value="" selected disabled>Danh mục báo cáo</option>
-          <option value="sectionInfo">Thông tin đại lý</option>
-          <option value="sectionA">A. Tổng quan (MTD)</option>
-          <option value="sectionB#b1">B.1 Bán hàng</option>
-          <option value="sectionB#b2">B.2 Manulife Pro</option>
-          <option value="sectionB#b3">B.3 MDRT+</option>
-          <option value="sectionB#b4">B.4 M-Star / Japan</option>
-          <option value="sectionB#b5">B.5 Thưởng năm</option>
-          <option value="sectionC#c1">C.1 Tuyển dụng</option>
-          <option value="sectionC#c2">C.2 Thăng cấp</option>
-          <option value="sectionC#c3">C.3 Duy trì chức danh</option>
-          <option value="sectionC#c4">C.4 MBA Pro</option>
-          <option value="sectionC#c5">C.5 Thưởng nhóm ưu tú</option>
-          <option value="sectionIncome">Tính thu nhập</option>
-        </select>
-      </div>
-
-      <section id="report" class="bg-white shadow rounded-xl p-4 md:p-6 mt-0 hidden"></section>
-      
+    <main>
+      <!-- vùng render báo cáo -->
+      <section id="report"></section>
     </main>
   </div>
 
-  <!-- Nút hỗ trợ nổi (desktop) -->
-  <button id="helpBtnDesktop" class="help-fab" aria-label="Hỗ trợ">Hỗ trợ</button>
-
-  <!-- ===== FOOTER (ĐÃ THAY BẰNG FOOTER CODE 1) ===== -->
+  <!-- ===== FOOTER ===== -->
   <footer id="pageFooter">
     <div>Bản quyền trang web thuộc về</div>
     <img src="/logo_textr.webp" alt="Logo" />
   </footer>
 
+  <!-- ===== LOGIC (thuật toán giữ nguyên từ trang báo cáo cũ) ===== -->
   <script>
     /* ===== STATE ===== */
     let dataRows = [];
     let mapping = [];
     let dataReady;
     let loggedIn = false;
+
+    /* ===== CONST ===== */
+    const INCOME_URL  = 'https://tracuubaocao.vunghanglam.com/income/';
 
     /* ===== LOAD DATA ===== */
     async function loadData(){
@@ -329,45 +234,22 @@
     dataReady = loadData();
 
     /* ===== DOM ===== */
-    const errorEl   = document.getElementById('errorMsg');
     const reportEl  = document.getElementById('report');
-    const hintEl    = document.getElementById('hint');
-    const tocMbEl   = document.getElementById('tocMobile');
     const sidebarEl = document.getElementById('sidebar');
-    const navEl     = document.getElementById('nav');
+    const tocMbEl   = document.getElementById('tocMobile');
     const headerEl  = document.getElementById('pageHeader');
-    const tTopEl    = document.getElementById('tTop');
-    const tMainEl   = document.getElementById('tMain');
+    const errorTop  = document.getElementById('errorTop');
+    const loginForm = document.getElementById('loginForm');
+    const msdlInput = document.getElementById('msdlInput');
+    const dateInput = document.getElementById('dateInput');
+    const loginBtn  = document.getElementById('loginBtn');
     const logoutBtn = document.getElementById('logoutBtn');
-    const helpDeskEl= document.getElementById('helpBtnDesktop');
-    const helpMobEl = document.getElementById('helpBtnMobile');
 
-    function isMobile(){ return window.matchMedia('(max-width: 640px)').matches; }
+    function isMobile(){ return window.matchMedia('(max-width: 1023px)').matches; }
 
-    /* ===== Title auto-fit (mobile không xuống dòng) ===== */
-    function fitText(el, maxPx, minPx){
-      if(!el) return;
-      const container = el.parentElement;
-      el.style.whiteSpace = 'nowrap';
-      let size = maxPx;
-      el.style.fontSize = size + 'px';
-      const maxWidth = container.clientWidth - 4;
-      while (size > minPx && el.scrollWidth > maxWidth){
-        size -= 1;
-        el.style.fontSize = size + 'px';
-      }
-    }
-    function fitTitles(){
-      if (isMobile()){
-        fitText(tTopEl, 24, 12);
-        fitText(tMainEl, 36, 18);
-      } else {
-        tTopEl.style.fontSize = '1.55rem';
-        tMainEl.style.fontSize = '3.2rem';
-      }
-    }
+    /* ===== UTIL (giữ nguyên) ===== */
+    function showErrorTop(msg){ if(!msg){errorTop.classList.remove('show'); errorTop.textContent=''; return;} errorTop.textContent=msg; errorTop.classList.add('show'); }
 
-    /* ===== UTIL ===== */
     function normalizeDate(s){
       if(!s) return '';
       s = String(s).trim();
@@ -390,44 +272,13 @@
       } else if (hasComma&&!hasDot){ s=s.replace(',', '.'); }
       const n=parseFloat(s); return isNaN(n)?NaN:n;
     }
-    function formatThousand(n,dec){
-      if (n===null||n===undefined||isNaN(n)) return "";
-      const fixed = Number(n).toFixed(dec);
-      let [intPart, frac=""] = fixed.split('.');
-      const sign = intPart.startsWith('-')?'-':'';
-      intPart = intPart.replace('-','').replace(/\B(?=(\d{3})+(?!\d))/g,'.');
-      return sign + intPart + (dec>0?','+frac:"");
-    }
+    function formatThousand(n,dec){ if (n===null||n===undefined||isNaN(n)) return ""; const fixed = Number(n).toFixed(dec); let [intPart, frac=""] = fixed.split('.'); const sign = intPart.startsWith('-')?'-':''; intPart = intPart.replace('-','').replace(/\B(?=(\d{3})+(?!\d))/g,'.'); return sign + intPart + (dec>0?','+frac:""); }
     function formatF3(val){ const n=parseLocaleNumber(val); if(isNaN(n)) return val??""; return formatThousand(n,3); }
     function formatNumber(val){ return (val ?? ""); }
 
-    /* === BỔ SUNG: ép định dạng 000.000,000 cho danh sách nhãn yêu cầu === */
     function normalizeLabel(label=""){ return String(label||"").toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' ').trim(); }
     const FORCE_F3_LABELS = new Set([
-      'Doanh thu FYP thực cấp',
-      'Tổng doanh thu FYP',
-      'FYP phát sinh tính thưởng',
-      'Mức thưởng tạm đạt',
-      'Cần thêm để đạt mức thưởng tiếp theo',
-      'Mức thưởng tiếp theo',
-      'FYP cần thêm để thăng hạng',
-      'FYP thực đạt (YTD)',
-      'FYP cần thêm để đạt tiến độ quý hiện tại',
-      'FYP cần thêm để đạt danh hiệu MDRT+',
-      'FYP phát sinh trong thời gian thi đua',
-      'Tổng FYP cần thêm để đạt thi đua',
-      'Tổng FYP phát sinh (YTD)',
-      'FYC Whole team L6M sau luật 50% cần thêm',
-      'fYP Whole team L6M sau luật 50% cần thêm',
-      'FYC cá nhân UM+ và ĐL trực tiếp L12M sau luật 50%',
-      'FYC cá nhân UM+ và ĐL trực tiếp L12M sau luật 50%',
-      'Tổng FYP phát sinh trong tháng của bản thân UM+ (A)',
-      'FYP của bản thân UM+ (A) và nhóm trực tiếp sau luật 50%',
-      'FYP của bản thân UM+ (B) báo cáo trực tiếp cho UM+ (A)',
-      'Tổng FYP sau luật 50% dùng để tính thưởng (cấp UM)',
-      'Tổng FYP WT trước luật 50% (cấp SUM+)',
-      'Tổng FYP WT sau luật 50% để tính thưởng (cấp SUM+)',
-      'Thưởng dự tính sau khi đã nhân hệ số TLDTHD'
+      'Doanh thu FYP thực cấp','Tổng doanh thu FYP','FYP phát sinh tính thưởng','Mức thưởng tạm đạt','Cần thêm để đạt mức thưởng tiếp theo','Mức thưởng tiếp theo','FYP cần thêm để thăng hạng','FYP thực đạt (YTD)','FYP cần thêm để đạt tiến độ quý hiện tại','FYP cần thêm để đạt danh hiệu MDRT+','FYP phát sinh trong thời gian thi đua','Tổng FYP cần thêm để đạt thi đua','Tổng FYP phát sinh (YTD)','FYC Whole team L6M sau luật 50% cần thêm','fYP Whole team L6M sau luật 50% cần thêm','FYC cá nhân UM+ và ĐL trực tiếp L12M sau luật 50%','FYC cá nhân UM+ và ĐL trực tiếp L12M sau luật 50%','Tổng FYP phát sinh trong tháng của bản thân UM+ (A)','FYP của bản thân UM+ (A) và nhóm trực tiếp sau luật 50%','FYP của bản thân UM+ (B) báo cáo trực tiếp cho UM+ (A)','Tổng FYP sau luật 50% dùng để tính thưởng (cấp UM)','Tổng FYP WT trước luật 50% (cấp SUM+)','Tổng FYP WT sau luật 50% để tính thưởng (cấp SUM+)','Thưởng dự tính sau khi đã nhân hệ số TLDTHD'
     ].map(normalizeLabel));
     function shouldF3Label(label=""){ const norm = normalizeLabel(label); if (FORCE_F3_LABELS.has(norm)) return true; return (norm.includes('fyp') || norm.includes('fyc')); }
     function fmt(val,key="",label=""){ return shouldF3Label(label)?formatF3(val):(val??""); }
@@ -435,122 +286,30 @@
     function exists(v){ return !(v===null||v===undefined||(typeof v==='string'&&v.trim()==='')); }
     function pick(row,keys){ for (const k of keys) if (exists(row[k])) return row[k]; return ''; }
 
-    function showError(msg){ errorEl.textContent=msg; errorEl.classList.remove('hidden'); }
-    function hideErrors(){ errorEl.classList.add('hidden'); }
-
-    function getHeaderH(){ return headerEl?.offsetHeight || 64; }
-    function getTocH(){ return (tocMbEl && getComputedStyle(tocMbEl).display!=='none') ? tocMbEl.offsetHeight : 0; }
-    function updateLayoutVars(){ const r=document.documentElement; r.style.setProperty('--header-h', getHeaderH()+'px'); r.style.setProperty('--fixed-top', getHeaderH()+'px'); r.style.setProperty('--toc-h', getTocH()+'px'); }
-
-    function toggleNavByViewport(){
-      if (!loggedIn){ 
-        tocMbEl.style.display='none'; sidebarEl.style.display='none';
-        if (helpDeskEl) helpDeskEl.style.display='none';
-        if (helpMobEl) helpMobEl.style.display='none';
-        return; 
-      }
-      if (window.matchMedia('(min-width: 1024px)').matches){
-        sidebarEl.style.display='block'; tocMbEl.style.display='none';
-        if (helpDeskEl) helpDeskEl.style.display='inline-flex';
-        if (helpMobEl) helpMobEl.style.display='none';
-      } else {
-        sidebarEl.style.display='none'; tocMbEl.style.display='block';
-        if (helpDeskEl) helpDeskEl.style.display='none';
-        if (helpMobEl) helpMobEl.style.display='block';
-      }
-      updateLayoutVars();
+    /* ===== LAYOUT HELPERS (từ trang income) ===== */
+    function setLayoutVars(){
+      const head=document.getElementById('pageHeader');
+      const footer=document.getElementById('pageFooter');
+      const toc=document.getElementById('tocMobile');
+      const h = head ? Math.ceil(head.getBoundingClientRect().height) : 64;
+      const f = footer ? Math.ceil(footer.getBoundingClientRect().height) : 66;
+      let t = 0;
+      if(toc && getComputedStyle(toc).display!=='none') t = Math.ceil(toc.getBoundingClientRect().height);
+      document.documentElement.style.setProperty('--header-h', h+'px');
+      document.documentElement.style.setProperty('--footer-h', f+'px');
+      document.documentElement.style.setProperty('--toc-h', t+'px');
     }
+    function applySidebarMode(){ if(!document.body.classList.contains('logged-in')) return; if(window.matchMedia('(min-width:1024px)').matches){ document.body.classList.add('sidebar-open'); } else { document.body.classList.remove('sidebar-open'); } }
 
-    function scrollToSectionStart(sectionId){
-      const section=document.getElementById(sectionId); if(!section) return;
-      const y = section.getBoundingClientRect().top + window.scrollY - (isMobile()? (getHeaderH()+getTocH()+10):(getHeaderH()+8));
-      window.scrollTo({ top:y, behavior:'smooth' });
-    }
-
-    /* ===== LOGIN ===== */
-    const loginForm = document.getElementById('loginForm');
-    const msdlInput = document.getElementById('msdlInput');
-    const dateInput = document.getElementById('dateInput');
-    const loginBtn  = loginForm.querySelector('button');
-
-    // chặn nhấn trước khi tải xong dữ liệu
-    loginBtn.disabled = true; loginBtn.textContent = 'Đang tải dữ liệu...';
-    dataReady.finally(()=>{ loginBtn.disabled=false; loginBtn.textContent='Đăng nhập'; });
-
-    let lastMsdl="", lastJoin="";
-
-    loginForm.onsubmit = async (e)=>{
-      e.preventDefault();
-      hideErrors();
-      await dataReady;
-
-      if (!Array.isArray(dataRows) || dataRows.length===0){
-        showError("Không tải được dữ liệu. Hãy kiểm tra data.json.");
-        return;
-      }
-
-      const msdlNorm = normalizeMSDL(msdlInput.value);
-      const dateNorm = normalizeDate(dateInput.value);
-
-      const msdlCols = ["MSDL","AGEN CODE","AGENT CODE","Agent Code","Mã Số Đại Lý","MÃ SỐ ĐẠI LÝ"];
-      const joinCols = ["JOIN DATE","Join Date","NGÀY GIA NHẬP","Ngày gia nhập"];
-
-      const row = dataRows.find(r => normalizeMSDL(pick(r,msdlCols))===msdlNorm &&
-                                     normalizeDate(pick(r,joinCols))===dateNorm);
-
-      if (!row){
-        const rowByMsdl = dataRows.find(r=>normalizeMSDL(pick(r,msdlCols))===msdlNorm);
-        if(rowByMsdl){
-          const expected=normalizeDate(pick(rowByMsdl,joinCols)) || (pick(rowByMsdl,joinCols)||'').trim();
-          showError(`Không tìm thấy đại lý phù hợp với thông tin bạn nhập!`);
-        } else showError("Không tìm thấy đại lý phù hợp với thông tin bạn nhập!");
-        return;
-      }
-
-      lastMsdl = pick(row, msdlCols);
-      lastJoin = pick(row, joinCols);
-
-      renderReport(row);
-      buildSidebarNav();
-      loggedIn = true;
-
-      // Sau đăng nhập: chỉ hiển thị "Thông tin đại lý"
-      activateSection('sectionInfo');
-
-      // Ẩn form đăng nhập, hiện nút Đăng xuất
-      loginForm.classList.add('hidden');
-      loginForm.style.display = 'none';
-      logoutBtn.style.display = 'inline-flex';
-
-      // Show sidebar/toc theo viewport + nút hỗ trợ phù hợp
-      toggleNavByViewport();
-      window.addEventListener('resize', toggleNavByViewport);
-
-      // hiện nội dung, update bản quyền
-      reportEl.classList.remove('hidden');
-      
-      hintEl.classList.remove('hidden');
-
-      // clear form
-      msdlInput.value=""; dateInput.value=""; msdlInput.blur(); dateInput.blur();
-    };
-
-    // Đăng xuất: refresh trang
-    logoutBtn.addEventListener('click', ()=>{ window.location.reload(); });
-
-    // ===== INFO SECTION =====
+    /* ===== SECTION RENDER ===== */
     function infoItem(label, value){ if(!exists(value)) return ''; return `<div class="info-item"><div class="label">${label}:</div><div class="val">${value}</div></div>`; }
     function renderInfoSection(row){
       const p13cn = addPercent(row["TLDTHD cá nhân"]);
       const p13nh = addPercent(row["TLDTHD toàn nhánh"]);
       const p13c1 = addPercent(row["TLDTHD cấp 1"]);
-
       const proMoc3 = row["PRO.MOC 3 THANG"];
       const hasAlert = exists(proMoc3) && String(proMoc3).trim() !== "-";
-      const alertHtml = hasAlert
-        ? `<div class="pro-alert ${isMobile() ? 'info-alert' : ''}">Cảnh báo: <span class="pro-name" style="font-weight:900;">Danh hiệu Manulife Pro</span> – ${proMoc3}</div>`
-        : "";
-
+      const alertHtml = hasAlert ? `<div class="pro-alert ${isMobile() ? 'info-alert' : ''}">Cảnh báo: <span class="pro-name" style="font-weight:900;">Danh hiệu Manulife Pro</span> – ${proMoc3}</div>` : "";
       const firstBlock = infoItem("Báo cáo dành cho", (row["TEN DAI LY"] || row["AGEN NAME"]));
       const restBlocks = `
         ${infoItem("KV | MS", row["KV|MS"])}
@@ -569,7 +328,6 @@
       `;
       const gridInner = isMobile() ? `${alertHtml}${firstBlock}${restBlocks}` : `${firstBlock}${restBlocks}`;
       const alertAfter = (!isMobile() && hasAlert) ? alertHtml : "";
-
       return `
         <div id="sectionInfo" class="section">
           <div class="section-title">Thông tin đại lý</div>
@@ -579,10 +337,8 @@
       `;
     }
 
-    /* ===== RENDER REPORT ===== */
     function renderReport(row){
       const Info = renderInfoSection(row);
-
       const A = `
         <div id="sectionA" class="section hide">
           <div class="section-title">A. BÁO CÁO TỔNG QUAN – (Month to date)</div>
@@ -591,8 +347,7 @@
             <li>Doanh thu FYP thực cấp: <span class="hl">${fmt(row["MTD.FYP CAP"], "MTD.FYP CAP", "Doanh thu FYP thực cấp")}</span></li>
             <li>Số lượng Đại lý mới tuyển dụng: <span class="hl">${formatNumber(row["RECRUIT T"])}</span></li>
           </ul>
-        </div>
-      `;
+        </div>`;
 
       const B = `
         <div id="sectionB" class="section hide">
@@ -680,8 +435,7 @@
               <li>Tổng FYP phát sinh (YTD): <span class="hl">${fmt(row["FC.FC FYP YTD"], "FC.FC FYP YTD", "Tổng FYP phát sinh (YTD)")}</span></li>
             </ul>
           </div>
-        </div>
-      `;
+        </div>`;
 
       const C = `
         <div id="sectionC" class="section hide">
@@ -782,134 +536,117 @@
               <li>Thưởng dự tính sau khi đã nhân hệ số TLDTHD: <span class="hl">${fmt(row["OTEAM.TIEN THUONG"], "OTEAM.TIEN THUONG", "Thưởng dự tính sau khi đã nhân hệ số TLDTHD")}</span></li>
             </ul>
           </div>
-        </div>
-      `;
+        </div>`;
 
-      // Tính thu nhập
-      const ms = encodeURIComponent(lastMsdl || '');
-      const jd = encodeURIComponent(normalizeDate(lastJoin || ''));
-      const incomeURL = `https://tracuubaocao.vunghanglam.com/income`;
-      const Income = `
-        <div id=\"sectionIncome\" class=\"section hide\">
-          <div class=\"section-title\">CÔNG CỤ DỰ TÍNH THU NHẬP</div>
-          <div>
-            <iframe id=\"incomeFrame\" src=\"${incomeURL}\" class=\"w-full h-[78vh] border rounded-lg\"></iframe>
-          </div>
-        </div>
-      `;
-
-      // ghép & chỉ hiển thị Info ban đầu
-      reportEl.innerHTML = Info + A + B + C + Income;
-
-      // TOC mobile: chuyển section khi chọn
-      const sel = document.getElementById('tocSelect');
-      sel.onchange = (e)=>{
-        const v=e.target.value; if(!v) return;
-        if(v.includes('#')){ const [parent,anchor]=v.split('#'); activateSection(parent,'#'+anchor); }
-        else { activateSection(v); }
-      };
+      reportEl.innerHTML = Info + A + B + C;
     }
 
-    /* ===== NAV ===== */
-    function buildSidebarNav(){
-      navEl.innerHTML = `
-        <div class="font-extrabold text-emerald-800 mb-2">Danh mục</div>
+    /* ===== NAV / TOC ===== */
+    function buildMobileTOC(){
+      const sel=document.getElementById('tocSelect'); if(!sel) return; sel.innerHTML='';
+      const addOpt=(val,text)=>{ const op=document.createElement('option'); op.value=val; op.textContent=text; sel.appendChild(op); };
+      addOpt('sectionInfo','Thông tin đại lý');
+      addOpt('sectionA','A. Tổng quan (MTD)');
+      addOpt('sectionB#b1','B.1 Bán hàng');
+      addOpt('sectionB#b2','B.2 Manulife Pro');
+      addOpt('sectionB#b3','B.3 MDRT+');
+      addOpt('sectionB#b4','B.4 M-Star / Japan');
+      addOpt('sectionB#b5','B.5 Thưởng năm');
+      addOpt('sectionC#c1','C.1 Tuyển dụng');
+      addOpt('sectionC#c2','C.2 Thăng cấp');
+      addOpt('sectionC#c3','C.3 Duy trì chức danh');
+      addOpt('sectionC#c4','C.4 MBA Pro');
+      addOpt('sectionC#c5','C.5 Thưởng nhóm ưu tú');
+      // Thêm mục mở tab mới
+      addOpt('openIncome','Tính thu nhập (mở tab)');
+      sel.addEventListener('change',()=>{ const v=sel.value; if(!v) return; if(v==='openIncome'){ window.open(INCOME_URL,'_blank'); sel.value=''; return; } showSection(v); });
+    }
 
-        <a href="#" data-type="section" data-target="sectionInfo" class="menu-item active">Thông tin đại lý</a>
-        <a href="#" data-type="section" data-target="sectionA" class="menu-item">A. Tổng quan (MTD)</a>
-
-        <div class="menu-item-group">
-          <div class="menu-head">B. Hoạt động cá nhân</div>
-          <div class="submenu">
-            <a href="#" data-type="sub" data-parent="sectionB" data-anchor="#b1">B.1 Bán hàng</a>
-            <a href="#" data-type="sub" data-parent="sectionB" data-anchor="#b2">B.2 Manulife Pro</a>
-            <a href="#" data-type="sub" data-parent="sectionB" data-anchor="#b3">B.3 MDRT+</a>
-            <a href="#" data-type="sub" data-parent="sectionB" data-anchor="#b4">B.4 M-Star / Japan</a>
-            <a href="#" data-type="sub" data-parent="sectionB" data-anchor="#b5">B.5 Thưởng năm</a>
-          </div>
-        </div>
-
-        <div class="menu-item-group">
-          <div class="menu-head">C. Tuyển dụng & Hệ thống</div>
-          <div class="submenu">
-            <a href="#" data-type="sub" data-parent="sectionC" data-anchor="#c1">C.1 Tuyển dụng</a>
-            <a href="#" data-type="sub" data-parent="sectionC" data-anchor="#c2">C.2 Thăng cấp</a>
-            <a href="#" data-type="sub" data-parent="sectionC" data-anchor="#c3">C.3 Duy trì chức danh</a>
-            <a href="#" data-type="sub" data-parent="sectionC" data-anchor="#c4">C.4 MBA Pro</a>
-            <a href="#" data-type="sub" data-parent="sectionC" data-anchor="#c5">C.5 Thưởng nhóm ưu tú</a>
-          </div>
-        </div>
-
-        <a href="#" data-type="section" data-target="sectionIncome" class="menu-item">Tính thu nhập</a>
-      `;
-      navEl.querySelectorAll('a').forEach(a=>{
-        a.addEventListener('click',(e)=>{
-          e.preventDefault();
-          const type=a.getAttribute('data-type');
-          const target=a.getAttribute('data-target');
-          const parent=a.getAttribute('data-parent');
-          const anchor=a.getAttribute('data-anchor');
-          if(type==='section') activateSection(target);
-          else if(type==='sub') activateSection(parent,anchor);
+    function bindSidebar(){
+      document.querySelectorAll('#sidebar .menu-item').forEach(a=>{
+        a.addEventListener('click',e=>{
+          const href=a.getAttribute('href')||''; const target=a.getAttribute('target');
+          const hasData=a.hasAttribute('data-target');
+          if(hasData){ e.preventDefault(); const base=a.getAttribute('data-target')||''; const anchor=a.getAttribute('data-anchor')||''; const val=anchor?`${base}${anchor}`:base; showSection(val); }
+          else{ // link ngoài như TÍNH THU NHẬP
+            if(target==='_blank') return; e.preventDefault(); window.open(INCOME_URL,'_blank');
+          }
         });
       });
     }
 
-    /* ===== ACTIVATE SECTION ===== */
-    function activateSection(sectionId, anchor){
-      // Ẩn mọi section
+    function showSection(value){
+      // value có thể là 'sectionB#b2'
+      const [sectionId, anchorRaw] = value.split('#');
+      const anchor = anchorRaw ? `#${anchorRaw}`.replace('##','#') : '';
+
+      // Ẩn/hiện section
       document.querySelectorAll('#report .section').forEach(sec=>sec.classList.add('hide'));
       const section = document.getElementById(sectionId); if(!section) return;
       section.classList.remove('hide');
 
-      // Nếu chọn mục con, chỉ hiển thị block đó
+      // Nếu có anchor: chỉ hiển thị block đó
       section.querySelectorAll('.sub-block').forEach(sb=>sb.classList.remove('hide'));
-      if(anchor){
-        section.querySelectorAll('.sub-block').forEach(sb=>sb.classList.add('hide'));
-        const sub = section.querySelector(anchor); if(sub) sub.classList.remove('hide');
-      }
+      if(anchor){ section.querySelectorAll('.sub-block').forEach(sb=>sb.classList.add('hide')); const sub = section.querySelector(anchor); if(sub) sub.classList.remove('hide'); }
 
       // Active menu
-      document.querySelectorAll('#nav .menu-item, #nav .submenu a').forEach(el=>el.classList.remove('active'));
-      if(!anchor){
-        const top=document.querySelector(`#nav .menu-item[data-target="${sectionId}"]`);
-        if(top) top.classList.add('active');
-      } else {
-        const sublink=document.querySelector(`#nav .submenu a[data-parent="${sectionId}"][data-anchor="${anchor}"]`);
-        if(sublink) sublink.classList.add('active');
-      }
+      document.querySelectorAll('#sidebar .menu-item').forEach(el=>el.classList.remove('active'));
+      if(!anchor){ const top=document.querySelector(`#sidebar .menu-item[data-target="${sectionId}"]`); if(top) top.classList.add('active'); }
+      else { const sublink=document.querySelector(`#sidebar .menu-item[data-target="${sectionId}"][data-anchor="${anchor}"]`); if(sublink) sublink.classList.add('active'); }
 
       // Đồng bộ dropdown mobile
-      const select=document.getElementById('tocSelect');
-      if (select && getComputedStyle(tocMbEl).display!=='none'){
-        const value=anchor?`${sectionId}${anchor}`:sectionId;
-        const opt=Array.from(select.options).find(o=>o.value===value);
-        if(opt) select.value=value;
+      const sel=document.getElementById('tocSelect'); if(sel){ sel.value = anchor ? `${sectionId}${anchor}` : sectionId; }
+
+      // cuộn tới đầu section (bên dưới header + TOC)
+      setLayoutVars();
+      const headH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header-h'))||64;
+      const tocH  = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--toc-h'))||0;
+      const offset = headH + tocH + 6;
+      const y = section.getBoundingClientRect().top + window.scrollY - offset;
+      window.scrollTo({ top: Math.max(0,y), behavior:'smooth' });
+    }
+
+    /* ===== LOGIN ===== */
+    // chặn nhấn trước khi tải xong dữ liệu
+    loginBtn.disabled = true; loginBtn.textContent = 'Đang tải dữ liệu...';
+    dataReady.finally(()=>{ loginBtn.disabled=false; loginBtn.textContent='Đăng nhập'; });
+
+    loginForm.addEventListener('submit', async (e)=>{
+      e.preventDefault(); showErrorTop(''); await dataReady;
+      if (!Array.isArray(dataRows) || dataRows.length===0){ showErrorTop('Không tải được dữ liệu. Hãy kiểm tra data.json.'); return; }
+
+      const msdlNorm = normalizeMSDL(msdlInput.value);
+      const dateNorm = normalizeDate(dateInput.value);
+      const msdlCols = ["MSDL","AGEN CODE","AGENT CODE","Agent Code","Mã Số Đại Lý","MÃ SỐ ĐẠI LÝ"];
+      const joinCols = ["JOIN DATE","Join Date","NGÀY GIA NHẬP","Ngày gia nhập"];
+
+      const row = dataRows.find(r => normalizeMSDL(pick(r,msdlCols))===msdlNorm && normalizeDate(pick(r,joinCols))===dateNorm);
+      if (!row){
+        const rowByMsdl = dataRows.find(r=>normalizeMSDL(pick(r,msdlCols))===msdlNorm);
+        if(rowByMsdl){ showErrorTop('Không tìm thấy đại lý phù hợp với thông tin bạn nhập!'); }
+        else showErrorTop('Không tìm thấy đại lý phù hợp với thông tin bạn nhập!');
+        return;
       }
 
-      // cuộn tới đầu section
-      scrollToSectionStart(sectionId);
-    }
+      // Render & bật giao diện
+      renderReport(row);
+      loggedIn = true;
+      document.body.classList.remove('logged-out');
+      document.body.classList.add('logged-in');
+      applySidebarMode();
+      buildMobileTOC();
+      showSection('sectionInfo');
+      setLayoutVars();
 
-    // ===== HỖ TRỢ =====
-    function openSupport(){ alert('Hỗ trợ: vui lòng liên hệ quản trị viên Vùng Hằng Lâm.'); }
-    helpDeskEl.addEventListener('click', openSupport);
-    helpMobEl.addEventListener('click', openSupport);
+      // Reset và xóa focus
+      msdlInput.value=''; dateInput.value=''; msdlInput.blur(); dateInput.blur();
+    });
+
+    logoutBtn.addEventListener('click', ()=>{ location.reload(); });
 
     /* ===== INIT ===== */
-    function init(){
-      fitTitles();
-      updateLayoutVars();
-
-      // Trước đăng nhập: ẩn sidebar & dropdown, ẩn report và các nút hỗ trợ
-      sidebarEl.style.display='none';
-      tocMbEl.style.display='none';
-      reportEl.classList.add('hidden');
-      helpDeskEl.style.display='none';
-      helpMobEl.style.display='none';
-    }
+    function init(){ setLayoutVars(); applySidebarMode(); bindSidebar(); window.addEventListener('resize', ()=>{ setLayoutVars(); applySidebarMode(); }); }
     window.addEventListener('load', init);
-    window.addEventListener('resize', ()=>{ fitTitles(); updateLayoutVars(); toggleNavByViewport(); });
   </script>
 </body>
 </html>
