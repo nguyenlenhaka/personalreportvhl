@@ -47,16 +47,21 @@
       align-items:center; gap:12px; padding:10px 12px;
     }
     .brand-row{ display:flex; align-items:center; gap:10px; min-width:0; }
-    .logo-d{ height:48px; width:auto; display:block; flex:0 0 auto; }
-    .title-wrap{ display:flex; flex-direction:column; gap:2px; min-width:0; }
+    .logo-d{ height:80px; width:auto; display:block; flex:0 0 auto; }
+    .title-wrap{ display:flex; flex-direction:column; gap:2px; min-width:0; 
+    .title-wrap {
+  overflow: visible !important;
+  height: auto !important;
+}
+}
     .title-top,.title-main{
       font-family:var(--ml-font);
       color:#059669; font-weight:800;
       white-space:normal; overflow:visible; text-overflow:clip;
-      word-break:keep-all; line-height:1.25; padding-block:2px;
+      word-break:keep-all; line-height:1.2; padding-block:2px;
     }
     .title-top{  font-size:clamp(14px, 1vw + 10px, 22px); }
-    .title-main{ font-size:clamp(18px, 1.8vw + 12px, 34px); }
+    .title-main{ font-size:clamp(12px, 1.8vw + 12px, 34px); }
 
     /* Cụm đăng nhập (style từ Code 1, nối với logic Code 2) */
     .login-cluster{
@@ -290,7 +295,7 @@
       </div>
 
       <section id="report" class="bg-white shadow rounded-xl p-4 md:p-6 mt-0 hidden"></section>
-      <div id="hint" class="mt-6 text-center text-gray-500 text-sm">Nhập thông tin để xem báo cáo đại lý</div>
+      
     </main>
   </div>
 
@@ -523,7 +528,7 @@
 
       // hiện nội dung, update bản quyền
       reportEl.classList.remove('hidden');
-      hintEl.textContent = "Bản quyền trang web thuộc về Vùng Hằng Lâm®";
+      
       hintEl.classList.remove('hidden');
 
       // clear form
