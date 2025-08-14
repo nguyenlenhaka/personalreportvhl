@@ -48,10 +48,88 @@
     .title-main{ font-size:clamp(18px, 1.8vw + 12px, 34px); }
 
     /* ===== LOGIN / LOGOUT ===== */
-    .login-cluster{ display:grid; gap:.5rem; align-items:center; grid-template-columns: 1fr; width:min(560px, 100%); justify-self:end; }
-    .login-cluster input{ height:44px; padding:0 12px; font-size:16px; border:1.3px solid #b7e7ce; border-radius:10px; background:#effaf3; font-weight:600; color:#0d7233; outline:none; width:100%; }
-    .login-btn{ height:44px; padding:0 18px; background:#008a53; color:#fff; border:none; border-radius:10px; font-weight:800; cursor:pointer; touch-action:manipulation; }
-    .login-btn:hover{ background:#066a42; }
+    .login-cluster{ 
+      display: flex; 
+      gap: 16px; 
+      align-items: flex-end;
+      justify-self: end;
+    }
+    
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    .password-input-wrapper {
+      position: relative;
+      display: inline-block;
+    }
+    
+    .login-cluster input{ 
+      height: 44px; 
+      padding: 0 12px; 
+      font-size: 16px; 
+      border: 1.3px solid #b7e7ce; 
+      border-radius: 10px; 
+      background: #effaf3; 
+      font-weight: 600; 
+      color: #0d7233; 
+      outline: none; 
+      width: 180px;
+    }
+    
+    .toggle-password {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 4px;
+      font-size: 16px;
+      color: #666;
+      transition: background-color 0.2s;
+    }
+    
+    .toggle-password:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+    }
+    
+    .password-input-wrapper input[type="password"] {
+      padding-right: 40px;
+    }
+    
+    /* Ẩn nút toggle khi đã đăng nhập */
+    body.logged-in .toggle-password {
+      display: none !important;
+    }
+    
+    /* Ẩn nút toggle khi đã đăng nhập */
+    body.logged-in .password-input-wrapper input {
+      padding-right: 12px;
+    }
+    
+    .login-cluster input::placeholder{ 
+      color: #666; 
+    }
+    
+    .login-btn{ 
+      height: 44px; 
+      padding: 0 18px; 
+      background: #008a53; 
+      color: #fff; 
+      border: none; 
+      border-radius: 10px; 
+      font-weight: 800; 
+      cursor: pointer; 
+      touch-action: manipulation;
+      min-width: 140px;
+    }
+    
+    .login-btn:hover{ background: #066a42; }
     .logout-only{ display:none !important; }
     body.logged-in .login-only{ display:none !important; }
     body.logged-in .logout-only{ display:block !important; }
@@ -71,7 +149,27 @@
     #tocMobile{ position:fixed; top:var(--header-h); left:0; right:0; z-index:880; background:#fff; padding:10px 10px 6px; border-bottom:1px solid #e5e7eb; display:none; will-change:top; }
     #tocMobile .row{ display:flex; gap:8px; }
     #tocSelect{ flex:1 1 auto; height:44px; border:1px solid #c7d5e6; border-radius:10px; padding:0 10px; font-weight:800; color:#00519c; background:#eff5ff; font-size:16px; }
-    #supportMobile{ flex:0 0 auto; display:inline-flex; align-items:center; justify-content:center; height:44px; padding:0 14px; background:#00a758; color:#fff; border-radius:10px; text-decoration:none; font-weight:900; white-space:nowrap; }
+    #supportMobile{ 
+      flex:0 0 auto; 
+      display:inline-flex; 
+      align-items:center; 
+      justify-content:center; 
+      height:44px; 
+      padding:0 14px; 
+      background:#00a758; 
+      color:#fff; 
+      border-radius:10px; 
+      text-decoration:none; 
+      font-weight:900; 
+      white-space:nowrap; 
+    }
+    
+    /* Nút hỗ trợ mobile khi đã đăng nhập - giữ vị trí trong TOC */
+    body.logged-in #supportMobile {
+      position: relative;
+      right: auto;
+      bottom: auto;
+    }
 
     /* ===== CONTENT ===== */
     body{ padding-top: calc(var(--header-h) + var(--toc-h) + 8px); }
@@ -81,16 +179,16 @@
     body.sidebar-open #contentWrap{ margin-left:var(--sidebar-width); }
     main{ max-width:1200px; margin:0 auto; padding:14px; }
 
-          /* Ẩn toàn bộ phần ngoài header khi chưa login */
-      body.logged-out #sidebar,
-      body.logged-out #contentWrap,
-      body.logged-out #supportDesk { display:none !important; }
+    /* Ẩn toàn bộ phần ngoài header khi chưa login */
+    body.logged-out #sidebar,
+    body.logged-out #contentWrap,
+    body.logged-out #supportDesk { display:none !important; }
       
       /* Ẩn dropdown TOC khi chưa login nhưng giữ nút hỗ trợ */
       body.logged-out #tocMobile .row { display:none !important; }
       body.logged-out #tocMobile { display:block !important; }
       
-      /* Hiển thị nút hỗ trợ ngay cả khi chưa đăng nhập */
+      /* Hiển thị nút hỗ trợ mobile khi chưa đăng nhập - nằm trên footer */
       body.logged-out #tocMobile::after {
         content: "Hỗ trợ";
         display: inline-flex;
@@ -104,9 +202,10 @@
         text-decoration: none;
         font-weight: 900;
         white-space: nowrap;
-        position: absolute;
+        position: fixed;
         right: 10px;
-        top: 10px;
+        bottom: calc(var(--footer-h) + 14px);
+        z-index: 940;
       }
 
     .section-title{ background:#fff; padding:12px 16px; border-left:6px solid #0ea35b; border-radius:8px; font-weight:900; color:#0b3d2c; margin:6px 0 14px; }
@@ -124,8 +223,8 @@
     .subsec{ margin:12px 0 10px; font-weight:900; color:#0b3d2c; padding-left:.75rem; border-left:6px solid #0ea35b; font-size:1.05rem; }
     .sub-block{ margin-bottom:8px; }
     .sub-content{ margin-left:20px; }
-    .fa-hide{ display:none; }
-    body.is-fa .fa-hide{ display:none !important; }
+    .fa-hide{ display:block; }
+    body.is-fa-or-sa .fa-hide{ display:none !important; }
 
     /* ===== MOBILE ===== */
     @media (max-width:1023px){
@@ -150,8 +249,21 @@
     #pageFooter img{ height:22px; width:auto; display:block; }
     #contentWrap::after{ content:""; display:block; height: calc(0.75 * var(--footer-h) + 24px); }
 
-    /* Hỗ trợ desktop */
-    #supportDesk{ position:fixed; right:18px; bottom:calc(var(--footer-h) + 14px); background:#00a758;color:#fff;padding:12px 16px;border-radius:28px;font-weight:900;text-decoration:none;box-shadow:0 4px 12px rgba(0,0,0,.18); z-index:940; display:none; }
+    /* Hỗ trợ desktop - luôn nằm góc dưới phía trên footer */
+    #supportDesk{ 
+      position:fixed; 
+      right:18px; 
+      bottom:calc(var(--footer-h) + 14px); 
+      background:#00a758;
+      color:#fff;
+      padding:12px 16px;
+      border-radius:28px;
+      font-weight:900;
+      text-decoration:none;
+      box-shadow:0 4px 12px rgba(0,0,0,.18); 
+      z-index:940; 
+      display:inline-flex !important; 
+    }
 
     /* Thông báo lỗi dưới header */
     #errorTop{ display:none; margin:0; border-top:1px solid #f5c2c7; background:#fff5f5; color:#b91c1c; font-weight:800; padding:8px 12px; }
@@ -180,27 +292,34 @@
 
       <!-- Cụm đăng nhập / đăng xuất -->
       <form id="loginForm" class="login-cluster">
-        <input class="login-only" type="text" id="msdlInput" placeholder="Nhập MSĐL" required />
-        <input class="login-only" type="text" id="dateInput" placeholder="Ngày gia nhập (dd/mm/yyyy hoặc ddmmyyyy)" required />
-        <button id="loginBtn" class="login-btn login-only" type="submit"><b>Đăng nhập</b></button>
+        <div class="input-group">
+          <input class="login-only" type="text" id="msdlInput" placeholder="Nhập MSDL" required />
+          <div class="password-input-wrapper">
+            <input class="login-only" type="password" id="dateInput" placeholder="Ngày gia nhập" required />
+            <button type="button" class="toggle-password" onclick="togglePassword()">
+              <span class="eye-icon">👁️</span>
+            </button>
+          </div>
+        </div>
+        <button id="loginBtn" class="login-btn login-only" type="submit">Đăng nhập</button>
         <button id="logoutBtn" class="login-btn logout-only" type="button">Đăng xuất</button>
       </form>
     </div>
     <div id="errorTop"></div>
   </header>
 
-      <!-- ===== TOC chỉ dành cho mobile ===== -->
-    <div id="tocMobile">
+  <!-- ===== TOC chỉ dành cho mobile ===== -->
+  <div id="tocMobile">
       <div class="update-date-mobile" id="mobileUpdateDate" style="display: none; text-align: center; padding: 8px 0; color: #0b3d2c; font-weight: 700; font-size: 14px; border-bottom: 1px solid #e5e7eb;"></div>
-      <div class="row">
-        <select id="tocSelect" aria-label="Chọn mục"></select>
-        <a id="supportMobile" href="http://zalo.me/0376763390" target="_blank" rel="noopener">Hỗ trợ</a>
-      </div>
+    <div class="row">
+      <select id="tocSelect" aria-label="Chọn mục"></select>
+      <a id="supportMobile" href="http://zalo.me/0376763390" target="_blank" rel="noopener">Hỗ trợ</a>
     </div>
+  </div>
 
   <!-- ===== SIDEBAR (desktop) ===== -->
-      <aside id="sidebar">
-      <div class="sidebar-inner">
+  <aside id="sidebar">
+    <div class="sidebar-inner">
         <div class="menu-title" id="sidebarUpdateDate">Danh mục</div>
 
       <a href="#" class="menu-item active" data-target="sectionInfo">THÔNG TIN ĐẠI LÝ</a>
@@ -251,6 +370,20 @@
     let mapping = [];
     let dataReady;
     let loggedIn = false;
+    
+    /* ===== PASSWORD TOGGLE ===== */
+    function togglePassword() {
+      const dateInput = document.getElementById('dateInput');
+      const eyeIcon = document.querySelector('.eye-icon');
+      
+      if (dateInput.type === 'password') {
+        dateInput.type = 'text';
+        eyeIcon.textContent = '🙈';
+      } else {
+        dateInput.type = 'password';
+        eyeIcon.textContent = '👁️';
+      }
+    }
 
     /* ===== CONST ===== */
     const INCOME_URL  = 'https://tracuubaocao.vunghanglam.com/income/';
@@ -383,9 +516,13 @@
       const hasAlert = exists(proMoc3) && String(proMoc3).trim() !== "-";
       const alertHtml = hasAlert ? `<div class="pro-alert ${isMobile() ? 'info-alert' : ''}">Cảnh báo: <span class="pro-name" style="font-weight:900;">Danh hiệu Manulife Pro</span> – ${proMoc3}</div>` : "";
       
-      // Kiểm tra chức danh có phải FA không
+      // Kiểm tra chức danh có phải FA hoặc SA không
       const chucDanh = String(row["Chức danh"] || "").toUpperCase();
-      const isFA = chucDanh.includes("FA") || chucDanh === "FA";
+      const isFAorSA = chucDanh.includes("FA") || chucDanh.includes("SA") || chucDanh === "FA" || chucDanh === "SA";
+      
+      // Debug log
+      console.log('renderInfoSection - Chức danh:', row["Chức danh"]);
+      console.log('renderInfoSection - isFAorSA:', isFAorSA);
       
       const firstBlock = infoItem("Báo cáo dành cho", (row["TEN DAI LY"] || row["AGEN NAME"]));
       const restBlocks = `
@@ -399,9 +536,16 @@
         ${infoItem("Chính thức từ", row["PRO.BAT DAU"])}
         ${infoItem("Manulife Pro (tạm tính)", row["PRO.DH TAM TINH CAO  NHAT"])}
         ${infoItem("P13 Cá nhân", p13cn)}
-        ${!isFA ? infoItem("P13 Toàn nhánh", p13nh) : ""}
-        ${!isFA ? infoItem("P13 cấp 1", p13c1) : ""}
-              `;
+        <div class="info-item fa-hide">
+          <div class="label">P13 Toàn nhánh</div>
+          <div class="val">${p13nh}</div>
+        </div>
+        <div class="info-item fa-hide">
+          <div class="label">P13 cấp 1</div>
+          <div class="val">${p13c1}</div>
+        </div>
+        ${infoItem("Số liệu cập nhật đến ngày", row["NGAY CHOT DATA"])}
+      `;
       const gridInner = isMobile() ? `${alertHtml}${firstBlock}${restBlocks}` : `${firstBlock}${restBlocks}`;
       const alertAfter = (!isMobile() && hasAlert) ? alertHtml : "";
       return `
@@ -414,9 +558,13 @@
     }
 
     function renderReport(row){
-      // Kiểm tra chức danh có phải FA không
+      // Kiểm tra chức danh có phải FA hoặc SA không
       const chucDanh = String(row["Chức danh"] || "").toUpperCase();
-      const isFA = chucDanh.includes("FA") || chucDanh === "FA";
+      const isFAorSA = chucDanh.includes("FA") || chucDanh.includes("SA") || chucDanh === "FA" || chucDanh === "SA";
+      
+      // Debug log
+      console.log('renderReport - Chức danh:', row["Chức danh"]);
+      console.log('renderReport - isFAorSA:', isFAorSA);
       
       const Info = renderInfoSection(row);
       const A = `
@@ -437,15 +585,15 @@
             <div class="subsec lvl-1">1. Hoạt động bán hàng</div>
             <div class="sub-content">
               <div class="subsec lvl-2"><strong>Nộp mới trong tháng</strong></div>
-              <ul class="mb-2 list-dot bullet-strong lvl-3">
+            <ul class="mb-2 list-dot bullet-strong lvl-3">
                 <li><span class="thin">Tổng số hợp đồng:</span> <span class="hl">${formatNumber(row["MTD.CC NOP"])}</span></li>
                 <li><span class="thin">Tổng doanh thu FYP:</span> <span class="hl">${fmt(row["MTD.FYP NOP"], "MTD.FYP NOP", "Tổng doanh thu FYP")}</span></li>
-              </ul>
+            </ul>
               <div class="subsec lvl-2"><strong>Thực cấp trong tháng</strong></div>
-              <ul class="mb-2 list-dot bullet-strong lvl-3">
+            <ul class="mb-2 list-dot bullet-strong lvl-3">
                 <li><span class="thin">Tổng số hợp đồng:</span> <span class="hl">${formatNumber(row["MTD.CC CAP"])}</span></li>
                 <li><span class="thin">Tổng doanh thu FYP:</span> <span class="hl">${fmt(row["MTD.FYP CAP"], "MTD.FYP CAP", "Tổng doanh thu FYP")}</span></li>
-              </ul>
+            </ul>
             </div>
           </div>
 
@@ -453,10 +601,10 @@
             <div class="subsec lvl-1">2. Danh hiệu Manulife Pro</div>
             <div class="sub-content">
               <div class="thin mb-1 lvl-2"><strong>Danh hiệu chính thức hiện tại:</strong> <span class="hl">${formatNumber(row["PRO.DH CHINH THUC"])}</span></div>
-              <ul class="mb-2 list-dot bullet-strong lvl-3">
+            <ul class="mb-2 list-dot bullet-strong lvl-3">
                 <li><span class="thin">Tháng bắt đầu:</span> <span class="hl">${formatNumber(row["PRO.BAT DAU"])}</span></li>
                 <li><span class="thin">Tháng kết thúc:</span> <span class="hl">${formatNumber(row["PRO.KET THUC"])}</span></li>
-              </ul>
+            </ul>
               <div class="thin mb-1 lvl-2"><strong>Thưởng năng suất xuất sắc tháng hiện tại:</strong></div>
               <ul class="mb-2 list-dot bullet-strong lvl-3">
                 <li><span class="thin">Danh hiệu dùng để xét thưởng:</span> <span class="hl">${formatNumber(row["PRO.DH XET THUONG"])}</span></li>
@@ -464,7 +612,7 @@
                 <li><span class="thin">Mức thưởng tạm đạt:</span> <span class="hl">${fmt(row["PRO.THUONG TAM DAT"], "PRO.THUONG TAM DAT", "Mức thưởng tạm đạt")}</span></li>
                 <li><span class="thin">Cần thêm để đạt mức thưởng tiếp theo:</span> <span class="hl">${fmt(row["PRO.FYP CAN TANG THUONG"], "PRO.FYP CAN TANG THUONG", "Cần thêm để đạt mức thưởng tiếp theo")}</span></li>
                 <li><span class="thin">Mức thưởng tiếp theo:</span> <span class="hl">${fmt(row["PRO.THUONG TIEP THEO"], "PRO.THUONG TIEP THEO", "Mức thưởng tiếp theo")}</span></li>
-              </ul>
+            </ul>
               <div class="thin mb-1 lvl-2"><strong>Theo dõi thăng hạng danh hiệu</strong></div>
               <ul class="mb-2 list-dot bullet-strong lvl-3">
                 <li><span class="thin">Tiến độ thăng hạng danh hiệu:</span> <span class="hl">${addPercent(row["PRO % THANG HANG"])}</span></li>
@@ -474,7 +622,7 @@
                 <li><span class="thin">CC cần thêm để để thăng hạng:</span> <span class="hl">${formatNumber(row["PRO.UP CC CAN THEM"])}</span></li>
                 <li><span class="thin">Số tháng có hoạt động cần thêm:</span> <span class="hl">${formatNumber(row["PRO.UP THANG CAN THEM"])}</span></li>
                 <li><span class="thin">Tỷ lệ P13 cần thêm để đạt danh hiệu:</span> <span class="hl">${addPercent(row["PRO.UP P13 CAN THEM"])}</span></li>
-              </ul>
+            </ul>
               <div class="thin mb-1 lvl-2"><strong>Theo dõi duy trì danh hiệu</strong></div>
               <ul class="mb-2 list-dot bullet-strong lvl-3">
                 <li><span class="thin">Kết quả xét duy trì danh hiệu:</span> <span class="hl">${formatNumber(row["PRO.KQ DUY TRI"])}</span></li>
@@ -486,7 +634,7 @@
                 <li><span class="thin">FYP đã đạt so với yêu cầu:</span> <span class="hl">${row["PRO.MOC FYP"]}</span></li>
                 <li><span class="thin">Số tháng có hoạt động so với yêu cầu:</span> <span class="hl">${formatNumber(row["PRO.MOC THANG HĐ"])}</span></li>
                 <li><span class="thin">Cảnh báo 3 tháng cuối kỳ xét:</span> <span class="hl">${formatNumber(row["PRO.MOC 3 THANG"])}</span></li>
-              </ul>
+            </ul>
             </div>
           </div>
 
@@ -500,7 +648,7 @@
                 <li><span class="thin">FYP cần thêm để đạt tiến độ quý hiện tại:</span> <span class="hl">${fmt(row["MDRT.FYP CAN DAT TD QUY"], "MDRT.FYP CAN DAT TD QUY", "FYP cần thêm để đạt tiến độ quý hiện tại")}</span></li>
                 <li><span class="thin">FYP cần thêm để đạt danh hiệu MDRT+:</span> <span class="hl">${fmt(row["MDRT.FYP CAN DAT DH"], "MDRT.FYP CAN DAT DH", "FYP cần thêm để đạt danh hiệu MDRT+")}</span></li>
                 <li><span class="thin">Danh hiệu đang trong tiến độ:</span> <span class="hl">${formatNumber(row["MDRT.DH TIEP THEO"])}</span></li>
-              </ul>
+            </ul>
             </div>
           </div>
 
@@ -512,7 +660,7 @@
                 <li><span class="thin">Tổng FYP cần thêm để đạt thi đua:</span> <span class="hl">${fmt(row["JPAN.FYP CAN DAT"], "JPAN.FYP CAN DAT", "Tổng FYP cần thêm để đạt thi đua")}</span></li>
                 <li><span class="thin">Tỷ lệ P13 hiện tại:</span> <span class="hl">${addPercent(row["JPAN.P13"])}</span></li>
                 <li><span class="thin">Số lượng vé đạt tạm tính:</span> <span class="hl">${formatNumber(row["JPAN.Đạt vé (tạm tính)"])}</span></li>
-              </ul>
+            </ul>
             </div>
           </div>
 
@@ -522,12 +670,12 @@
               <ul class="mb-2 list-dot bullet-strong lvl-3">
                 <li><span class="thin">Tổng số CC thực cấp (YTD):</span> <span class="hl">${formatNumber(row["FC.FC CC YTD"])}</span></li>
                 <li><span class="thin">Tổng FYP phát sinh (YTD):</span> <span class="hl">${fmt(row["FC.FC FYP YTD"], "FC.FC FYP YTD", "Tổng FYP phát sinh (YTD)")}</span></li>
-              </ul>
+            </ul>
             </div>
           </div>
         </div>`;
 
-            const C = `
+      const C = `
         <div id="sectionC" class="section hide">
           <div class="section-title">C. BÁO CÁO CHI TIẾT HOẠT ĐỘNG TUYỂN DỤNG VÀ HỆ THỐNG</div>
 
@@ -537,7 +685,7 @@
               <ul class="mb-2 list-dot bullet-strong lvl-3">
                 <li><span class="thin">Số lượng tuyển dụng trực tiếp tháng hiện tại:</span> <span class="hl">${formatNumber(row["RECRUIT T"])}</span></li>
                 <li><span class="thin">Số lượng tuyển dụng trực tiếp active M0:</span> <span class="hl">${formatNumber(row["RECRUIT ACT T"])}</span></li>
-              </ul>
+            </ul>
             </div>
           </div>
 
@@ -551,23 +699,22 @@
                 <li><span class="thin">Tiềm năng thăng cấp:</span> <span class="hl">${formatNumber(row["UP.TIEM NANG TC UM"])}</span></li>
                 <li><span class="thin">Theo dõi các khóa đào tạo bắt buộc (Y/N):</span></li>
                 <li style="margin-left: 20px;">
-                  SBW: <span class="hl">${formatNumber(row["UP.SBW"])}</span> &nbsp; 
-                  MS: <span class="hl">${formatNumber(row["UP.MS"])}</span> &nbsp;
-                  LS: <span class="hl">${formatNumber(row["UP.LS"])}</span> &nbsp;
-                  COACHING: <span class="hl">${formatNumber(row["UP.COACHING"])}</span>
-                </li>
+                SBW: <span class="hl">${formatNumber(row["UP.SBW"])}</span> &nbsp; 
+                MS: <span class="hl">${formatNumber(row["UP.MS"])}</span> &nbsp;
+                LS: <span class="hl">${formatNumber(row["UP.LS"])}</span> &nbsp;
+                COACHING: <span class="hl">${formatNumber(row["UP.COACHING"])}</span>
+              </li>
                 <li><span class="thin">Số lượng NRA với 1CC & 4tr FYC cần thêm:</span> <span class="hl">${formatInt(row["UP.CAN TD ACT 4TR FYC L3M"])}</span></li>
                 <li><span class="thin">2A Số lượng đại lý còn làm việc Whole team cần thêm:</span> <span class="hl">${formatNumber(row["UP.CAN CA WT"])}</span></li>
                 <li><span class="thin">2B Số lượng đại lý còn làm việc và có ≥ 15tr FYC L3M cần thêm:</span> <span class="hl">${formatNumber(row["UP.CAN CA 15TR L3M"])}</span></li>
                 <li><span class="thin">Số lượng UM+ báo cáo trực tiếp cần thêm:</span> <span class="hl">${formatNumber(row["UP.CAN UM+TT"])}</span></li>
                 <li><span class="thin">Nguồn sản xuất cần thêm:</span> <span class="hl">${formatNumber(row["UP.CAN NGUON SX"])}</span></li>
                 <li><span class="thin">FYC Whole team L6M sau luật 50% cần thêm:</span> <span class="hl">${fmt(row["UP.CAN FYC WT L6M"], "UP.CAN FYC WT L6M", "FYC Whole team L6M sau luật 50% cần thêm")}</span></li>
-              </ul>
+            </ul>
             </div>
           </div>
 
-          ${!isFA ? `
-          <div id="c3" class="sub-block hide">
+          <div id="c3" class="sub-block hide fa-hide">
             <div class="subsec lvl-1">3. Theo dõi duy trì chức danh</div>
             <div class="sub-content">
               <div class="thin lvl-2"><strong>Đánh giá từ</strong> <span class="hl">${formatNumber(row["MOC.FROM"])}</span> <strong>đến</strong> <span class="hl">${formatNumber(row["MOC.TO"])}</span> <strong>của kỳ đánh giá ngày</strong> <span class="hl">${formatNumber(row["MOC.IN"])}</span></div>
@@ -577,19 +724,19 @@
                 <li><span class="thin">Kết quả đánh giá tạm tính (Y/N):</span> <span class="hl">${formatNumber(row["MOC.KQ TAM TINH"])}</span></li>
                 <li><span class="thin">Theo dõi các khóa đào tạo bắt buộc (Y/N):</span></li>
                 <li style="margin-left: 20px;">
-                  MS: <span class="hl">${formatNumber(row["UP.MS"])}</span> &nbsp;
-                  LS: <span class="hl">${formatNumber(row["UP.LS"])}</span> &nbsp;
-                  COACHING: <span class="hl">${formatNumber(row["UP.COACHING"])}</span>
-                </li>
+                MS: <span class="hl">${formatNumber(row["UP.MS"])}</span> &nbsp;
+                LS: <span class="hl">${formatNumber(row["UP.LS"])}</span> &nbsp;
+                COACHING: <span class="hl">${formatNumber(row["UP.COACHING"])}</span>
+              </li>
                 <li><span class="thin">Số lượng NRA với 1CC & 4tr FYC cần thêm:</span> <span class="hl">${formatInt(row["MOC.CAN TD ACT 4TR L6M"])}</span></li>
                 <li><span class="thin">Số lượng UM+ báo cáo trực tiếp cần thêm:</span> <span class="hl">${formatNumber(row["MOC.CAN UM+ TT"])}</span></li>
                 <li><span class="thin">FYP Whole team L6M sau luật 50% cần thêm:</span> <span class="hl">${fmt(row["MOC.CAN FYC WT L6M"], "MOC.CAN FYC WT L6M", "FYP Whole team L6M sau luật 50% cần thêm")}</span></li>
                 <li><span class="thin">Tỷ lệ duy trì P13 cần thêm:</span> <span class="hl">${addPercent(row["MOC.CAN P13 WT"])}</span></li>
-              </ul>
+            </ul>
             </div>
           </div>
 
-          <div id="c4" class="sub-block hide">
+          <div id="c4" class="sub-block hide fa-hide">
             <div class="subsec lvl-1">4. Danh hiệu MBA Pro</div>
             <div class="sub-content">
               <div class="thin mb-1 lvl-2"><strong>Danh hiệu chính thức hiện tại:</strong> <span class="hl">${formatNumber(row["MBA.DH CT HIEN TAI"])}</span></div>
@@ -602,7 +749,7 @@
                 <li><span class="thin">Số UM+ mới thăng cấp L12M:</span> <span class="hl">${formatNumber(row["MBA.TH UM+ MOI L12M"])}</span></li>
                 <li><span class="thin">P13 cấp báo cáo trực tiếp:</span> <span class="hl">${addPercent(row["MBA.TH P13 BCTT"])}</span></li>
                 <li><span class="thin">Danh hiệu MBA Pro tạm tính theo kết quả xét thăng hạng:</span> <span class="hl">${formatNumber(row["MBA.TH DH TAM TINH QUY SAU"])}</span></li>
-              </ul>
+            </ul>
               <div class="thin mb-1 lvl-2"><strong>Theo dõi duy trì hạng:</strong></div>
               <ul class="mb-2 list-dot bullet-strong lvl-3">
                 <li><span class="thin">Kết quả xét duy trì tạm tính:</span> <span class="hl">${formatNumber(row["MBA.KQ DT DH HTAI"])}</span></li>
@@ -610,12 +757,12 @@
                 <li><span class="thin">Số lượng Manulife Pro có sản xuất trong quý:</span> <span class="hl">${formatNumber(row["MBA.SO MANPRO ACT TRONG QUY"])}</span></li>
                 <li><span class="thin">FYC cá nhân UM+ và ĐL trực tiếp L12M sau luật 50%:</span> <span class="hl">${fmt(row["MBA.TH FYC TO TT SAU 50"], "MBA.TH FYC TO TT SAU 50", "FYC cá nhân UM+ và ĐL trực tiếp L12M sau luật 50%")}</span></li>
                 <li><span class="thin">Số UM+ mới thăng cấp L12M:</span> <span class="hl">${formatNumber(row["MBA.TH UM+ MOI L12M"])}</span></li>
-              </ul>
+            </ul>
               <div class="thin mb-1 lvl-2"><strong>Danh hiệu tạm tính quý sau (sau thăng hạng & duy trì):</strong> <span class="hl">${formatNumber(row["MBA.DH TAM TINH QUY SAU"])}</span></div>
             </div>
           </div>
 
-          <div id="c5" class="sub-block hide">
+          <div id="c5" class="sub-block hide fa-hide">
             <div class="subsec lvl-1">5. Thưởng năng suất nhóm ưu tú hàng tháng</div>
             <div class="sub-content">
               <ul class="mb-2 list-dot bullet-strong lvl-3">
@@ -634,10 +781,9 @@
                 <li><span class="thin">Tỷ lệ P13:</span> <span class="hl">${addPercent(row["OTEAM.P13"])}</span></li>
                 <li><span class="thin">Hệ số nhân TLDTHD:</span> <span class="hl">${formatNumber(row["OTEAM.HE SO THUONG"])}</span></li>
                 <li><span class="thin">Thưởng dự tính sau khi đã nhân hệ số TLDTHD:</span> <span class="hl">${fmt(row["OTEAM.TIEN THUONG"], "OTEAM.TIEN THUONG", "Thưởng dự tính sau khi đã nhân hệ số TLDTHD")}</span></li>
-              </ul>
+            </ul>
             </div>
           </div>
-          ` : ''}
         </div>`;
 
       reportEl.innerHTML = Info + A + B + C;
@@ -651,10 +797,10 @@
       const sel=document.getElementById('tocSelect'); if(!sel) return; sel.innerHTML='';
       const addOpt=(val,text)=>{ const op=document.createElement('option'); op.value=val; op.textContent=text; sel.appendChild(op); };
       
-      // Kiểm tra chức danh có phải FA không
+      // Kiểm tra chức danh có phải FA hoặc SA không
       const chucDanhEl = document.querySelector('#sectionInfo .info-item .val');
       const chucDanh = chucDanhEl ? String(chucDanhEl.textContent || "").toUpperCase() : "";
-      const isFA = chucDanh.includes("FA") || chucDanh === "FA";
+      const isFAorSA = chucDanh.includes("FA") || chucDanh.includes("SA") || chucDanh === "FA" || chucDanh === "SA";
       
       addOpt('sectionInfo','Thông tin đại lý');
       addOpt('sectionA','A. Tổng quan (MTD)');
@@ -665,10 +811,10 @@
       addOpt('sectionB#b5','B.5 Thưởng năm');
       addOpt('sectionC#c1','C.1 Tuyển dụng');
       addOpt('sectionC#c2','C.2 Thăng cấp');
-      if (!isFA) {
-        addOpt('sectionC#c3','C.3 Duy trì chức danh');
-        addOpt('sectionC#c4','C.4 MBA Pro');
-        addOpt('sectionC#c5','C.5 Thưởng nhóm ưu tú');
+      if (!isFAorSA) {
+      addOpt('sectionC#c3','C.3 Duy trì chức danh');
+      addOpt('sectionC#c4','C.4 MBA Pro');
+      addOpt('sectionC#c5','C.5 Thưởng nhóm ưu tú');
       }
       addOpt('openIncome','Tính thu nhập (mở tab)');
       sel.addEventListener('change',()=>{ const v=sel.value; if(!v) return; if(v==='openIncome'){ window.open(INCOME_URL,'_blank'); sel.value=''; return; } showSection(v); });
@@ -754,14 +900,22 @@
       document.body.classList.remove('logged-out');
       document.body.classList.add('logged-in');
       
-      // Kiểm tra và thêm class is-fa nếu chức danh là FA
+      // Kiểm tra và thêm class is-fa nếu chức danh là FA hoặc SA
       const chucDanh = String(row["Chức danh"] || "").toUpperCase();
-      const isFA = chucDanh.includes("FA") || chucDanh === "FA";
-      if (isFA) {
-        document.body.classList.add('is-fa');
+      const isFAorSA = chucDanh.includes("FA") || chucDanh.includes("SA") || chucDanh === "FA" || chucDanh === "SA";
+      
+      // Debug log
+      console.log('Login - Chức danh:', row["Chức danh"]);
+      console.log('Login - isFAorSA:', isFAorSA);
+      console.log('Login - Body classes before:', document.body.className);
+      
+      if (isFAorSA) {
+        document.body.classList.add('is-fa-or-sa');
       } else {
-        document.body.classList.remove('is-fa');
+        document.body.classList.remove('is-fa-or-sa');
       }
+      
+      console.log('Login - Body classes after:', document.body.className);
       
       applySidebarMode();
       buildMobileTOC();
