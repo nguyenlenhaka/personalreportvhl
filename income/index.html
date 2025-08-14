@@ -209,28 +209,28 @@
     }
 
     .section-title{
-      background:#fff; padding:12px 16px; border-left:6px solid var(--accent); border-radius:8px;
-      font-weight:900; color:var(--brand); margin:6px 0 14px;
+      background:#fff; padding:12px 16px; border-left:6px solid #0ea35b; border-radius:8px;
+      font-weight:900; color:#0b3d2c; margin:6px 0 14px;
     }
 
     :root{ --pad:18px; }
     .top-fields,.top-fields-2{display:grid;grid-template-columns:repeat(12,1fr);gap:16px;align-items:end;margin:10px var(--pad)}
     .top-fields-2{margin-bottom:8px}
     .field{grid-column:span 4;display:flex;flex-direction:column;min-width:0}
-    .field label{font-size:1.05rem;font-weight:800;color:var(--brand);margin:0 0 6px 2px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .field label{font-size:1.05rem;font-weight:800;color:#0b3d2c;margin:0 0 6px 2px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .field input,.field select{
-      height:46px;padding:0 12px;font-size:16px;border:1.3px solid #c7d5e6;border-radius:8px;background-color:#effaf3;
-      font-weight:800;color:var(--brand);text-align:center
+      height:46px;padding:0 12px;font-size:16px;border:1.3px solid #b7e7ce;border-radius:8px;background-color:#effaf3;
+      font-weight:800;color:#0d7233;text-align:center
     }
-    .field input[readonly]{background:#f5fffb;color:var(--accent);border-color:#bfc7d1}
-    .gd-stage>b{display:block;margin:6px var(--pad);font-weight:900;}
+    .field input[readonly]{background:#f8f9fa;color:#0ea35b;border-color:#dee2e6}
+    .gd-stage>b{display:block;margin:6px var(--pad);font-weight:900;color:#0b3d2c;}
     .summary-row{display:grid;grid-template-columns:repeat(12,1fr);gap:18px;align-items:end;margin:16px var(--pad) 8px}
     .summary-block{grid-column:span 6;text-align:center;min-width:0}
-    .summary-block label{color:var(--brand);font-weight:900;letter-spacing:.02em;display:block;margin-bottom:6px;text-transform:uppercase;font-size:.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .summary-block input{background:#f5fffb;color:var(--accent);border:2px solid var(--accent);border-radius:10px;font-size:16px;font-weight:900;height:56px;text-align:center;width:100%}
+    .summary-block label{color:#0b3d2c;font-weight:900;letter-spacing:.02em;display:block;margin-bottom:6px;text-transform:uppercase;font-size:.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .summary-block input{background:#f5fffb;color:#00a758;border:2px solid #00a758;border-radius:10px;font-size:16px;font-weight:900;height:56px;text-align:center;width:100%}
     .calc-wrap{display:flex;align-items:center;gap:10px}
-    #calc-btn{background:var(--brand);color:#fff;border:none;border-radius:12px;padding:14px 24px;font-size:18px;font-weight:800;box-shadow:0 6px 18px rgba(0,81,193,.25);white-space:nowrap;cursor:pointer;touch-action:manipulation}
-    #calc-btn:hover{background:var(--accent)}
+    #calc-btn{background:#059669;color:#fff;border:none;border-radius:12px;padding:14px 24px;font-size:18px;font-weight:800;box-shadow:0 6px 18px rgba(0,81,193,.25);white-space:nowrap;cursor:pointer;touch-action:manipulation}
+#calc-btn:hover{background:#00a758}
 
     /* ===== MOBILE: MỖI DÒNG 1 TRƯỜNG ===== */
     @media (max-width:1023px){
@@ -292,7 +292,7 @@
     <div class="header-grid">
       <!-- Hàng brand: logo & tên trang cùng 1 dòng -->
       <div class="brand-row">
-        <img src="/logo.webp" alt="logo" class="logo-d" />
+        <img src="../logo.webp" alt="logo" class="logo-d" />
         <div class="title-wrap">
           <div class="title-top">CỔNG THÔNG TIN VÙNG HẰNG LÂM</div>
           <div class="title-main">DỰ TÍNH THU NHẬP</div>
@@ -471,14 +471,15 @@
               <div class="field"><label for="fyp-chinh"><b>∑ FYP SP chính</b></label><input type="text" id="fyp-chinh" readonly/></div>
               <div class="field"><label for="fyp-kem"><b>∑ FYP SP gắn kèm</b></label><input type="text" id="fyp-kem" readonly/></div>
             </div>
-            <div class="top-fields" style="align-items:center">
-              <div class="field" style="flex:3"><label for="tong-fyp"><b>∑ FYP Từ các HĐ</b></label><input type="text" id="tong-fyp" readonly/></div>
-              <div class="field" style="flex:3;display:flex;align-items:flex-end">
-                <div class="calc-wrap">
-                  <button id="calc-btn" onclick="calculateIncome(); showSection('sec-khoanthu')">Tính thu nhập</button>
-                </div>
-              </div>
+                    <div class="top-fields" style="align-items:center">
+          <div class="field" style="flex:3"><label for="tong-fyp"><b>∑ FYP Từ các HĐ</b></label><input type="text" id="tong-fyp" readonly/></div>
+          <div class="field" style="flex:3;display:flex;align-items:flex-end">
+            <div class="calc-wrap">
+              <button id="calc-btn" onclick="calculateIncome(); showSection('sec-khoanthu')">Tính thu nhập</button>
+
             </div>
+          </div>
+        </div>
           </div>
         </div>
       </section>
@@ -563,7 +564,7 @@
   <!-- ===== FOOTER ===== -->
   <footer id="pageFooter">
     <div>Bản quyền trang web thuộc về</div>
-    <img src="/logo_textr.webp" alt="Logo" />
+    <img src="../logo_textr.webp" alt="Logo" />
   </footer>
 
   <!-- ===== LOGIC (GIỮ NGUYÊN, CHỈ CHỈNH HÀNH VI CUỘN TRÊN MOBILE) ===== -->
@@ -610,15 +611,53 @@ const datesEqual=(a,b)=>normalizeDateForCompare(a)===normalizeDateForCompare(b);
 async function fetchFirstJson(list){for(const url of list){try{const r=await fetch(url,{cache:'no-store'});if(r.ok)return await r.json();}catch{}}return null;}
 async function loadData(){
   const btn=document.querySelector('button[onclick="searchAgent()"]'); if(btn){btn.disabled=true;btn.textContent="Đang tải dữ liệu...";}
-  try{const r=await fetch('/income.json',{cache:'no-store'}); if(!r.ok)throw new Error('HTTP '+r.status); data=await r.json();}catch(e){alert("Không tải được income.json."); data=[];}
+  
+  try{
+    const r=await fetch('../income.json',{cache:'no-store'}); 
+    if(!r.ok)throw new Error('HTTP '+r.status); 
+    data=await r.json();
+  }catch(e){
+    console.error('Error loading income.json:', e);
+    alert("Không tải được income.json."); 
+    data=[];
+  }
+  
   isDataReady=Array.isArray(data)&&data.length>0;
-  nspro=await fetchFirstJson(['nspro.json','NSPRO.json','Nspro.json'])||[];
-  nst6 =await fetchFirstJson(['6nst.json','6NST.json'])||[];
-  nst7 =await fetchFirstJson(['7nst.json','7NST.json'])||[];
-  nsq6 =await fetchFirstJson(['6NSQ.json','6nsq.json'])||[];
-  nsq7 =await fetchFirstJson(['7NSQ.json','7nsq.json'])||[];
-  hsdt =await fetchFirstJson(['hsdt.json','HSDT.json'])||[];
-  trackingMDRT=await fetchFirstJson(['trackingmdrt.json','TRACKING MDRT.json','TRACKING%20MDRT.json'])||[];
+  console.log('loadData - income.json loaded:', isDataReady, 'records:', data.length);
+  
+  // Load các file JSON khác - sửa đường dẫn để trỏ về thư mục gốc
+  try {
+    nspro=await fetchFirstJson(['../nspro.json','../NSPRO.json','../Nspro.json'])||[];
+    nst6 =await fetchFirstJson(['../6nst.json','../6NST.json'])||[];
+    nst7 =await fetchFirstJson(['../7nst.json','../7NST.json'])||[];
+    nsq6 =await fetchFirstJson(['../6NSQ.json','../6nsq.json'])||[];
+    nsq7 =await fetchFirstJson(['../7NSQ.json','../7nsq.json'])||[];
+    hsdt =await fetchFirstJson(['../hsdt.json','../HSDT.json'])||[];
+    trackingMDRT=await fetchFirstJson(['../trackingmdrt.json','../TRACKING MDRT.json','../TRACKING%20MDRT.json'])||[];
+    
+    console.log('loadData - nspro loaded:', nspro.length, 'records');
+    console.log('loadData - nst6 loaded:', nst6.length, 'records');
+    console.log('loadData - nst7 loaded:', nst7.length, 'records');
+    console.log('loadData - nsq6 loaded:', nsq6.length, 'records');
+    console.log('loadData - nsq7 loaded:', nsq7.length, 'records');
+    console.log('loadData - hsdt loaded:', hsdt.length, 'records');
+    console.log('loadData - trackingMDRT loaded:', trackingMDRT.length, 'records');
+    
+    // Kiểm tra dữ liệu có đúng định dạng không
+    if(nst6.length > 0) {
+      console.log('loadData - nst6 sample data:', nst6[0]);
+    }
+    if(nsq6.length > 0) {
+      console.log('loadData - nsq6 sample data:', nsq6[0]);
+    }
+    if(trackingMDRT.length > 0) {
+      console.log('loadData - trackingMDRT sample data:', trackingMDRT[0]);
+    }
+    
+  } catch(e) {
+    console.error('Error loading other JSON files:', e);
+  }
+  
   if(btn){btn.disabled=false;btn.textContent="Đăng nhập";}
 }
 
@@ -659,79 +698,302 @@ function updateTongHop(){
 /* ===== NS PRO / NST / NSQ / MDRT ===== */
 function isProGroup(txt){return /manulife\s*pro/i.test(txt)||/\bpro\b/i.test(txt)}
 function calculateNSPro(){
-  const cc=parseInt(document.getElementById("tong-cc").value,10)||0;
-  const tongFYP=parseMoney3(document.getElementById("tong-fyp").value);
-  const nhom=(document.getElementById("nhom-dai-ly").value||'').trim(); const nA=rmAccent(nhom);
-  if(!cc||!nspro.length||!tongFYP||!isProGroup(nA)){document.getElementById("thuong-nspro").value=formatMoney3(0);return}
-  let base=0;
-  for(const row of nspro){
-    const need=parseMoney3(getByKeyLoose(row,"FYP của tháng xét thưởng"));
-    if(tongFYP<need)continue;
-    const keys=normKeyMap(row);
-    let col=keys['MANULIFEPROBAC']||keys['MANULIFEPROVANG']||keys['MANULIFEPROBACHKIM'];
-    if(/bach\s*kim/i.test(nA)) col=keys['MANULIFEPROBACHKIM'];
-    else if(/vang/i.test(nA))  col=keys['MANULIFEPROVANG'];
-    base=Math.max(base,parseMoney3(col?row[col]:0));
+  // 1. CHUYỂN ĐỔI DỮ LIỆU VỀ SỐ TRƯỚC KHI TÍNH
+  const cc = parseInt(document.getElementById("tong-cc").value, 10) || 0;
+  const tongFYP = parseMoney3(document.getElementById("tong-fyp").value) || 0;
+  const nhom = (document.getElementById("nhom-dai-ly").value || '').trim();
+  const heSo = parseFloat(document.getElementById("he-so-thuong").value) || 1;
+  
+  console.log('calculateNSPro - INPUT VALUES:', {
+    tongCC: cc,
+    tongFYP: tongFYP,
+    nhomDaiLy: nhom,
+    heSo: heSo
+  });
+  
+  // 2. KIỂM TRA ĐIỀU KIỆN
+  const nA = rmAccent(nhom);
+  if(!cc || !nspro.length || !tongFYP || !isProGroup(nA)){
+    console.log('calculateNSPro - conditions not met:', {
+      hasCC: !!cc,
+      hasNSProData: !!nspro.length,
+      hasFYP: !!tongFYP,
+      isProGroup: isProGroup(nA)
+    });
+    document.getElementById("thuong-nspro").value = formatMoney3(0);
+    return;
   }
-  const heSo=parseFloat(document.getElementById("he-so-thuong").value)||1;
-  document.getElementById("thuong-nspro").value=formatMoney3(base*heSo);
+  
+  // 3. THỰC HIỆN LOGIC TÍNH TOÁN VỚI SỐ
+  let base = 0;
+  for(const row of nspro){
+    const need = parseMoney3(getByKeyLoose(row, "FYP của tháng xét thưởng")) || 0;
+    
+    console.log('calculateNSPro - checking row:', {
+      need: need,
+      currentFYP: tongFYP,
+      condition: tongFYP >= need
+    });
+    
+    if(tongFYP < need) continue;
+    
+    const keys = normKeyMap(row);
+    let col = keys['MANULIFEPROBAC'] || keys['MANULIFEPROVANG'] || keys['MANULIFEPROBACHKIM'];
+    
+    if(/bach\s*kim/i.test(nA)) col = keys['MANULIFEPROBACHKIM'];
+    else if(/vang/i.test(nA)) col = keys['MANULIFEPROVANG'];
+    
+    const rowValue = parseMoney3(col ? row[col] : 0) || 0;
+    base = Math.max(base, rowValue);
+    
+    console.log('calculateNSPro - row calculation:', {
+      availableKeys: Object.keys(keys),
+      selectedCol: col,
+      rowValue: rowValue,
+      currentBest: base
+    });
+  }
+  
+  // 4. TÍNH KẾT QUẢ CUỐI CÙNG
+  const result = base * heSo;
+  
+  console.log('calculateNSPro - FINAL CALCULATION:', {
+    base: base,
+    heSo: heSo,
+    result: result
+  });
+  
+  // 5. HIỂN THỊ THEO ĐỊNH DẠNG YÊU CẦU
+  document.getElementById("thuong-nspro").value = formatMoney3(result);
 }
 function calculateNST(){
-  const th=parseInt(document.getElementById("thang-lam-viec").value,10)||0;
-  const tongFYC=parseMoney3(document.getElementById("tong-fyc").value);
-  const fycT=parseMoney3(document.getElementById("fyc-thuong").value);
-  const sum=tongFYC+fycT;
-  const table=th<=6?nst6:nst7; let rate=0;
-  for(const row of table){const need=parseMoney3(getByKeyLoose(row,"FYC trong 3 tháng gần nhất")); const r=parseFloat(getByKeyLoose(row,"% Tỷ lệ thưởng năng suất tháng"))||0; if(sum>=need && r>=rate)rate=r;}
-  const heSo=parseFloat(document.getElementById("he-so-thuong").value)||1;
-  document.getElementById("thuong-nst").value=formatMoney3(fycT*rate*heSo);
-}
-function calculateNSQ(){
-  const m=parseInt(document.getElementById("month-select").value,10)||0;
-  if(![3,6,9,12].includes(m)){document.getElementById("thuong-nsq").value=formatMoney3(0);return}
-  const th=parseInt(document.getElementById("thang-lam-viec").value,10)||0;
-  const cur=parseMoney3(document.getElementById("tong-fyc-quy").value);
-  const fycT=parseMoney3(document.getElementById("fyc-thuong").value);
-  const sum=fycT+cur;
-  const table=th<=6?nsq6:nsq7;
-  const nh=(document.getElementById("nhom-dai-ly").value||"").trim(); const nA=rmAccent(nh);
-  let tl=0;
+  // 1. CHUYỂN ĐỔI DỮ LIỆU VỀ SỐ TRƯỚC KHI TÍNH
+  const th = parseInt(document.getElementById("thang-lam-viec").value, 10) || 0;
+  const tongFYC = parseMoney3(document.getElementById("tong-fyc").value) || 0;
+  const fycT = parseMoney3(document.getElementById("fyc-thuong").value) || 0;
+  const heSo = parseFloat(document.getElementById("he-so-thuong").value) || 1;
+  
+  // 2. THỰC HIỆN LOGIC TÍNH TOÁN VỚI SỐ
+  const sum = tongFYC + fycT;
+  const table = th <= 6 ? nst6 : nst7;
+  
+  console.log('calculateNST - INPUT VALUES:', {
+    thangLamViec: th,
+    tongFYC: tongFYC,
+    fycThuong: fycT,
+    heSo: heSo,
+    sum: sum,
+    table: th <= 6 ? 'nst6' : 'nst7',
+    tableData: table
+  });
+  
+  let rate = 0;
   for(const row of table){
-    const need=parseMoney3(getByKeyLoose(row,"FYC của quý xét thưởng"));
-    if(sum>=need){
-      const keys=normKeyMap(row);
-      let val=(/manulife\s*pro/i.test(nA) || /manulife$/i.test(nA)) ? row[keys['MANULIFE']] : (row[keys['DLTHUONG']]||row[keys['DAILY']]);
-      if(typeof val==='string') val=val.replace('%','');
-      const r=(parseFloat(val)||0)/100;
-      if(r>=tl) tl=r;
+    const need = parseMoney3(getByKeyLoose(row, "FYC trong 3 tháng gần nhất")) || 0;
+    const rowRate = parseFloat(getByKeyLoose(row, "% Tỷ lệ thưởng năng suất tháng")) || 0;
+    
+    console.log('calculateNST - checking row:', {
+      need: need,
+      rowRate: rowRate,
+      currentBest: rate,
+      sum: sum,
+      condition: sum >= need
+    });
+    
+    if(sum >= need && rowRate >= rate) {
+      rate = rowRate;
     }
   }
-  const heSo=parseFloat(document.getElementById("he-so-thuong").value)||1;
-  document.getElementById("thuong-nsq").value=formatMoney3(sum*tl*heSo);
+  
+  // 3. TÍNH KẾT QUẢ CUỐI CÙNG
+  const result = fycT * rate * heSo;
+  
+  console.log('calculateNST - CALCULATION:', {
+    fycT: fycT,
+    rate: rate,
+    heSo: heSo,
+    result: result
+  });
+  
+  // 4. HIỂN THỊ THEO ĐỊNH DẠNG YÊU CẦU
+  document.getElementById("thuong-nst").value = formatMoney3(result);
+}
+function calculateNSQ(){
+  // 1. CHUYỂN ĐỔI DỮ LIỆU VỀ SỐ TRƯỚC KHI TÍNH
+  const m = parseInt(document.getElementById("month-select").value, 10) || 0;
+  const th = parseInt(document.getElementById("thang-lam-viec").value, 10) || 0;
+  const cur = parseMoney3(document.getElementById("tong-fyc-quy").value) || 0;
+  const fycT = parseMoney3(document.getElementById("fyc-thuong").value) || 0;
+  const heSo = parseFloat(document.getElementById("he-so-thuong").value) || 1;
+  const nh = (document.getElementById("nhom-dai-ly").value || "").trim();
+  
+  console.log('calculateNSQ - INPUT VALUES:', {
+    month: m,
+    thangLamViec: th,
+    tongFYCQuy: cur,
+    fycThuong: fycT,
+    heSo: heSo,
+    nhomDaiLy: nh
+  });
+  
+  // 2. KIỂM TRA ĐIỀU KIỆN THÁNG QUÝ
+  if(![3,6,9,12].includes(m)){
+    console.log('calculateNSQ - not a quarter month, setting to 0');
+    document.getElementById("thuong-nsq").value = formatMoney3(0);
+    return;
+  }
+  
+  // 3. THỰC HIỆN LOGIC TÍNH TOÁN VỚI SỐ
+  const sum = fycT + cur;
+  const table = th <= 6 ? nsq6 : nsq7;
+  const nA = rmAccent(nh);
+  
+  console.log('calculateNSQ - CALCULATION SETUP:', {
+    sum: sum,
+    table: th <= 6 ? 'nsq6' : 'nsq7',
+    tableData: table,
+    nhomNormalized: nA
+  });
+  
+  let tl = 0;
+  for(const row of table){
+    const need = parseMoney3(getByKeyLoose(row, "FYC của quý xét thưởng")) || 0;
+    
+    console.log('calculateNSQ - checking row:', {
+      need: need,
+      currentSum: sum,
+      currentBest: tl,
+      condition: sum >= need
+    });
+    
+    if(sum >= need){
+      const keys = normKeyMap(row);
+      let val = (/manulife\s*pro/i.test(nA) || /manulife$/i.test(nA)) ? 
+                 row[keys['MANULIFE']] : 
+                 (row[keys['DLTHUONG']] || row[keys['DAILY']]);
+      
+      if(typeof val === 'string') val = val.replace('%', '');
+      const r = (parseFloat(val) || 0) / 100;
+      
+      console.log('calculateNSQ - found rate:', {
+        originalValue: val,
+        rate: r,
+        availableKeys: Object.keys(keys)
+      });
+      
+      if(r >= tl) tl = r;
+    }
+  }
+  
+  // 4. TÍNH KẾT QUẢ CUỐI CÙNG
+  const result = sum * tl * heSo;
+  
+  console.log('calculateNSQ - FINAL CALCULATION:', {
+    sum: sum,
+    tyLe: tl,
+    heSo: heSo,
+    result: result
+  });
+  
+  // 5. HIỂN THỊ THEO ĐỊNH DẠNG YÊU CẦU
+  document.getElementById("thuong-nsq").value = formatMoney3(result);
 }
 function calculateThuongMDRT(){
-  const alertEl=document.getElementById('alert-mdrt');
-  const setAlert=msg=>{ if(alertEl){ alertEl.textContent=msg||''; alertEl.style.display=msg?'block':'none'; } };
+  const alertEl = document.getElementById('alert-mdrt');
+  const setAlert = msg => { 
+    if(alertEl){ 
+      alertEl.textContent = msg || ''; 
+      alertEl.style.display = msg ? 'block' : 'none'; 
+    } 
+  };
 
-  const m=parseInt(document.getElementById("month-select").value,10)||0;
-  if(![3,6,9,12].includes(m)){ document.getElementById("thuong-mdrt").value=formatMoney3(0); setAlert(''); return; }
+  // 1. CHUYỂN ĐỔI DỮ LIỆU VỀ SỐ TRƯỚC KHI TÍNH
+  const m = parseInt(document.getElementById("month-select").value, 10) || 0;
+  const activeMonths = parseInt((document.getElementById("active-months").value || '').replace(/[^\d]/g, ''), 10) || 0;
+  const currentCC = parseInt((document.getElementById("tong-cc").value || '').replace(/[^\d]/g, ''), 10) || 0;
+  const toDate = parseMoney3(document.getElementById("mdrt-fyp").value) || 0;
+  const thisM = parseMoney3(document.getElementById("tong-fyp").value) || 0;
+  
+  console.log('calculateThuongMDRT - INPUT VALUES:', {
+    month: m,
+    activeMonths: activeMonths,
+    currentCC: currentCC,
+    toDateFYP: toDate,
+    thisMonthFYP: thisM
+  });
+  
+  // 2. KIỂM TRA ĐIỀU KIỆN THÁNG QUÝ
+  if(![3,6,9,12].includes(m)){ 
+    console.log('calculateThuongMDRT - not a quarter month, setting to 0');
+    document.getElementById("thuong-mdrt").value = formatMoney3(0); 
+    setAlert(''); 
+    return; 
+  }
 
-  const activeMonths=parseInt((document.getElementById("active-months").value||'').replace(/[^\d]/g,''),10)||0;
-  const currentCC=parseInt((document.getElementById("tong-cc").value||'').replace(/[^\d]/g,''),10)||0;
-
-  if(activeMonths < 2){ document.getElementById("thuong-mdrt").value = formatMoney3(0); setAlert('Không đủ tiêu chuẩn nhận thưởng tiến độ'); return; }
-  if(currentCC < 1){ document.getElementById("thuong-mdrt").value = formatMoney3(0); setAlert('Chưa có hợp đồng trong tháng xét'); return; }
+  // 3. KIỂM TRA ĐIỀU KIỆN TIÊU CHUẨN
+  if(activeMonths < 2){ 
+    console.log('calculateThuongMDRT - not enough active months');
+    document.getElementById("thuong-mdrt").value = formatMoney3(0); 
+    setAlert('Không đủ tiêu chuẩn nhận thưởng tiến độ'); 
+    return; 
+  }
+  
+  if(currentCC < 1){ 
+    console.log('calculateThuongMDRT - no contracts this month');
+    document.getElementById("thuong-mdrt").value = formatMoney3(0); 
+    setAlert('Chưa có hợp đồng trong tháng xét'); 
+    return; 
+  }
+  
   setAlert('');
 
-  const toDate=parseMoney3(document.getElementById("mdrt-fyp").value);
-  const thisM=parseMoney3(document.getElementById("tong-fyp").value);
-  const progress=toDate+thisM;
-  const row=trackingMDRT.find(r=>parseInt(getByKeyLoose(r,'Tháng xét'),10)===m);
-  if(!row){ document.getElementById("thuong-mdrt").value=formatMoney3(0); return; }
-  const need=parseMoney3(getByKeyLoose(row,'FYP YÊU CẦU'));
-  const muc1=parseMoney3(getByKeyLoose(row,'MỨC 1 THẤP'))||parseMoney3(getByKeyLoose(row,'MÚC 1 THẤP'))||parseMoney3(getByKeyLoose(row,'MUC 1 THAP'))||0;
-  const muc2=parseMoney3(getByKeyLoose(row,'MỨC 2 CAO'))||parseMoney3(getByKeyLoose(row,'MUC 2 CAO'))||0;
-  let thuong=0; if(need>0 && progress>0){const tl=progress/need; if(tl>=1)thuong=muc2; else if(tl>=0.9)thuong=muc1;}
+  // 4. THỰC HIỆN LOGIC TÍNH TOÁN VỚI SỐ
+  const progress = toDate + thisM;
+  
+  console.log('calculateThuongMDRT - CALCULATION SETUP:', {
+    toDate: toDate,
+    thisMonth: thisM,
+    totalProgress: progress
+  });
+  
+  const row = trackingMDRT.find(r => parseInt(getByKeyLoose(r, 'Tháng xét'), 10) === m);
+  console.log('calculateThuongMDRT - found tracking row:', row);
+  
+  if(!row){ 
+    console.log('calculateThuongMDRT - no tracking data for month', m);
+    document.getElementById("thuong-mdrt").value = formatMoney3(0); 
+    return; 
+  }
+  
+  const need = parseMoney3(getByKeyLoose(row, 'FYP YÊU CẦU')) || 0;
+  const muc1 = parseMoney3(getByKeyLoose(row, 'MỨC 1 THẤP')) || 
+                parseMoney3(getByKeyLoose(row, 'MÚC 1 THẤP')) || 
+                parseMoney3(getByKeyLoose(row, 'MUC 1 THAP')) || 0;
+  const muc2 = parseMoney3(getByKeyLoose(row, 'MỨC 2 CAO')) || 
+                parseMoney3(getByKeyLoose(row, 'MUC 2 CAO')) || 0;
+  
+  console.log('calculateThuongMDRT - TRACKING DATA:', {
+    requiredFYP: need,
+    level1Reward: muc1,
+    level2Reward: muc2
+  });
+  
+  // 5. TÍNH KẾT QUẢ CUỐI CÙNG
+  let thuong = 0; 
+  if(need > 0 && progress > 0){
+    const tl = progress / need; 
+    console.log('calculateThuongMDRT - progress ratio:', tl);
+    
+    if(tl >= 1) thuong = muc2; 
+    else if(tl >= 0.9) thuong = muc1;
+  }
+  
+  console.log('calculateThuongMDRT - FINAL RESULT:', {
+    progressRatio: progress / need,
+    finalReward: thuong
+  });
+  
+  // 6. HIỂN THỊ THEO ĐỊNH DẠNG YÊU CẦU
   document.getElementById("thuong-mdrt").value = formatMoney3(thuong);
 }
 
@@ -848,7 +1110,9 @@ function searchAgent(){
   document.getElementById("active-months").value=String(getByKeyLoose(found,"Active months")||'').toString().trim();
 
   ["sohd-gd1","sohd-gd2","sohd-gd3","fypchinh-gd1","fypchinh-gd2","fypchinh-gd3","fypkem-gd1","fypkem-gd2","fypkem-gd3"].forEach(id=>{const el=document.getElementById(id); if(el) el.value='';});
-  sanitizeAllNumericInputs(); updateTongHop(); calculateNSPro(); calculateNST(); calculateNSQ(); calculateThuongMDRT(); calculateTongThuNhap();
+  sanitizeAllNumericInputs(); 
+  updateTongHop(); // updateTongHop() đã bao gồm tất cả các hàm tính thưởng
+  calculateTongThuNhap(); // Tính tổng thu nhập cuối cùng
   syncReadonlyTitles();
 
   isLoggedIn=true;
@@ -900,30 +1164,121 @@ function applySidebarMode(){
 
 /* ===== GỘP TÍNH THU NHẬP ===== */
 function calculateIncome(){
-  const tongFYP=parseMoney3(document.getElementById('tong-fyp').value);
-  const chinh=parseMoney3(document.getElementById('fyp-chinh').value);
-  const kem=parseMoney3(document.getElementById('fyp-kem').value);
+  console.log('=== calculateIncome START ===');
+  
+  // 1. CHUYỂN ĐỔI DỮ LIỆU VỀ SỐ TRƯỚC KHI TÍNH
+  const tongFYP = parseMoney3(document.getElementById('tong-fyp').value) || 0;
+  const chinh = parseMoney3(document.getElementById('fyp-chinh').value) || 0;
+  const kem = parseMoney3(document.getElementById('fyp-kem').value) || 0;
 
-  const fycChinh=chinh*0.3;
-  const fycKem=kem*0.2;
-  const thuongKem=kem*0.2;
-  const fycThuong=fycChinh+fycKem+thuongKem;
+  console.log('calculateIncome - INPUT VALUES:', {
+    tongFYP: tongFYP,
+    chinh: chinh,
+    kem: kem
+  });
 
-  document.getElementById('fyc-chinh').value=formatMoney3(fycChinh);
-  document.getElementById('fyc-kem').value=formatMoney3(fycKem);
-  document.getElementById('thuong-kem').value=formatMoney3(thuongKem);
-  document.getElementById('fyc-thuong').value=formatMoney3(fycThuong);
+  // 2. THỰC HIỆN LOGIC TÍNH TOÁN VỚI SỐ
+  const fycChinh = chinh * 0.3;
+  const fycKem = kem * 0.2;
+  const thuongKem = kem * 0.2;
+  const fycThuong = fycChinh + fycKem + thuongKem;
 
+  console.log('calculateIncome - CALCULATED VALUES:', {
+    fycChinh: fycChinh,
+    fycKem: fycKem,
+    thuongKem: thuongKem,
+    fycThuong: fycThuong
+  });
+
+  // 3. HIỂN THỊ KẾT QUẢ THEO ĐỊNH DẠNG YÊU CẦU
+  document.getElementById('fyc-chinh').value = formatMoney3(fycChinh);
+  document.getElementById('fyc-kem').value = formatMoney3(fycKem);
+  document.getElementById('thuong-kem').value = formatMoney3(thuongKem);
+  document.getElementById('fyc-thuong').value = formatMoney3(fycThuong);
+
+  // 4. GỌI CÁC HÀM TÍNH THƯỞNG KHÁC
+  console.log('calculateIncome - calling calculateNSPro()');
   calculateNSPro();
+  
+  console.log('calculateIncome - calling calculateNST()');
   calculateNST();
+  
+  console.log('calculateIncome - calling calculateNSQ()');
   calculateNSQ();
+  
+  console.log('calculateIncome - calling calculateThuongMDRT()');
   calculateThuongMDRT();
+  
+  console.log('calculateIncome - calling calculateTongThuNhap()');
   calculateTongThuNhap();
+  
+  console.log('=== calculateIncome END ===');
+}
+
+/* ===== TEST FUNCTIONS ===== */
+function testCalculations() {
+  console.log('=== TESTING CALCULATIONS ===');
+  
+  // Kiểm tra dữ liệu đã load
+  console.log('Data status:', {
+    income: data.length,
+    nspro: nspro.length,
+    nst6: nst6.length,
+    nst7: nst7.length,
+    nsq6: nsq6.length,
+    nsq7: nsq7.length,
+    hsdt: hsdt.length,
+    trackingMDRT: trackingMDRT.length
+  });
+  
+  // Test parseMoney3
+  console.log('parseMoney3 test:', {
+    '1000': parseMoney3('1000'),
+    '1,000': parseMoney3('1,000'),
+    '1.000': parseMoney3('1.000'),
+    'empty': parseMoney3(''),
+    'null': parseMoney3(null),
+    'undefined': parseMoney3(undefined)
+  });
+  
+  // Test getByKeyLoose
+  if(nst6.length > 0) {
+    const testRow = nst6[0];
+    console.log('getByKeyLoose test with nst6[0]:', {
+      original: testRow,
+      'FYC trong 3 tháng gần nhất': getByKeyLoose(testRow, 'FYC trong 3 tháng gần nhất'),
+      '% Tỷ lệ thưởng năng suất tháng': getByKeyLoose(testRow, '% Tỷ lệ thưởng năng suất tháng')
+    });
+  } else {
+    console.log('nst6 is empty or not loaded');
+  }
+  
+  // Test normKeyMap
+  if(nst6.length > 0) {
+    const testRow = nst6[0];
+    const keys = normKeyMap(testRow);
+    console.log('normKeyMap test:', {
+      original: Object.keys(testRow),
+      normalized: Object.keys(keys)
+    });
+  }
+  
+  // Test với dữ liệu thực tế
+  console.log('Testing with real data...');
+  if(data.length > 0) {
+    console.log('Sample income data:', data[0]);
+  }
 }
 
 /* ===== INIT ===== */
 window.addEventListener('load', async ()=>{
   await loadData();
+  
+  // Test các hàm sau khi load dữ liệu
+  setTimeout(() => {
+    testCalculations();
+  }, 1000);
+  
   populateMonthSelect(); sanitizeAllNumericInputs(); autoFormatInputs();
   enableEnterToCalc(); setLayoutVars(); applySidebarMode();
   window.addEventListener('resize', ()=>{ setLayoutVars(); applySidebarMode(); });
