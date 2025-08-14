@@ -16,7 +16,7 @@
       --header-h: 64px;
       --footer-h: 66px;
       --toc-h: 0px;          /* chiều cao dropdown mobile (tự tính bằng JS) */
-      --brand:#0051c1; 
+      --brand:#059669; 
       --accent:#00a758;
     }
     /* đảm bảo không tràn ngang trên mọi thiết bị */
@@ -37,35 +37,99 @@
     .brand-row{
       display:flex; align-items:center; gap:10px; min-width:0;
     }
-    .logo-d{ height:48px; width:auto; display:block; flex:0 0 auto; }
+    .logo-d{ height:70px; width:auto; display:block; flex:0 0 auto; }
 
     /* Tiêu đề: cho phép xuống dòng, không cắt dấu */
     .title-wrap{ display:flex; flex-direction:column; gap:2px; min-width:0; }
     .title-top,.title-main{
       font-family:'Manulife JH Sans','ManulifeJHSans',system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
-      color:#059669; font-weight:800;
+      color:var(--brand); font-weight:800;
       white-space:normal; overflow:visible; text-overflow:clip;
       word-break:keep-all; line-height:1.25; padding-block:2px;
     }
-    .title-top{  font-size:clamp(14px, 1vw + 10px, 22px); }
+    .title-top{  font-size:clamp(14px, 1vw + 10px, 22px); text-transform:uppercase; }
     .title-main{ font-size:clamp(18px, 1.8vw + 12px, 34px); }
 
     /* ===== LOGIN / LOGOUT ===== */
-    .login-cluster{
-      display:grid; gap:.5rem; align-items:center;
-      grid-template-columns: 1fr; /* MỖI DÒNG 1 TRƯỜNG TRÊN MOBILE */
-      width:min(560px, 100%);
-      justify-self:end;
+    .login-cluster{ 
+      display: flex; 
+      gap: 16px; 
+      align-items: flex-end;
+      justify-self: end;
     }
-    .login-cluster input{
-      height:44px; padding:0 12px; font-size:16px; border:1.3px solid #b7e7ce; border-radius:10px;
-      background:#effaf3; font-weight:600; color:#0d7233; outline:none; width:100%;
+    
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
     }
-    .login-btn{
-      height:44px; padding:0 18px; background:#008a53; color:#fff; border:none; border-radius:10px;
-      font-weight:800; cursor:pointer; touch-action:manipulation;
+    
+    .password-input-wrapper {
+      position: relative;
+      display: inline-block;
     }
-    .login-btn:hover{ background:#066a42; }
+    
+    .login-cluster input{ 
+      height: 44px; 
+      padding: 0 12px; 
+      font-size: 16px; 
+      border: 1.3px solid #b7e7ce; 
+      border-radius: 10px; 
+      background: #effaf3; 
+      font-weight: 600; 
+      color: #0d7233; 
+      outline: none; 
+      width: 180px;
+    }
+    
+    .login-btn{ 
+      height: 44px; 
+      padding: 0 18px; 
+      background: #008a53; 
+      color: #fff; 
+      border: none; 
+      border-radius: 10px; 
+      font-weight: 800; 
+      cursor: pointer; 
+      touch-action: manipulation;
+      min-width: 140px;
+    }
+    
+    .login-btn:hover{ background: #066a42; }
+    
+    .toggle-password {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 4px;
+      font-size: 16px;
+      color: #666;
+      transition: background-color 0.2s;
+    }
+    
+    .toggle-password:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+    }
+    
+    .password-input-wrapper input[type="password"] {
+      padding-right: 40px;
+    }
+    
+    /* Ẩn nút toggle khi đã đăng nhập */
+    body.logged-in .toggle-password {
+      display: none !important;
+    }
+    
+    /* Ẩn nút toggle khi đã đăng nhập */
+    body.logged-in .password-input-wrapper input {
+      padding-right: 12px;
+    }
+    
     .logout-only{ display:none !important; }
     body.logged-in .login-only{ display:none !important; }
     body.logged-in .logout-only{ display:block !important; }
@@ -119,37 +183,72 @@
     body.logged-out #tocMobile,
     body.logged-out #contentWrap,
     body.logged-out #supportDesk { display:none !important; }
+    
+    /* Ẩn dropdown TOC khi chưa login nhưng giữ nút hỗ trợ */
+    body.logged-out #tocMobile .row { display:none !important; }
+    body.logged-out #tocMobile { display:block !important; }
+    
+    /* Hiển thị nút hỗ trợ mobile khi chưa đăng nhập - nằm trên footer */
+    body.logged-out #tocMobile::after {
+      content: "Hỗ trợ";
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 44px;
+      padding: 0 14px;
+      background: #00a758;
+      color: #fff;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 900;
+      white-space: nowrap;
+      position: fixed;
+      right: 10px;
+      bottom: calc(var(--footer-h) + 14px);
+      z-index: 940;
+    }
 
     .section-title{
-      background:#fff; padding:12px 16px; border-left:6px solid #0ea35b; border-radius:8px;
-      font-weight:900; color:#0b3d2c; margin:6px 0 14px;
+      background:#fff; padding:12px 16px; border-left:6px solid var(--accent); border-radius:8px;
+      font-weight:900; color:var(--brand); margin:6px 0 14px;
     }
 
     :root{ --pad:18px; }
     .top-fields,.top-fields-2{display:grid;grid-template-columns:repeat(12,1fr);gap:16px;align-items:end;margin:10px var(--pad)}
     .top-fields-2{margin-bottom:8px}
     .field{grid-column:span 4;display:flex;flex-direction:column;min-width:0}
-    .field label{font-size:1.05rem;font-weight:800;color:#24364a;margin:0 0 6px 2px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .field label{font-size:1.05rem;font-weight:800;color:var(--brand);margin:0 0 6px 2px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .field input,.field select{
       height:46px;padding:0 12px;font-size:16px;border:1.3px solid #c7d5e6;border-radius:8px;background-color:#effaf3;
       font-weight:800;color:var(--brand);text-align:center
     }
-    .field input[readonly]{background:#f5fffb;color:#0b8a62;border-color:#bfc7d1}
+    .field input[readonly]{background:#f5fffb;color:var(--accent);border-color:#bfc7d1}
     .gd-stage>b{display:block;margin:6px var(--pad);font-weight:900;}
     .summary-row{display:grid;grid-template-columns:repeat(12,1fr);gap:18px;align-items:end;margin:16px var(--pad) 8px}
     .summary-block{grid-column:span 6;text-align:center;min-width:0}
-    .summary-block label{color:#0051c1;font-weight:900;letter-spacing:.02em;display:block;margin-bottom:6px;text-transform:uppercase;font-size:.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .summary-block input{background:#f5fffb;color:#048f60;border:2px solid #00a578;border-radius:10px;font-size:16px;font-weight:900;height:56px;text-align:center;width:100%}
+    .summary-block label{color:var(--brand);font-weight:900;letter-spacing:.02em;display:block;margin-bottom:6px;text-transform:uppercase;font-size:.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .summary-block input{background:#f5fffb;color:var(--accent);border:2px solid var(--accent);border-radius:10px;font-size:16px;font-weight:900;height:56px;text-align:center;width:100%}
     .calc-wrap{display:flex;align-items:center;gap:10px}
-    #calc-btn{background:#0d72b5;color:#fff;border:none;border-radius:12px;padding:14px 24px;font-size:18px;font-weight:800;box-shadow:0 6px 18px rgba(13,114,181,.25);white-space:nowrap;cursor:pointer;touch-action:manipulation}
-    #calc-btn:hover{background:#085a93}
+    #calc-btn{background:var(--brand);color:#fff;border:none;border-radius:12px;padding:14px 24px;font-size:18px;font-weight:800;box-shadow:0 6px 18px rgba(0,81,193,.25);white-space:nowrap;cursor:pointer;touch-action:manipulation}
+    #calc-btn:hover{background:var(--accent)}
 
     /* ===== MOBILE: MỖI DÒNG 1 TRƯỜNG ===== */
     @media (max-width:1023px){
       /* BRAND & LOGIN: brand (logo + tên) cùng 1 dòng; login mỗi thành phần 1 dòng */
       .header-grid{ grid-template-columns:1fr; }
       .brand-row{ justify-content:flex-start; }
-      .login-cluster{ width:100%; justify-self:stretch; grid-template-columns:1fr; }
+      .login-cluster{ 
+        width:100%; 
+        justify-self:stretch; 
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .input-group {
+        width: 100%;
+      }
+      .login-cluster input {
+        width: 100%;
+      }
       .logo-d{ height:44px; }
       .title-top{ font-size:clamp(13px, 1.6vw + 10px, 18px); }
       .title-main{ font-size:clamp(16px, 3vw + 10px, 24px); }
@@ -180,10 +279,10 @@
     #pageFooter img{ height:22px; width:auto; display:block; }
     #contentWrap::after{ content:""; display:block; height: calc(0.75 * var(--footer-h) + 24px); }
 
-    /* Hỗ trợ desktop */
+    /* Hỗ trợ desktop - luôn nằm góc dưới phía trên footer */
     #supportDesk{
       position:fixed; right:18px; bottom:calc(var(--footer-h) + 14px);
-      background:#00a758;color:#fff;padding:12px 16px;border-radius:28px;font-weight:900;text-decoration:none;box-shadow:0 4px 12px rgba(0,0,0,.18); z-index:940; display:none;
+      background:#00a758;color:#fff;padding:12px 16px;border-radius:28px;font-weight:900;text-decoration:none;box-shadow:0 4px 12px rgba(0,0,0,.18); z-index:940; display:inline-flex !important;
     }
   </style>
 </head>
@@ -201,9 +300,16 @@
       </div>
       <!-- Cụm đăng nhập: LUÔN theo từng dòng trên mobile; desktop gọn gàng bên phải -->
       <div class="login-cluster">
-        <input class="login-only" type="text" id="agent-id" placeholder="Nhập MSĐL" />
-        <input class="login-only" type="text" id="ngay-gia-nhap" placeholder="Ngày gia nhập (dd/mm/yyyy hoặc ddmmyyyy)" />
-        <button class="login-btn login-only" type="button" onclick="searchAgent()"><b>Đăng nhập</b></button>
+        <div class="input-group">
+          <input class="login-only" type="text" id="agent-id" placeholder="Nhập MSDL" />
+          <div class="password-input-wrapper">
+            <input class="login-only" type="password" id="ngay-gia-nhap" placeholder="Ngày gia nhập" />
+            <button type="button" class="toggle-password" onclick="togglePassword()">
+              <span class="eye-icon">👁️</span>
+            </button>
+          </div>
+        </div>
+        <button class="login-btn login-only" type="button" onclick="searchAgent()">Đăng nhập</button>
         <button id="logoutBtn" class="login-btn logout-only" type="button" onclick="location.reload()">Đăng xuất</button>
       </div>
     </div>
@@ -465,6 +571,20 @@
 /* ===== GLOBAL VARS ===== */
 let data=[],nspro=[],nst6=[],nst7=[],nsq6=[],nsq7=[],hsdt=[],trackingMDRT=[];
 let isDataReady=false, isLoggedIn=false;
+
+/* ===== PASSWORD TOGGLE ===== */
+function togglePassword() {
+  const dateInput = document.getElementById('ngay-gia-nhap');
+  const eyeIcon = document.querySelector('.eye-icon');
+  
+  if (dateInput.type === 'password') {
+    dateInput.type = 'text';
+    eyeIcon.textContent = '🙈';
+  } else {
+    dateInput.type = 'password';
+    eyeIcon.textContent = '👁️';
+  }
+}
 
 /* ===== MONEY HELPERS ===== */
 const NF3=new Intl.NumberFormat('vi-VN',{minimumFractionDigits:3,maximumFractionDigits:3});
@@ -825,3 +945,4 @@ window.addEventListener('load', async ()=>{
   </script>
 </body>
 </html>
+  
