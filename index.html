@@ -81,11 +81,33 @@
     body.sidebar-open #contentWrap{ margin-left:var(--sidebar-width); }
     main{ max-width:1200px; margin:0 auto; padding:14px; }
 
-    /* Ẩn toàn bộ phần ngoài header khi chưa login */
-    body.logged-out #sidebar,
-    body.logged-out #tocMobile,
-    body.logged-out #contentWrap,
-    body.logged-out #supportDesk { display:none !important; }
+          /* Ẩn toàn bộ phần ngoài header khi chưa login */
+      body.logged-out #sidebar,
+      body.logged-out #contentWrap,
+      body.logged-out #supportDesk { display:none !important; }
+      
+      /* Ẩn dropdown TOC khi chưa login nhưng giữ nút hỗ trợ */
+      body.logged-out #tocMobile .row { display:none !important; }
+      body.logged-out #tocMobile { display:block !important; }
+      
+      /* Hiển thị nút hỗ trợ ngay cả khi chưa đăng nhập */
+      body.logged-out #tocMobile::after {
+        content: "Hỗ trợ";
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 44px;
+        padding: 0 14px;
+        background: #00a758;
+        color: #fff;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: 900;
+        white-space: nowrap;
+        position: absolute;
+        right: 10px;
+        top: 10px;
+      }
 
     .section-title{ background:#fff; padding:12px 16px; border-left:6px solid #0ea35b; border-radius:8px; font-weight:900; color:#0b3d2c; margin:6px 0 14px; }
 
@@ -101,6 +123,9 @@
     .thin{ font-weight:700; color:#0b3d2c; }
     .subsec{ margin:12px 0 10px; font-weight:900; color:#0b3d2c; padding-left:.75rem; border-left:6px solid #0ea35b; font-size:1.05rem; }
     .sub-block{ margin-bottom:8px; }
+    .sub-content{ margin-left:20px; }
+    .fa-hide{ display:none; }
+    body.is-fa .fa-hide{ display:none !important; }
 
     /* ===== MOBILE ===== */
     @media (max-width:1023px){
@@ -164,18 +189,19 @@
     <div id="errorTop"></div>
   </header>
 
-  <!-- ===== TOC chỉ dành cho mobile ===== -->
-  <div id="tocMobile">
-    <div class="row">
-      <select id="tocSelect" aria-label="Chọn mục"></select>
-      <a id="supportMobile" href="http://zalo.me/0376763390" target="_blank" rel="noopener">Hỗ trợ</a>
+      <!-- ===== TOC chỉ dành cho mobile ===== -->
+    <div id="tocMobile">
+      <div class="update-date-mobile" id="mobileUpdateDate" style="display: none; text-align: center; padding: 8px 0; color: #0b3d2c; font-weight: 700; font-size: 14px; border-bottom: 1px solid #e5e7eb;"></div>
+      <div class="row">
+        <select id="tocSelect" aria-label="Chọn mục"></select>
+        <a id="supportMobile" href="http://zalo.me/0376763390" target="_blank" rel="noopener">Hỗ trợ</a>
+      </div>
     </div>
-  </div>
 
   <!-- ===== SIDEBAR (desktop) ===== -->
-  <aside id="sidebar">
-    <div class="sidebar-inner">
-      <div class="menu-title">Danh mục</div>
+      <aside id="sidebar">
+      <div class="sidebar-inner">
+        <div class="menu-title" id="sidebarUpdateDate">Danh mục</div>
 
       <a href="#" class="menu-item active" data-target="sectionInfo">THÔNG TIN ĐẠI LÝ</a>
       <a href="#" class="menu-item" data-target="sectionA">A. TỔNG QUAN (MTD)</a>
@@ -193,9 +219,9 @@
       <div class="submenu">
         <a href="#" class="menu-item" data-target="sectionC" data-anchor="#c1">C.1 Tuyển dụng</a>
         <a href="#" class="menu-item" data-target="sectionC" data-anchor="#c2">C.2 Thăng cấp</a>
-        <a href="#" class="menu-item" data-target="sectionC" data-anchor="#c3">C.3 Duy trì chức danh</a>
-        <a href="#" class="menu-item" data-target="sectionC" data-anchor="#c4">C.4 MBA Pro</a>
-        <a href="#" class="menu-item" data-target="sectionC" data-anchor="#c5">C.5 Thưởng nhóm ưu tú</a>
+        <a href="#" class="menu-item fa-hide" data-target="sectionC" data-anchor="#c3">C.3 Duy trì chức danh</a>
+        <a href="#" class="menu-item fa-hide" data-target="sectionC" data-anchor="#c4">C.4 MBA Pro</a>
+        <a href="#" class="menu-item fa-hide" data-target="sectionC" data-anchor="#c5">C.5 Thưởng nhóm ưu tú</a>
       </div>
 
       <!-- Mở tab mới -->
@@ -356,6 +382,11 @@
       const proMoc3 = row["PRO.MOC 3 THANG"];
       const hasAlert = exists(proMoc3) && String(proMoc3).trim() !== "-";
       const alertHtml = hasAlert ? `<div class="pro-alert ${isMobile() ? 'info-alert' : ''}">Cảnh báo: <span class="pro-name" style="font-weight:900;">Danh hiệu Manulife Pro</span> – ${proMoc3}</div>` : "";
+      
+      // Kiểm tra chức danh có phải FA không
+      const chucDanh = String(row["Chức danh"] || "").toUpperCase();
+      const isFA = chucDanh.includes("FA") || chucDanh === "FA";
+      
       const firstBlock = infoItem("Báo cáo dành cho", (row["TEN DAI LY"] || row["AGEN NAME"]));
       const restBlocks = `
         ${infoItem("KV | MS", row["KV|MS"])}
@@ -366,11 +397,11 @@
         ${infoItem("Nhóm đại lý", row["Nhóm Đại lý"])}
         ${infoItem("Manulife Pro (chính thức)", row["PRO.DH CHINH THUC"])}
         ${infoItem("Chính thức từ", row["PRO.BAT DAU"])}
+        ${infoItem("Manulife Pro (tạm tính)", row["PRO.DH TAM TINH CAO  NHAT"])}
         ${infoItem("P13 Cá nhân", p13cn)}
-        ${infoItem("P13 Toàn nhánh", p13nh)}
-        ${infoItem("P13 cấp 1", p13c1)}
+        ${!isFA ? infoItem("P13 Toàn nhánh", p13nh) : ""}
+        ${!isFA ? infoItem("P13 cấp 1", p13c1) : ""}
         ${infoItem("Số liệu cập nhật đến ngày", row["NGAY CHOT DATA"])}
-        ${infoItem("ĐVT", "Nghìn VND")}
       `;
       const gridInner = isMobile() ? `${alertHtml}${firstBlock}${restBlocks}` : `${firstBlock}${restBlocks}`;
       const alertAfter = (!isMobile() && hasAlert) ? alertHtml : "";
@@ -384,14 +415,18 @@
     }
 
     function renderReport(row){
+      // Kiểm tra chức danh có phải FA không
+      const chucDanh = String(row["Chức danh"] || "").toUpperCase();
+      const isFA = chucDanh.includes("FA") || chucDanh === "FA";
+      
       const Info = renderInfoSection(row);
       const A = `
         <div id="sectionA" class="section hide">
           <div class="section-title">A. BÁO CÁO TỔNG QUAN – (Month to date)</div>
           <ul class="mb-4 list-dot bullet-strong lvl-2">
-            <li>Số hợp đồng thực cấp: <span class="hl">${formatNumber(row["MTD.CC CAP"])}</span></li>
-            <li>Doanh thu FYP thực cấp: <span class="hl">${fmt(row["MTD.FYP CAP"], "MTD.FYP CAP", "Doanh thu FYP thực cấp")}</span></li>
-            <li>Số lượng Đại lý mới tuyển dụng: <span class="hl">${formatNumber(row["RECRUIT T"])}</span></li>
+            <li><span class="thin">Số hợp đồng thực cấp:</span> <span class="hl">${formatNumber(row["MTD.CC CAP"])}</span></li>
+            <li><span class="thin">Doanh thu FYP thực cấp:</span> <span class="hl">${fmt(row["MTD.FYP CAP"], "MTD.FYP CAP", "Doanh thu FYP thực cấp")}</span></li>
+            <li><span class="thin">Số lượng Đại lý mới tuyển dụng:</span> <span class="hl">${formatNumber(row["RECRUIT T"])}</span></li>
           </ul>
         </div>`;
 
@@ -401,187 +436,209 @@
 
           <div id="b1" class="sub-block">
             <div class="subsec lvl-1">1. Hoạt động bán hàng</div>
-            <div class="thin lvl-2">Nộp mới trong tháng</div>
-            <ul class="mb-2 list-dot bullet-strong lvl-3">
-              <li>Tổng số hợp đồng: <span class="hl">${formatNumber(row["MTD.CC NOP"])}</span></li>
-              <li>Tổng doanh thu FYP: <span class="hl">${fmt(row["MTD.FYP NOP"], "MTD.FYP NOP", "Tổng doanh thu FYP")}</span></li>
-            </ul>
-            <div class="thin lvl-2">Thực cấp trong tháng</div>
-            <ul class="mb-2 list-dot bullet-strong lvl-3">
-              <li>Tổng số hợp đồng: <span class="hl">${formatNumber(row["MTD.CC CAP"])}</span></li>
-              <li>Tổng doanh thu FYP: <span class="hl">${fmt(row["MTD.FYP CAP"], "MTD.FYP CAP", "Tổng doanh thu FYP")}</span></li>
-            </ul>
+            <div class="sub-content">
+              <div class="subsec lvl-2"><strong>Nộp mới trong tháng</strong></div>
+              <ul class="mb-2 list-dot bullet-strong lvl-3">
+                <li><span class="thin">Tổng số hợp đồng:</span> <span class="hl">${formatNumber(row["MTD.CC NOP"])}</span></li>
+                <li><span class="thin">Tổng doanh thu FYP:</span> <span class="hl">${fmt(row["MTD.FYP NOP"], "MTD.FYP NOP", "Tổng doanh thu FYP")}</span></li>
+              </ul>
+              <div class="subsec lvl-2"><strong>Thực cấp trong tháng</strong></div>
+              <ul class="mb-2 list-dot bullet-strong lvl-3">
+                <li><span class="thin">Tổng số hợp đồng:</span> <span class="hl">${formatNumber(row["MTD.CC CAP"])}</span></li>
+                <li><span class="thin">Tổng doanh thu FYP:</span> <span class="hl">${fmt(row["MTD.FYP CAP"], "MTD.FYP CAP", "Tổng doanh thu FYP")}</span></li>
+              </ul>
+            </div>
           </div>
 
           <div id="b2" class="sub-block hide">
             <div class="subsec lvl-1">2. Danh hiệu Manulife Pro</div>
-            <div class="lvl-2">Danh hiệu chính thức hiện tại: <span class="hl">${formatNumber(row["PRO.DH CHINH THUC"])}</span></div>
-            <ul class="mb-2 list-dot bullet-strong lvl-3">
-              <li>Tháng bắt đầu: <span class="hl">${formatNumber(row["PRO.BAT DAU"])}</span></li>
-              <li>Tháng kết thúc: <span class="hl">${formatNumber(row["PRO.KET THUC"])}</span></li>
-            </ul>
-            <div class="thin mb-1 lvl-2">Thưởng năng suất xuất sắc tháng hiện tại:</div>
-            <ul class="mb-2 list-dot lvl-3">
-              <li>Danh hiệu dùng để xét thưởng: <span class="hl">${formatNumber(row["PRO.DH XET THUONG"])}</span></li>
-              <li>FYP phát sinh tính thưởng: <span class="hl">${fmt(row["PRO.FYP HIEN TAI"], "PRO.FYP HIEN TAI", "FYP phát sinh tính thưởng")}</span></li>
-              <li>Mức thưởng tạm đạt: <span class="hl">${fmt(row["PRO.THUONG TAM DAT"], "PRO.THUONG TAM DAT", "Mức thưởng tạm đạt")}</span></li>
-              <li>Cần thêm để đạt mức thưởng tiếp theo: <span class="hl">${fmt(row["PRO.FYP CAN TANG THUONG"], "PRO.FYP CAN TANG THUONG", "Cần thêm để đạt mức thưởng tiếp theo")}</span></li>
-              <li>Mức thưởng tiếp theo: <span class="hl">${fmt(row["PRO.THUONG TIEP THEO"], "PRO.THUONG TIEP THEO", "Mức thưởng tiếp theo")}</span></li>
-            </ul>
-            <div class="thin mb-1 lvl-2">Theo dõi thăng hạng danh hiệu</div>
-            <ul class="mb-2 list-dot lvl-3">
-              <li>Tiến độ thăng hạng danh hiệu: <span class="hl">${addPercent(row["PRO % THANG HANG"])}</span></li>
-              <li>Kết quả tại tháng T-2: <span class="hl">${formatNumber(row["PRO.DH TAM TINH T-2"])}</span></li>
-              <li>Kết quả tại tháng T-1: <span class="hl">${formatNumber(row["PRO.DH TAM TINH T-1"])}</span></li>
-              <li>FYP cần thêm để thăng hạng: <span class="hl">${fmt(row["PRO.UP FYP CAN THEM"], "PRO.UP FYP CAN THEM", "FYP cần thêm để thăng hạng")}</span></li>
-              <li>CC cần thêm để để thăng hạng: <span class="hl">${formatNumber(row["PRO.UP CC CAN THEM"])}</span></li>
-              <li>Số tháng có hoạt động cần thêm: <span class="hl">${formatNumber(row["PRO.UP THANG CAN THEM"])}</span></li>
-              <li>Tỷ lệ P13 cần thêm để đạt danh hiệu: <span class="hl">${addPercent(row["PRO.UP P13 CAN THEM"])}</span></li>
-            </ul>
-            <div class="thin mb-1 lvl-2">Theo dõi duy trì danh hiệu</div>
-            <ul class="mb-2 list-dot lvl-3">
-              <li>Kết quả xét duy trì danh hiệu: <span class="hl">${formatNumber(row["PRO.KQ DUY TRI"])}</span></li>
-              <li>Tạm tính theo kết quả tại tháng T-2: <span class="hl">${formatNumber(row["PRO.DH TAM TINH T-2"])}</span></li>
-              <li>Tạm tính theo kết quả tại tháng T-1: <span class="hl">${formatNumber(row["PRO.DH TAM TINH T-1"])}</span></li>
-              <li>Danh hiệu tạm tính cao nhất: <span class="hl">${formatNumber(row["PRO.DH TAM TINH CAO NHAT"])}</span></li>
-              <li>Tiến độ duy trì danh hiệu: <span class="hl">${addPercent(row["PRO % MOC"])}</span></li>
-              <li>Giai đoạn đánh giá: <span class="hl">${formatNumber(row["PRO.GD MOC"])}</span></li>
-              <li>FYP đã đạt so với yêu cầu: <span class="hl">${row["PRO.MOC FYP"]}</span></li>
-              <li>Số tháng có hoạt động so với yêu cầu: <span class="hl">${formatNumber(row["PRO.MOC THANG HĐ"])}</span></li>
-              <li>Cảnh báo 3 tháng cuối kỳ xét: <span class="hl">${formatNumber(row["PRO.MOC 3 THANG"])}</span></li>
-            </ul>
+            <div class="sub-content">
+              <div class="thin mb-1 lvl-2"><strong>Danh hiệu chính thức hiện tại:</strong> <span class="hl">${formatNumber(row["PRO.DH CHINH THUC"])}</span></div>
+              <ul class="mb-2 list-dot bullet-strong lvl-3">
+                <li><span class="thin">Tháng bắt đầu:</span> <span class="hl">${formatNumber(row["PRO.BAT DAU"])}</span></li>
+                <li><span class="thin">Tháng kết thúc:</span> <span class="hl">${formatNumber(row["PRO.KET THUC"])}</span></li>
+              </ul>
+              <div class="thin mb-1 lvl-2"><strong>Thưởng năng suất xuất sắc tháng hiện tại:</strong></div>
+              <ul class="mb-2 list-dot bullet-strong lvl-3">
+                <li><span class="thin">Danh hiệu dùng để xét thưởng:</span> <span class="hl">${formatNumber(row["PRO.DH XET THUONG"])}</span></li>
+                <li><span class="thin">FYP phát sinh tính thưởng:</span> <span class="hl">${fmt(row["PRO.FYP HIEN TAI"], "PRO.FYP HIEN TAI", "FYP phát sinh tính thưởng")}</span></li>
+                <li><span class="thin">Mức thưởng tạm đạt:</span> <span class="hl">${fmt(row["PRO.THUONG TAM DAT"], "PRO.THUONG TAM DAT", "Mức thưởng tạm đạt")}</span></li>
+                <li><span class="thin">Cần thêm để đạt mức thưởng tiếp theo:</span> <span class="hl">${fmt(row["PRO.FYP CAN TANG THUONG"], "PRO.FYP CAN TANG THUONG", "Cần thêm để đạt mức thưởng tiếp theo")}</span></li>
+                <li><span class="thin">Mức thưởng tiếp theo:</span> <span class="hl">${fmt(row["PRO.THUONG TIEP THEO"], "PRO.THUONG TIEP THEO", "Mức thưởng tiếp theo")}</span></li>
+              </ul>
+              <div class="thin mb-1 lvl-2"><strong>Theo dõi thăng hạng danh hiệu</strong></div>
+              <ul class="mb-2 list-dot bullet-strong lvl-3">
+                <li><span class="thin">Tiến độ thăng hạng danh hiệu:</span> <span class="hl">${addPercent(row["PRO % THANG HANG"])}</span></li>
+                <li><span class="thin">Kết quả tại tháng T-2:</span> <span class="hl">${formatNumber(row["PRO.DH TAM TINH T-2"])}</span></li>
+                <li><span class="thin">Kết quả tại tháng T-1:</span> <span class="hl">${formatNumber(row["PRO.DH TAM TINH T-1"])}</span></li>
+                <li><span class="thin">FYP cần thêm để thăng hạng:</span> <span class="hl">${fmt(row["PRO.UP FYP CAN THEM"], "PRO.UP FYP CAN THEM", "FYP cần thêm để thăng hạng")}</span></li>
+                <li><span class="thin">CC cần thêm để để thăng hạng:</span> <span class="hl">${formatNumber(row["PRO.UP CC CAN THEM"])}</span></li>
+                <li><span class="thin">Số tháng có hoạt động cần thêm:</span> <span class="hl">${formatNumber(row["PRO.UP THANG CAN THEM"])}</span></li>
+                <li><span class="thin">Tỷ lệ P13 cần thêm để đạt danh hiệu:</span> <span class="hl">${addPercent(row["PRO.UP P13 CAN THEM"])}</span></li>
+              </ul>
+              <div class="thin mb-1 lvl-2"><strong>Theo dõi duy trì danh hiệu</strong></div>
+              <ul class="mb-2 list-dot bullet-strong lvl-3">
+                <li><span class="thin">Kết quả xét duy trì danh hiệu:</span> <span class="hl">${formatNumber(row["PRO.KQ DUY TRI"])}</span></li>
+                <li><span class="thin">Tạm tính theo kết quả tại tháng T-2:</span> <span class="hl">${formatNumber(row["PRO.DH TAM TINH T-2"])}</span></li>
+                <li><span class="thin">Tạm tính theo kết quả tại tháng T-1:</span> <span class="hl">${formatNumber(row["PRO.DH TAM TINH T-1"])}</span></li>
+                <li><span class="thin">Danh hiệu tạm tính cao nhất:</span> <span class="hl">${formatNumber(row["PRO.DH TAM TINH CAO NHAT"])}</span></li>
+                <li><span class="thin">Tiến độ duy trì danh hiệu:</span> <span class="hl">${addPercent(row["PRO % MOC"])}</span></li>
+                <li><span class="thin">Giai đoạn đánh giá:</span> <span class="hl">${formatNumber(row["PRO.GD MOC"])}</span></li>
+                <li><span class="thin">FYP đã đạt so với yêu cầu:</span> <span class="hl">${row["PRO.MOC FYP"]}</span></li>
+                <li><span class="thin">Số tháng có hoạt động so với yêu cầu:</span> <span class="hl">${formatNumber(row["PRO.MOC THANG HĐ"])}</span></li>
+                <li><span class="thin">Cảnh báo 3 tháng cuối kỳ xét:</span> <span class="hl">${formatNumber(row["PRO.MOC 3 THANG"])}</span></li>
+              </ul>
+            </div>
           </div>
 
           <div id="b3" class="sub-block hide">
             <div class="subsec lvl-1">3. Danh hiệu MDRT+</div>
-            <div class="lvl-2">Yêu cầu FYP tiến độ quý hiện tại: <span class="hl">${fmt(row["MDRT.FYP Y/C QUY HT"], "MDRT.FYP Y/C QUY HT", "FYP tiến độ quý hiện tại")}</span></div>
-            <div class="lvl-2">Tiến độ quý hiện tại đã đạt: <span class="hl">${addPercent(row["MDRT.TIEN DO QUY"])}</span></div>
-            <ul class="mb-2 list-dot lvl-3">
-              <li>FYP thực đạt (YTD): <span class="hl">${fmt(row["MDRT.FYP CAP"], "MDRT.FYP CAP", "FYP thực đạt (YTD)")}</span></li>
-              <li>FYP cần thêm để đạt tiến độ quý hiện tại: <span class="hl">${fmt(row["MDRT.FYP CAN DAT TD QUY"], "MDRT.FYP CAN DAT TD QUY", "FYP cần thêm để đạt tiến độ quý hiện tại")}</span></li>
-              <li>FYP cần thêm để đạt danh hiệu MDRT+: <span class="hl">${fmt(row["MDRT.FYP CAN DAT DH"], "MDRT.FYP CAN DAT DH", "FYP cần thêm để đạt danh hiệu MDRT+")}</span></li>
-              <li>Danh hiệu đang trong tiến độ: <span class="hl">${formatNumber(row["MDRT.DH TIEP THEO"])}</span></li>
-            </ul>
+            <div class="sub-content">
+              <div class="lvl-2"><strong>Yêu cầu FYP tiến độ quý hiện tại:</strong> <span class="hl">${fmt(row["MDRT.FYP Y/C QUY HT"], "MDRT.FYP Y/C QUY HT", "FYP tiến độ quý hiện tại")}</span></div>
+              <div class="lvl-2"><strong>Tiến độ quý hiện tại đã đạt:</strong> <span class="hl">${addPercent(row["MDRT.TIEN DO QUY"])}</span></div>
+              <ul class="mb-2 list-dot bullet-strong lvl-3">
+                <li><span class="thin">FYP thực đạt (YTD):</span> <span class="hl">${fmt(row["MDRT.FYP CAP"], "MDRT.FYP CAP", "FYP thực đạt (YTD)")}</span></li>
+                <li><span class="thin">FYP cần thêm để đạt tiến độ quý hiện tại:</span> <span class="hl">${fmt(row["MDRT.FYP CAN DAT TD QUY"], "MDRT.FYP CAN DAT TD QUY", "FYP cần thêm để đạt tiến độ quý hiện tại")}</span></li>
+                <li><span class="thin">FYP cần thêm để đạt danh hiệu MDRT+:</span> <span class="hl">${fmt(row["MDRT.FYP CAN DAT DH"], "MDRT.FYP CAN DAT DH", "FYP cần thêm để đạt danh hiệu MDRT+")}</span></li>
+                <li><span class="thin">Danh hiệu đang trong tiến độ:</span> <span class="hl">${formatNumber(row["MDRT.DH TIEP THEO"])}</span></li>
+              </ul>
+            </div>
           </div>
 
           <div id="b4" class="sub-block hide">
             <div class="subsec lvl-1">4. Hành trình M-Star, Xứ sở hoa anh đào</div>
-            <ul class="mb-2 list-dot lvl-2">
-              <li>FYP phát sinh trong thời gian thi đua: <span class="hl">${fmt(row["JPAN.FYP THI DUA"], "JPAN.FYP THI DUA", "FYP phát sinh trong thời gian thi đua")}</span></li>
-              <li>Tổng FYP cần thêm để đạt thi đua: <span class="hl">${fmt(row["JPAN.FYP CAN DAT"], "JPAN.FYP CAN DAT", "Tổng FYP cần thêm để đạt thi đua")}</span></li>
-              <li>Tỷ lệ P13 hiện tại: <span class="hl">${addPercent(row["JPAN.P13"])}</span></li>
-              <li>Số lượng vé đạt tạm tính: <span class="hl">${formatNumber(row["JPAN.Đạt vé (tạm tính)"])}</span></li>
-            </ul>
+            <div class="sub-content">
+              <ul class="mb-2 list-dot bullet-strong lvl-3">
+                <li><span class="thin">FYP phát sinh trong thời gian thi đua:</span> <span class="hl">${fmt(row["JPAN.FYP THI DUA"], "JPAN.FYP THI DUA", "FYP phát sinh trong thời gian thi đua")}</span></li>
+                <li><span class="thin">Tổng FYP cần thêm để đạt thi đua:</span> <span class="hl">${fmt(row["JPAN.FYP CAN DAT"], "JPAN.FYP CAN DAT", "Tổng FYP cần thêm để đạt thi đua")}</span></li>
+                <li><span class="thin">Tỷ lệ P13 hiện tại:</span> <span class="hl">${addPercent(row["JPAN.P13"])}</span></li>
+                <li><span class="thin">Số lượng vé đạt tạm tính:</span> <span class="hl">${formatNumber(row["JPAN.Đạt vé (tạm tính)"])}</span></li>
+              </ul>
+            </div>
           </div>
 
           <div id="b5" class="sub-block hide">
             <div class="subsec lvl-1">5. Khoản thưởng kinh doanh xuất sắc hàng năm</div>
-            <ul class="mb-4 list-dot lvl-2">
-              <li>Tổng số CC thực cấp (YTD): <span class="hl">${formatNumber(row["FC.FC CC YTD"])}</span></li>
-              <li>Tổng FYP phát sinh (YTD): <span class="hl">${fmt(row["FC.FC FYP YTD"], "FC.FC FYP YTD", "Tổng FYP phát sinh (YTD)")}</span></li>
-            </ul>
+            <div class="sub-content">
+              <ul class="mb-2 list-dot bullet-strong lvl-3">
+                <li><span class="thin">Tổng số CC thực cấp (YTD):</span> <span class="hl">${formatNumber(row["FC.FC CC YTD"])}</span></li>
+                <li><span class="thin">Tổng FYP phát sinh (YTD):</span> <span class="hl">${fmt(row["FC.FC FYP YTD"], "FC.FC FYP YTD", "Tổng FYP phát sinh (YTD)")}</span></li>
+              </ul>
+            </div>
           </div>
         </div>`;
 
-      const C = `
+            const C = `
         <div id="sectionC" class="section hide">
           <div class="section-title">C. BÁO CÁO CHI TIẾT HOẠT ĐỘNG TUYỂN DỤNG VÀ HỆ THỐNG</div>
 
           <div id="c1" class="sub-block">
             <div class="subsec lvl-1">1. Hoạt động tuyển dụng</div>
-            <ul class="mb-2 list-dot lvl-2">
-              <li>Số lượng tuyển dụng trực tiếp tháng hiện tại: <span class="hl">${formatNumber(row["RECRUIT T"])}</span></li>
-              <li>Số lượng tuyển dụng trực tiếp active M0: <span class="hl">${formatNumber(row["RECRUIT ACT T"])}</span></li>
-            </ul>
+            <div class="sub-content">
+              <ul class="mb-2 list-dot bullet-strong lvl-3">
+                <li><span class="thin">Số lượng tuyển dụng trực tiếp tháng hiện tại:</span> <span class="hl">${formatNumber(row["RECRUIT T"])}</span></li>
+                <li><span class="thin">Số lượng tuyển dụng trực tiếp active M0:</span> <span class="hl">${formatNumber(row["RECRUIT ACT T"])}</span></li>
+              </ul>
+            </div>
           </div>
 
           <div id="c2" class="sub-block hide">
             <div class="subsec lvl-1">2. Theo dõi thăng cấp</div>
-            <ul class="mb-2 list-dot lvl-2">
-              <li>Tiến độ thăng lên UM (đối với FA): <span class="hl">${addPercent(row["UP % FA TO UM"])}</span></li>
-              <li>Vị trí thăng cấp: <span class="hl">${formatNumber(row["UP.TC LEN"])}</span></li>
-              <li>Kết quả đánh giá: <span class="hl">${formatNumber(row["UP.KQ DG"])}</span></li>
-              <li>Tiềm năng thăng cấp: <span class="hl">${formatNumber(row["UP.TIEM NANG TC UM"])}</span></li>
-              <li>Theo dõi các khóa đào tạo bắt buộc (Y/N):<br>
-                SBW: <span class="hl">${formatNumber(row["UP.SBW"])}</span> &nbsp; 
-                MS: <span class="hl">${formatNumber(row["UP.MS"])}</span> &nbsp;
-                LS: <span class="hl">${formatNumber(row["UP.LS"])}</span> &nbsp;
-                COACHING: <span class="hl">${formatNumber(row["UP.COACHING"])}</span>
-              </li>
-              <li>Số lượng NRA với 1CC & 4tr FYC cần thêm: <span class="hl">${formatInt(row["UP.CAN TD ACT 4TR FYC L3M"])}</span></li>
-              <li>2A Số lượng đại lý còn làm việc Whole team cần thêm: <span class="hl">${formatNumber(row["UP.CAN CA WT"])}</span></li>
-              <li>2B Số lượng đại lý còn làm việc và có ≥ 15tr FYC L3M cần thêm: <span class="hl">${formatNumber(row["UP.CAN CA 15TR L3M"])}</span></li>
-              <li>Số lượng UM+ báo cáo trực tiếp cần thêm: <span class="hl">${formatNumber(row["UP.CAN UM+TT"])}</span></li>
-              <li>Nguồn sản xuất cần thêm: <span class="hl">${formatNumber(row["UP.CAN NGUON SX"])}</span></li>
-              <li>FYC Whole team L6M sau luật 50% cần thêm: <span class="hl">${fmt(row["UP.CAN FYC WT L6M"], "UP.CAN FYC WT L6M", "FYC Whole team L6M sau luật 50% cần thêm")}</span></li>
-            </ul>
+            <div class="sub-content">
+              <ul class="mb-2 list-dot bullet-strong lvl-3">
+                <li><span class="thin">Tiến độ thăng lên UM (đối với FA):</span> <span class="hl">${addPercent(row["UP % FA TO UM"])}</span></li>
+                <li><span class="thin">Vị trí thăng cấp:</span> <span class="hl">${formatNumber(row["UP.TC LEN"])}</span></li>
+                <li><span class="thin">Kết quả đánh giá:</span> <span class="hl">${formatNumber(row["UP.KQ DG"])}</span></li>
+                <li><span class="thin">Tiềm năng thăng cấp:</span> <span class="hl">${formatNumber(row["UP.TIEM NANG TC UM"])}</span></li>
+                <li><span class="thin">Theo dõi các khóa đào tạo bắt buộc (Y/N):</span></li>
+                <li style="margin-left: 20px;">
+                  SBW: <span class="hl">${formatNumber(row["UP.SBW"])}</span> &nbsp; 
+                  MS: <span class="hl">${formatNumber(row["UP.MS"])}</span> &nbsp;
+                  LS: <span class="hl">${formatNumber(row["UP.LS"])}</span> &nbsp;
+                  COACHING: <span class="hl">${formatNumber(row["UP.COACHING"])}</span>
+                </li>
+                <li><span class="thin">Số lượng NRA với 1CC & 4tr FYC cần thêm:</span> <span class="hl">${formatInt(row["UP.CAN TD ACT 4TR FYC L3M"])}</span></li>
+                <li><span class="thin">2A Số lượng đại lý còn làm việc Whole team cần thêm:</span> <span class="hl">${formatNumber(row["UP.CAN CA WT"])}</span></li>
+                <li><span class="thin">2B Số lượng đại lý còn làm việc và có ≥ 15tr FYC L3M cần thêm:</span> <span class="hl">${formatNumber(row["UP.CAN CA 15TR L3M"])}</span></li>
+                <li><span class="thin">Số lượng UM+ báo cáo trực tiếp cần thêm:</span> <span class="hl">${formatNumber(row["UP.CAN UM+TT"])}</span></li>
+                <li><span class="thin">Nguồn sản xuất cần thêm:</span> <span class="hl">${formatNumber(row["UP.CAN NGUON SX"])}</span></li>
+                <li><span class="thin">FYC Whole team L6M sau luật 50% cần thêm:</span> <span class="hl">${fmt(row["UP.CAN FYC WT L6M"], "UP.CAN FYC WT L6M", "FYC Whole team L6M sau luật 50% cần thêm")}</span></li>
+              </ul>
+            </div>
           </div>
 
+          ${!isFA ? `
           <div id="c3" class="sub-block hide">
             <div class="subsec lvl-1">3. Theo dõi duy trì chức danh</div>
-            <div class="thin lvl-2">Đánh giá từ <span class="hl">${formatNumber(row["MOC.FROM"])}</span> đến <span class="hl">${formatNumber(row["MOC.TO"])}</span> của kỳ đánh giá ngày <span class="hl">${formatNumber(row["MOC.IN"])}</span></div>
-            <ul class="mb-2 list-dot lvl-3">
-              <li>Chức danh hiện tại: <span class="hl">${formatNumber(row["MOC.RANK"])}</span></li>
-              <li>Tháng tại chức: <span class="hl">${formatNumber(row["MOC.TAI VI"])}</span></li>
-              <li>Kết quả đánh giá tạm tính (Y/N): <span class="hl">${formatNumber(row["MOC.KQ TAM TINH"])}</span></li>
-              <li>Theo dõi các khóa đào tạo bắt buộc (Y/N):<br>
-                MS: <span class="hl">${formatNumber(row["UP.MS"])}</span> &nbsp;
-                LS: <span class="hl">${formatNumber(row["UP.LS"])}</span> &nbsp;
-                COACHING: <span class="hl">${formatNumber(row["UP.COACHING"])}</span>
-              </li>
-              <li>Số lượng NRA với 1CC & 4tr FYC cần thêm: <span class="hl">${formatInt(row["MOC.CAN TD ACT 4TR L6M"])}</span></li>
-              <li>Số lượng UM+ báo cáo trực tiếp cần thêm: <span class="hl">${formatNumber(row["MOC.CAN UM+ TT"])}</span></li>
-              <li>FYP Whole team L6M sau luật 50% cần thêm: <span class="hl">${fmt(row["MOC.CAN FYC WT L6M"], "MOC.CAN FYC WT L6M", "FYP Whole team L6M sau luật 50% cần thêm")}</span></li>
-              <li>Tỷ lệ duy trì P13 cần thêm: <span class="hl">${addPercent(row["MOC.CAN P13 WT"])}</span></li>
-            </ul>
+            <div class="sub-content">
+              <div class="thin lvl-2"><strong>Đánh giá từ</strong> <span class="hl">${formatNumber(row["MOC.FROM"])}</span> <strong>đến</strong> <span class="hl">${formatNumber(row["MOC.TO"])}</span> <strong>của kỳ đánh giá ngày</strong> <span class="hl">${formatNumber(row["MOC.IN"])}</span></div>
+              <ul class="mb-2 list-dot bullet-strong lvl-3">
+                <li><span class="thin">Chức danh hiện tại:</span> <span class="hl">${formatNumber(row["MOC.RANK"])}</span></li>
+                <li><span class="thin">Tháng tại chức:</span> <span class="hl">${formatNumber(row["MOC.TAI VI"])}</span></li>
+                <li><span class="thin">Kết quả đánh giá tạm tính (Y/N):</span> <span class="hl">${formatNumber(row["MOC.KQ TAM TINH"])}</span></li>
+                <li><span class="thin">Theo dõi các khóa đào tạo bắt buộc (Y/N):</span></li>
+                <li style="margin-left: 20px;">
+                  MS: <span class="hl">${formatNumber(row["UP.MS"])}</span> &nbsp;
+                  LS: <span class="hl">${formatNumber(row["UP.LS"])}</span> &nbsp;
+                  COACHING: <span class="hl">${formatNumber(row["UP.COACHING"])}</span>
+                </li>
+                <li><span class="thin">Số lượng NRA với 1CC & 4tr FYC cần thêm:</span> <span class="hl">${formatInt(row["MOC.CAN TD ACT 4TR L6M"])}</span></li>
+                <li><span class="thin">Số lượng UM+ báo cáo trực tiếp cần thêm:</span> <span class="hl">${formatNumber(row["MOC.CAN UM+ TT"])}</span></li>
+                <li><span class="thin">FYP Whole team L6M sau luật 50% cần thêm:</span> <span class="hl">${fmt(row["MOC.CAN FYC WT L6M"], "MOC.CAN FYC WT L6M", "FYP Whole team L6M sau luật 50% cần thêm")}</span></li>
+                <li><span class="thin">Tỷ lệ duy trì P13 cần thêm:</span> <span class="hl">${addPercent(row["MOC.CAN P13 WT"])}</span></li>
+              </ul>
+            </div>
           </div>
 
           <div id="c4" class="sub-block hide">
             <div class="subsec lvl-1">4. Danh hiệu MBA Pro</div>
-            <ul class="mb-2 list-dot lvl-2">
-              <li>Danh hiệu chính thức hiện tại: <span class="hl">${formatNumber(row["MBA.DH CT HIEN TAI"])}</span></li>
-              <li><span class="thin">Theo dõi thăng hạng:</span></li>
-            </ul>
-            <ul class="mb-2 list-dot lvl-3">
-              <li>Tiềm năng thăng hạng (FYC ≥ 80% yêu cầu hạn tiếp theo): <span class="hl">${fmt(row["MBA.TIEM NANG 80%FYC"], "MBA.TIEM NANG 80%FYC", "FYC cá nhân UM+ và ĐL trực tiếp L12M sau luật 50%")}</span></li>
-              <li>Số lượng đại lý đạt chuẩn trong quý: <span class="hl">${formatNumber(row["MBA.TH DL DAT CHUAN TRONG QUY"])}</span></li>
-              <li>Số lượng đại lý đạt chuẩn trong 2 quý: <span class="hl">${formatNumber(row["MBA.TH DL DAT CHUAN 2 QUY"])}</span></li>
-              <li>FYC cá nhân UM+ và ĐL trực tiếp L12M sau luật 50%: <span class="hl">${fmt(row["MBA.TH FYC TO TT SAU 50"], "MBA.TH FYC TO TT SAU 50", "FYC cá nhân UM+ và ĐL trực tiếp L12M sau luật 50%")}</span></li>
-              <li>Số UM+ mới thăng cấp L12M: <span class="hl">${formatNumber(row["MBA.TH UM+ MOI L12M"])}</span></li>
-              <li>P13 cấp báo cáo trực tiếp: <span class="hl">${addPercent(row["MBA.TH P13 BCTT"])}</span></li>
-              <li>Danh hiệu MBA Pro tạm tính theo kết quả xét thăng hạng: <span class="hl">${formatNumber(row["MBA.TH DH TAM TINH QUY SAU"])}</span></li>
-            </ul>
-            <ul class="mb-2 list-dot lvl-2"><li><span class="thin">Theo dõi duy trì hạng:</span></li></ul>
-            <ul class="mb-2 list-dot lvl-3">
-              <li>Kết quả xét duy trì tạm tính: <span class="hl">${formatNumber(row["MBA.KQ DT DH HTAI"])}</span></li>
-              <li>Số quý liên tục giữ danh hiệu MBA Pro hiện tại: <span class="hl">${formatNumber(row["MBA.DT SO QUY LIEN TUC"])}</span></li>
-              <li>Số lượng Manulife Pro có sản xuất trong quý: <span class="hl">${formatNumber(row["MBA.SO MANPRO ACT TRONG QUY"])}</span></li>
-              <li>FYC cá nhân UM+ và ĐL trực tiếp L12M sau luật 50%: <span class="hl">${fmt(row["MBA.TH FYC TO TT SAU 50"], "MBA.TH FYC TO TT SAU 50", "FYC cá nhân UM+ và ĐL trực tiếp L12M sau luật 50%")}</span></li>
-              <li>Số UM+ mới thăng cấp L12M: <span class="hl">${formatNumber(row["MBA.TH UM+ MOI L12M"])}</span></li>
-            </ul>
-            <ul class="mb-2 list-dot lvl-2"><li>Danh hiệu tạm tính quý sau (sau thăng hạng & duy trì): <span class="hl">${formatNumber(row["MBA.DH TAM TINH QUY SAU"])}</span></li></ul>
+            <div class="sub-content">
+              <div class="thin mb-1 lvl-2"><strong>Danh hiệu chính thức hiện tại:</strong> <span class="hl">${formatNumber(row["MBA.DH CT HIEN TAI"])}</span></div>
+              <div class="thin mb-1 lvl-2"><strong>Theo dõi thăng hạng:</strong></div>
+              <ul class="mb-2 list-dot bullet-strong lvl-3">
+                <li><span class="thin">Tiềm năng thăng hạng (FYC ≥ 80% yêu cầu hạn tiếp theo):</span> <span class="hl">${fmt(row["MBA.TIEM NANG 80%FYC"], "MBA.TIEM NANG 80%FYC", "FYC cá nhân UM+ và ĐL trực tiếp L12M sau luật 50%")}</span></li>
+                <li><span class="thin">Số lượng đại lý đạt chuẩn trong quý:</span> <span class="hl">${formatNumber(row["MBA.TH DL DAT CHUAN TRONG QUY"])}</span></li>
+                <li><span class="thin">Số lượng đại lý đạt chuẩn trong 2 quý:</span> <span class="hl">${formatNumber(row["MBA.TH DL DAT CHUAN 2 QUY"])}</span></li>
+                <li><span class="thin">FYC cá nhân UM+ và ĐL trực tiếp L12M sau luật 50%:</span> <span class="hl">${fmt(row["MBA.TH FYC TO TT SAU 50"], "MBA.TH FYC TO TT SAU 50", "FYC cá nhân UM+ và ĐL trực tiếp L12M sau luật 50%")}</span></li>
+                <li><span class="thin">Số UM+ mới thăng cấp L12M:</span> <span class="hl">${formatNumber(row["MBA.TH UM+ MOI L12M"])}</span></li>
+                <li><span class="thin">P13 cấp báo cáo trực tiếp:</span> <span class="hl">${addPercent(row["MBA.TH P13 BCTT"])}</span></li>
+                <li><span class="thin">Danh hiệu MBA Pro tạm tính theo kết quả xét thăng hạng:</span> <span class="hl">${formatNumber(row["MBA.TH DH TAM TINH QUY SAU"])}</span></li>
+              </ul>
+              <div class="thin mb-1 lvl-2"><strong>Theo dõi duy trì hạng:</strong></div>
+              <ul class="mb-2 list-dot bullet-strong lvl-3">
+                <li><span class="thin">Kết quả xét duy trì tạm tính:</span> <span class="hl">${formatNumber(row["MBA.KQ DT DH HTAI"])}</span></li>
+                <li><span class="thin">Số quý liên tục giữ danh hiệu MBA Pro hiện tại:</span> <span class="hl">${formatNumber(row["MBA.DT SO QUY LIEN TUC"])}</span></li>
+                <li><span class="thin">Số lượng Manulife Pro có sản xuất trong quý:</span> <span class="hl">${formatNumber(row["MBA.SO MANPRO ACT TRONG QUY"])}</span></li>
+                <li><span class="thin">FYC cá nhân UM+ và ĐL trực tiếp L12M sau luật 50%:</span> <span class="hl">${fmt(row["MBA.TH FYC TO TT SAU 50"], "MBA.TH FYC TO TT SAU 50", "FYC cá nhân UM+ và ĐL trực tiếp L12M sau luật 50%")}</span></li>
+                <li><span class="thin">Số UM+ mới thăng cấp L12M:</span> <span class="hl">${formatNumber(row["MBA.TH UM+ MOI L12M"])}</span></li>
+              </ul>
+              <div class="thin mb-1 lvl-2"><strong>Danh hiệu tạm tính quý sau (sau thăng hạng & duy trì):</strong> <span class="hl">${formatNumber(row["MBA.DH TAM TINH QUY SAU"])}</span></div>
+            </div>
           </div>
 
           <div id="c5" class="sub-block hide">
             <div class="subsec lvl-1">5. Thưởng năng suất nhóm ưu tú hàng tháng</div>
-            <ul class="mb-2 list-dot lvl-2">
-              <li>Tổng CC phát sinh trong tháng của bản thân UM+ (A): <span class="hl">${formatNumber(row["OTEAM.CC UM+"])}</span></li>
-              <li>Tổng FYP phát sinh trong tháng của bản thân UM+ (A): <span class="hl">${fmt(row["OTEAM.FYP UM+"], "OTEAM.FYP UM+", "Tổng FYP phát sinh trong tháng của bản thân UM+ (A)")}</span></li>
-              <li>Số NRA có ≥1CC và 15tr FYP L3M của bản thân UM+(A): <span class="hl">${formatInt(row["OTEAM.TDTT ACT"])}</span></li>
-              <li>FYP của bản thân UM+ (A) và nhóm trực tiếp sau luật 50%: <span class="hl">${fmt(row["OTEAM.TONG FYP TT"], "OTEAM.TONG FYP TT", "FYP của bản thân UM+ (A) và nhóm trực tiếp sau luật 50%")}</span></li>
-              <li>FYP của bản thân UM+ (B) báo cáo trực tiếp cho UM+ (A): <span class="hl">${fmt(row["OTEAM.FYP UM+ MOI"], "OTEAM.FYP UM+ MOI", "FYP của bản thân UM+ (B) báo cáo trực tiếp cho UM+ (A)")}</span></li>
-              <li>Tổng FYP sau luật 50% dùng để tính thưởng (cấp UM): <span class="hl">${fmt(row["OTEAM.TONG FYP SAU LUAT XET THUONG"], "OTEAM.TONG FYP SAU LUAT XET THUONG", "Tổng FYP sau luật 50% dùng để tính thưởng (cấp UM)")}</span></li>
-              <li>Tổng FYP WT trước luật 50% (cấp SUM+): <span class="hl">${fmt(row["OTEAM.FYP WT TRUOC LUAT"], "OTEAM.FYP WT TRUOC LUAT", "Tổng FYP WT trước luật 50% (cấp SUM+)")}</span></li>
-              <li>Tổng FYP WT sau luật 50% để tính thưởng (cấp SUM+):(2): <span class="hl">${fmt(row["OTEAM.FYP WT SAU LUAT"], "OTEAM.FYP WT SAU LUAT", "Tổng FYP WT sau luật 50% để tính thưởng (cấp SUM+)")}</span></li>
-              <li>Y/c về tổng FYP: <span class="hl">${fmt(row["OTEAM.Y/C TONG FYP"], "OTEAM.Y/C TONG FYP", "Y/c về tổng FYP")}</span></li>
-              <li>Y/c về bán cá nhân: <span class="hl">${formatNumber(row["OTEAM.Y/C SX CA NHAN"])}</span></li>
-              <li>Y/c về tuyển có active: <span class="hl">${formatNumber(row["OTEAM.Y/C TDTT ACT"])}</span></li>
-              <li>Kết quả đạt thưởng thi đua (Y/N): <span class="hl">${formatNumber(row["OTEAM.DAT THUONG"])}</span></li>
-              <li>Tỷ lệ P13: <span class="hl">${addPercent(row["OTEAM.P13"])}</span></li>
-              <li>Hệ số nhân TLDTHD: <span class="hl">${formatNumber(row["OTEAM.HE SO THUONG"])}</span></li>
-              <li>Thưởng dự tính sau khi đã nhân hệ số TLDTHD: <span class="hl">${fmt(row["OTEAM.TIEN THUONG"], "OTEAM.TIEN THUONG", "Thưởng dự tính sau khi đã nhân hệ số TLDTHD")}</span></li>
-            </ul>
+            <div class="sub-content">
+              <ul class="mb-2 list-dot bullet-strong lvl-3">
+                <li><span class="thin">Tổng CC phát sinh trong tháng của bản thân UM+ (A):</span> <span class="hl">${formatNumber(row["OTEAM.CC UM+"])}</span></li>
+                <li><span class="thin">Tổng FYP phát sinh trong tháng của bản thân UM+ (A):</span> <span class="hl">${fmt(row["OTEAM.FYP UM+"], "OTEAM.FYP UM+", "Tổng FYP phát sinh trong tháng của bản thân UM+ (A)")}</span></li>
+                <li><span class="thin">Số NRA có ≥1CC và 15tr FYP L3M của bản thân UM+(A):</span> <span class="hl">${formatInt(row["OTEAM.TDTT ACT"])}</span></li>
+                <li><span class="thin">FYP của bản thân UM+ (A) và nhóm trực tiếp sau luật 50%:</span> <span class="hl">${fmt(row["OTEAM.TONG FYP TT"], "OTEAM.TONG FYP TT", "FYP của bản thân UM+ (A) và nhóm trực tiếp sau luật 50%")}</span></li>
+                <li><span class="thin">FYP của bản thân UM+ (B) báo cáo trực tiếp cho UM+ (A):</span> <span class="hl">${fmt(row["OTEAM.FYP UM+ MOI"], "OTEAM.FYP UM+ MOI", "FYP của bản thân UM+ (B) báo cáo trực tiếp cho UM+ (A)")}</span></li>
+                <li><span class="thin">Tổng FYP sau luật 50% dùng để tính thưởng (cấp UM):</span> <span class="hl">${fmt(row["OTEAM.TONG FYP SAU LUAT XET THUONG"], "OTEAM.TONG FYP SAU LUAT XET THUONG", "Tổng FYP sau luật 50% dùng để tính thưởng (cấp UM)")}</span></li>
+                <li><span class="thin">Tổng FYP WT trước luật 50% (cấp SUM+):</span> <span class="hl">${fmt(row["OTEAM.FYP WT TRUOC LUAT"], "OTEAM.FYP WT TRUOC LUAT", "Tổng FYP WT trước luật 50% (cấp SUM+)")}</span></li>
+                <li><span class="thin">Tổng FYP WT sau luật 50% để tính thưởng (cấp SUM+):(2):</span> <span class="hl">${fmt(row["OTEAM.FYP WT SAU LUAT"], "OTEAM.FYP WT SAU LUAT", "Tổng FYP WT sau luật 50% để tính thưởng (cấp SUM+)")}</span></li>
+                <li><span class="thin">Y/c về tổng FYP:</span> <span class="hl">${fmt(row["OTEAM.Y/C TONG FYP"], "OTEAM.Y/C TONG FYP", "Y/c về tổng FYP")}</span></li>
+                <li><span class="thin">Y/c về bán cá nhân:</span> <span class="hl">${formatNumber(row["OTEAM.Y/C SX CA NHAN"])}</span></li>
+                <li><span class="thin">Y/c về tuyển có active:</span> <span class="hl">${formatNumber(row["OTEAM.Y/C TDTT ACT"])}</span></li>
+                <li><span class="thin">Kết quả đạt thưởng thi đua (Y/N):</span> <span class="hl">${formatNumber(row["OTEAM.DAT THUONG"])}</span></li>
+                <li><span class="thin">Tỷ lệ P13:</span> <span class="hl">${addPercent(row["OTEAM.P13"])}</span></li>
+                <li><span class="thin">Hệ số nhân TLDTHD:</span> <span class="hl">${formatNumber(row["OTEAM.HE SO THUONG"])}</span></li>
+                <li><span class="thin">Thưởng dự tính sau khi đã nhân hệ số TLDTHD:</span> <span class="hl">${fmt(row["OTEAM.TIEN THUONG"], "OTEAM.TIEN THUONG", "Thưởng dự tính sau khi đã nhân hệ số TLDTHD")}</span></li>
+              </ul>
+            </div>
           </div>
+          ` : ''}
         </div>`;
 
       reportEl.innerHTML = Info + A + B + C;
@@ -594,6 +651,12 @@
     function buildMobileTOC(){
       const sel=document.getElementById('tocSelect'); if(!sel) return; sel.innerHTML='';
       const addOpt=(val,text)=>{ const op=document.createElement('option'); op.value=val; op.textContent=text; sel.appendChild(op); };
+      
+      // Kiểm tra chức danh có phải FA không
+      const chucDanhEl = document.querySelector('#sectionInfo .info-item .val');
+      const chucDanh = chucDanhEl ? String(chucDanhEl.textContent || "").toUpperCase() : "";
+      const isFA = chucDanh.includes("FA") || chucDanh === "FA";
+      
       addOpt('sectionInfo','Thông tin đại lý');
       addOpt('sectionA','A. Tổng quan (MTD)');
       addOpt('sectionB#b1','B.1 Bán hàng');
@@ -603,9 +666,11 @@
       addOpt('sectionB#b5','B.5 Thưởng năm');
       addOpt('sectionC#c1','C.1 Tuyển dụng');
       addOpt('sectionC#c2','C.2 Thăng cấp');
-      addOpt('sectionC#c3','C.3 Duy trì chức danh');
-      addOpt('sectionC#c4','C.4 MBA Pro');
-      addOpt('sectionC#c5','C.5 Thưởng nhóm ưu tú');
+      if (!isFA) {
+        addOpt('sectionC#c3','C.3 Duy trì chức danh');
+        addOpt('sectionC#c4','C.4 MBA Pro');
+        addOpt('sectionC#c5','C.5 Thưởng nhóm ưu tú');
+      }
       addOpt('openIncome','Tính thu nhập (mở tab)');
       sel.addEventListener('change',()=>{ const v=sel.value; if(!v) return; if(v==='openIncome'){ window.open(INCOME_URL,'_blank'); sel.value=''; return; } showSection(v); });
     }
@@ -689,10 +754,33 @@
       renderReport(row);
       document.body.classList.remove('logged-out');
       document.body.classList.add('logged-in');
+      
+      // Kiểm tra và thêm class is-fa nếu chức danh là FA
+      const chucDanh = String(row["Chức danh"] || "").toUpperCase();
+      const isFA = chucDanh.includes("FA") || chucDanh === "FA";
+      if (isFA) {
+        document.body.classList.add('is-fa');
+      } else {
+        document.body.classList.remove('is-fa');
+      }
+      
       applySidebarMode();
       buildMobileTOC();
       showSection('sectionInfo');     // mặc định vào mục Thông tin đại lý
       setLayoutVars();
+      
+      // Cập nhật ngày cập nhật trong sidebar
+      const sidebarUpdateDate = document.getElementById('sidebarUpdateDate');
+      if (sidebarUpdateDate && row["NGAY CHOT DATA"]) {
+        sidebarUpdateDate.textContent = `Cập nhật: ${row["NGAY CHOT DATA"]}`;
+      }
+      
+      // Cập nhật ngày cập nhật trong mobile TOC
+      const mobileUpdateDate = document.getElementById('mobileUpdateDate');
+      if (mobileUpdateDate && row["NGAY CHOT DATA"]) {
+        mobileUpdateDate.textContent = `Cập nhật: ${row["NGAY CHOT DATA"]}`;
+        mobileUpdateDate.style.display = 'block';
+      }
 
       // Reset input
       msdlInput.value=''; dateInput.value=''; msdlInput.blur(); dateInput.blur();
