@@ -401,8 +401,7 @@
         ${infoItem("P13 Cá nhân", p13cn)}
         ${!isFA ? infoItem("P13 Toàn nhánh", p13nh) : ""}
         ${!isFA ? infoItem("P13 cấp 1", p13c1) : ""}
-        ${infoItem("Số liệu cập nhật đến ngày", row["NGAY CHOT DATA"])}
-      `;
+              `;
       const gridInner = isMobile() ? `${alertHtml}${firstBlock}${restBlocks}` : `${firstBlock}${restBlocks}`;
       const alertAfter = (!isMobile() && hasAlert) ? alertHtml : "";
       return `
