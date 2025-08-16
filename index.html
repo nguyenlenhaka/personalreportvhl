@@ -278,34 +278,34 @@
 
   </style>
 </head>
+
 <body class="logged-out">
   <!-- ===== HEADER ===== -->
   <header id="pageHeader" class="app-header">
     <div class="header-grid">
+      <!-- Hàng brand: logo & tên trang cùng 1 dòng -->
       <div class="brand-row">
-         &#160;&#160;<img src="/logo.webp" alt="logo" class="logo-d" />
+        <img src="../logo.webp" alt="logo" class="logo-d" />
         <div class="title-wrap">
           <div class="title-top">CỔNG THÔNG TIN VÙNG HẰNG LÂM</div>
           <div class="title-main">HỆ THỐNG BÁO CÁO CÁ NHÂN</div>
         </div>
       </div>
-
-      <!-- Cụm đăng nhập / đăng xuất -->
-      <form id="loginForm" class="login-cluster">
+      <!-- Cụm đăng nhập: LUÔN theo từng dòng trên mobile; desktop gọn gàng bên phải -->
+      <div class="login-cluster">
         <div class="input-group">
-          <input class="login-only" type="text" id="msdlInput" placeholder="Nhập MSDL" required />
+          <input class="login-only" type="text" id="agent-id" placeholder="Nhập MSDL" />
           <div class="password-input-wrapper">
-            <input class="login-only" type="password" id="dateInput" placeholder="Ngày gia nhập" required />
+            <input class="login-only" type="password" id="ngay-gia-nhap" placeholder="Ngày gia nhập" />
             <button type="button" class="toggle-password" onclick="togglePassword()">
               <span class="eye-icon">👁️</span>
             </button>
           </div>
         </div>
-        <button id="loginBtn" class="login-btn login-only" type="submit">Đăng nhập</button>
-        <button id="logoutBtn" class="login-btn logout-only" type="button">Đăng xuất</button>
-      </form>
+        <button class="login-btn login-only" type="button" onclick="searchAgent()">Đăng nhập</button>
+        <button id="logoutBtn" class="login-btn logout-only" type="button" onclick="location.reload()">Đăng xuất</button>
+      </div>
     </div>
-    <div id="errorTop"></div>
   </header>
 
   <!-- ===== TOC chỉ dành cho mobile ===== -->
