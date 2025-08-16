@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
-  <title>DỰ TÍNH THU NHẬP – Vùng Hằng Lâm</title>
+  <title>CÔNG CỤ DỰ TÍNH THU NHẬP – Vùng Hằng Lâm</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 
   <!-- Font của dự án -->
@@ -176,7 +176,7 @@
 
     #contentWrap{ margin-left:0; }
     body.sidebar-open #contentWrap{ margin-left:var(--sidebar-width); }
-    main{ max-width:1200px; margin:0 auto; padding:14px; }
+    main{ max-width:1920x; margin:0 auto; padding:0px; }
 
     /* Ẩn toàn bộ phần ngoài header khi chưa login */
     body.logged-out #sidebar,
@@ -233,7 +233,7 @@
 #calc-btn:hover{background:#00a758}
 
     /* ===== MOBILE: MỖI DÒNG 1 TRƯỜNG ===== */
-    @media (max-width:1023px){
+    @media (max-width:480px){
       /* BRAND & LOGIN: brand (logo + tên) cùng 1 dòng; login mỗi thành phần 1 dòng */
       .header-grid{ grid-template-columns:1fr; }
       .brand-row{ justify-content:flex-start; }
@@ -251,7 +251,7 @@
       }
       .logo-d{ height:44px; }
       .title-top{ font-size:clamp(13px, 1.6vw + 10px, 18px); }
-      .title-main{ font-size:clamp(16px, 3vw + 10px, 24px); }
+      .title-main{ font-size:clamp(15px, 3vw + 10px, 24px); }
 
       .top-fields,.top-fields-2{grid-template-columns:1fr;gap:10px}
       .field{grid-column:1/-1}
@@ -263,7 +263,7 @@
       body.sidebar-open #contentWrap{ margin-left:0 } /* mobile không chừa chỗ sidebar */
       body.logged-in #tocMobile{ display:block; }     /* dropdown luôn hiện khi đã đăng nhập */
     }
-    @media (min-width:1024px){
+    @media (min-width:768px){
       body.logged-in #sidebar{ display:block; }
       body.logged-in.sidebar-open #supportDesk{ display:inline-flex; }
     }
@@ -295,7 +295,7 @@
         <img src="../logo.webp" alt="logo" class="logo-d" />
         <div class="title-wrap">
           <div class="title-top">CỔNG THÔNG TIN VÙNG HẰNG LÂM</div>
-          <div class="title-main">CÔNH CỤ DỰ TÍNH THU NHẬP</div>
+          <div class="title-main">CÔNG CỤ DỰ TÍNH THU NHẬP</div>
         </div>
       </div>
       <!-- Cụm đăng nhập: LUÔN theo từng dòng trên mobile; desktop gọn gàng bên phải -->
