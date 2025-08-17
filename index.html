@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
-  <title>BÁO CÁO CÁ NHÂN – Vùng Hằng Lâm</title>
+  <title>HỆ THỐNG BÁO CÁO CÁ NHÂN – Vùng Hằng Lâm</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 
   <!-- Font của dự án -->
@@ -177,7 +177,7 @@
 
     #contentWrap{ margin-left:0; }
     body.sidebar-open #contentWrap{ margin-left:var(--sidebar-width); }
-    main{ max-width:1366px; margin:0 auto; padding:14px; }
+    main{ max-width:1200px; margin:0 auto; padding:14px; }
 
     /* Ẩn toàn bộ phần ngoài header khi chưa login */
     body.logged-out #sidebar,
@@ -278,34 +278,34 @@
 
   </style>
 </head>
-
 <body class="logged-out">
   <!-- ===== HEADER ===== -->
   <header id="pageHeader" class="app-header">
     <div class="header-grid">
-      <!-- Hàng brand: logo & tên trang cùng 1 dòng -->
       <div class="brand-row">
-        <img src="../logo.webp" alt="logo" class="logo-d" />
+         &#160;&#160;<img src="/logo.webp" alt="logo" class="logo-d" />
         <div class="title-wrap">
           <div class="title-top">CỔNG THÔNG TIN VÙNG HẰNG LÂM</div>
           <div class="title-main">HỆ THỐNG BÁO CÁO CÁ NHÂN</div>
         </div>
       </div>
-      <!-- Cụm đăng nhập: LUÔN theo từng dòng trên mobile; desktop gọn gàng bên phải -->
-      <div class="login-cluster">
+
+      <!-- Cụm đăng nhập / đăng xuất -->
+      <form id="loginForm" class="login-cluster">
         <div class="input-group">
-          <input class="login-only" type="text" id="agent-id" placeholder="Nhập MSDL" />
+          <input class="login-only" type="text" id="msdlInput" placeholder="Nhập MSDL" required />
           <div class="password-input-wrapper">
-            <input class="login-only" type="password" id="ngay-gia-nhap" placeholder="Ngày gia nhập" />
+            <input class="login-only" type="password" id="dateInput" placeholder="Ngày gia nhập" required />
             <button type="button" class="toggle-password" onclick="togglePassword()">
               <span class="eye-icon">👁️</span>
             </button>
           </div>
         </div>
-        <button class="login-btn login-only" type="button" onclick="searchAgent()">Đăng nhập</button>
-        <button id="logoutBtn" class="login-btn logout-only" type="button" onclick="location.reload()">Đăng xuất</button>
-      </div>
+        <button id="loginBtn" class="login-btn login-only" type="submit">Đăng nhập</button>
+        <button id="logoutBtn" class="login-btn logout-only" type="button">Đăng xuất</button>
+      </form>
     </div>
+    <div id="errorTop"></div>
   </header>
 
   <!-- ===== TOC chỉ dành cho mobile ===== -->
@@ -730,7 +730,7 @@
               </li>
                 <li><span class="thin">Số lượng NRA với 1CC & 4tr FYC cần thêm:</span> <span class="hl">${formatInt(row["MOC.CAN TD ACT 4TR L6M"])}</span></li>
                 <li><span class="thin">Số lượng UM+ báo cáo trực tiếp cần thêm:</span> <span class="hl">${formatNumber(row["MOC.CAN UM+ TT"])}</span></li>
-                <li><span class="thin">FYC Whole team L6M sau luật 50% cần thêm:</span> <span class="hl">${fmt(row["MOC.CAN FYC WT L6M"], "MOC.CAN FYC WT L6M", "FYP Whole team L6M sau luật 50% cần thêm")}</span></li>
+                <li><span class="thin">FYP Whole team L6M sau luật 50% cần thêm:</span> <span class="hl">${fmt(row["MOC.CAN FYC WT L6M"], "MOC.CAN FYC WT L6M", "FYP Whole team L6M sau luật 50% cần thêm")}</span></li>
                 <li><span class="thin">Tỷ lệ duy trì P13 cần thêm:</span> <span class="hl">${addPercent(row["MOC.CAN P13 WT"])}</span></li>
             </ul>
             </div>
