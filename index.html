@@ -816,7 +816,7 @@
       addOpt('sectionC#c4','C.4 MBA Pro');
       addOpt('sectionC#c5','C.5 Thưởng nhóm ưu tú');
       }
-      addOpt('openIncome','Tính thu nhập (mở tab)');
+      addOpt('openIncome','Tính thu nhập');
       sel.addEventListener('change',()=>{ const v=sel.value; if(!v) return; if(v==='openIncome'){ window.open(INCOME_URL,'_blank'); sel.value=''; return; } showSection(v); });
     }
 
