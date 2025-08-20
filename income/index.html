@@ -1147,11 +1147,28 @@ function searchAgent(){
     activeT2 = getByKeyLoose(found, `Active_Thang${month1}`);
   }
   
-  // Đếm số tháng có hoạt động (giá trị khác 0, "0", null, undefined)
+  // Chuyển đổi dữ liệu từ text sang số trước khi tính toán
+  const parseActiveValue = (value) => {
+    if (value === null || value === undefined || value === "") return 0;
+    if (typeof value === "number") return value;
+    if (typeof value === "string") {
+      const trimmed = value.trim();
+      if (trimmed === "" || trimmed === "0" || trimmed === "null" || trimmed === "undefined") return 0;
+      const num = parseFloat(trimmed);
+      return isNaN(num) ? 0 : num;
+    }
+    return 0;
+  };
+  
+  const activeTNum = parseActiveValue(activeT);
+  const activeT1Num = parseActiveValue(activeT1);
+  const activeT2Num = parseActiveValue(activeT2);
+  
+  // Đếm số tháng có hoạt động (giá trị > 0)
   let activeMonthsCount = 0;
-  if (activeT && activeT !== 0 && activeT !== "0" && activeT !== "") activeMonthsCount++;
-  if (activeT1 && activeT1 !== 0 && activeT1 !== "0" && activeT1 !== "") activeMonthsCount++;
-  if (activeT2 && activeT2 !== 0 && activeT2 !== "0" && activeT2 !== "") activeMonthsCount++;
+  if (activeTNum > 0) activeMonthsCount++;
+  if (activeT1Num > 0) activeMonthsCount++;
+  if (activeT2Num > 0) activeMonthsCount++;
   
   document.getElementById("active-months").value = activeMonthsCount.toString();
 
