@@ -429,7 +429,10 @@
               <div class="field"><label for="fyp-gd1"><b>∑ FYP</b></label><input type="text" id="fyp-gd1" readonly/></div>
             </div>
             <div class="top-fields-2">
-              <div class="field"><label for="thuongmemo-gd1"><b>Thưởng Memo Giai đoạn 1</b></label><input type="text" id="thuongmemo-gd1" readonly/><span id="alert-gd1" style="color:red;display:none"></span></div>
+              <div class="field"><label for="thuongmemo-gd1"><b>Thưởng Memo Giai đoạn 1</b></label><input type="text" id="thuongmemo-gd1" readonly/></div>
+            </div>
+            <div class="top-fields-2">
+              <div class="field"><span id="alert-gd1" style="color:red;font-weight:bold;font-size:14px;text-align:left;display:block;width:100%""></span></div>
             </div>
           </div>
 
@@ -444,7 +447,10 @@
               <div class="field"><label for="fyp-gd2"><b>∑ FYP</b></label><input type="text" id="fyp-gd2" readonly/></div>
             </div>
             <div class="top-fields-2">
-              <div class="field"><label for="thuongmemo-gd2"><b>Thưởng Memo Giai đoạn 2</b></label><input type="text" id="thuongmemo-gd2" readonly/><span id="alert-gd2" style="color:red;display:none"></span></div>
+              <div class="field"><label for="thuongmemo-gd2"><b>Thưởng Memo Giai đoạn 2</b></label><input type="text" id="thuongmemo-gd2" readonly/></div>
+            </div>
+            <div class="top-fields-2">
+              <div class="field"><span id="alert-gd2" style="color:red;font-weight:bold;font-size:14px;text-align:left;display:block;width:100%""></span></div>
             </div>
           </div>
 
@@ -459,7 +465,10 @@
               <div class="field"><label for="fyp-gd3"><b>∑ FYP</b></label><input type="text" id="fyp-gd3" readonly/></div>
             </div>
             <div class="top-fields-2">
-              <div class="field"><label for="thuongmemo-gd3"><b>Thưởng Memo Giai đoạn 3</b></label><input type="text" id="thuongmemo-gd3" readonly/><span id="alert-gd3" style="color:red;display:none"></span></div>
+              <div class="field"><label for="thuongmemo-gd3"><b>Thưởng Memo Giai đoạn 3</b></label><input type="text" id="thuongmemo-gd3" readonly/></div>
+            </div>
+            <div class="top-fields-2">
+              <div class="field"><span id="alert-gd3" style="color:red;font-weight:bold;font-size:14px;text-align:left;display:block;width:100%""></span></div>
             </div>
           </div>
 
@@ -509,6 +518,15 @@
         </div>
         <div class="top-fields">
           <div class="field"><label for="thuong-memo" class="income-note"><b>0001M08/2025/ASBD</b></label><input type="text" id="thuong-memo" readonly/></div>
+        </div>
+        <div class="top-fields">
+          <div class="field"><span id="alert-gd1-summary" style="color:red;font-weight:bold;font-size:14px;text-align:left;display:block;width:100%"></span></div>
+        </div>
+        <div class="top-fields">
+          <div class="field"><span id="alert-gd2-summary" style="color:red;font-weight:bold;font-size:14px;text-align:left;display:block;width:100%"></span></div>
+        </div>
+        <div class="top-fields">
+          <div class="field"><span id="alert-gd3-summary" style="color:red;font-weight:bold;font-size:14px;text-align:left;display:block;width:100%"></span></div>
         </div>
       </section>
 
@@ -592,6 +610,27 @@ const NF3=new Intl.NumberFormat('vi-VN',{minimumFractionDigits:3,maximumFraction
 const formatMoney3=v=>Number.isFinite(+v)?NF3.format(+v):'';
 function parseMoney3(s){ if(typeof s==='number')return s; if(!s)return 0; const n=parseFloat(String(s).replace(/\./g,'').replace(',','.')); return Number.isFinite(n)?n:0; }
 
+/* ===== NUMERIC VALUE PARSER ===== */
+// Hàm chung để chuyển đổi dữ liệu từ text sang số
+// Xử lý định dạng số với dấu . cho thập phân (ví dụ: 1.5, 2.75)
+// Áp dụng cho TẤT CẢ các trường số: Active, FYC, FYP, MDRT-FYP, Số tháng làm việc, v.v.
+function parseActiveValue(value) {
+  if (value === null || value === undefined || value === "") return 0;
+  if (typeof value === "number") return value;
+  if (typeof value === "string") {
+    const trimmed = value.trim();
+    if (trimmed === "" || trimmed === "0" || trimmed === "0.0" || trimmed === "0.00" || trimmed === "null" || trimmed === "undefined") return 0;
+    
+    // Xử lý các trường hợp đặc biệt
+    if (trimmed === "0.0" || trimmed === "0.00") return 0;
+    
+    // Chuyển đổi sang số, dấu . là dấu thập phân
+    const num = parseFloat(trimmed);
+    return isNaN(num) ? 0 : num;
+  }
+  return 0;
+}
+
 /* ===== ID LISTS ===== */
 const MONEY_INPUT_IDS_EDITABLE=['fypchinh-gd1','fypkem-gd1','fypchinh-gd2','fypkem-gd2','fypchinh-gd3','fypkem-gd3'];
 const COUNT_INPUT_IDS_EDITABLE=['sohd-gd1','sohd-gd2','sohd-gd3'];
@@ -672,7 +711,24 @@ function calcMemoStage(gd,sohd,tongFYP){let m1,t1,m2,t2;if(gd==='gd1'){m1=25000;
   const optU=optimizeMemo(+tongFYP||0,Infinity,m1,t1,m2,t2);let res=optU,txt='';const cc=Math.max(0,+sohd||0);
   if(cc>0){if(cc<optU.used){res=optimizeMemo(+tongFYP||0,cc,m1,t1,m2,t2);txt=`Thưởng tối ưu từ ${optU.used} HĐ; bạn nhập ${cc} nên chỉ tính tối đa ${cc} HĐ.`}else if(cc>optU.used){txt=`Chỉ thưởng tối đa ${optU.used} hợp đồng!`}}
   document.getElementById('thuongmemo-'+gd).value=formatMoney3(res.reward);
-  const el=document.getElementById('alert-'+gd); if(el){el.textContent=txt; el.style.display=txt?'block':'none'}
+  
+  // Hiển thị cảnh báo với tên giai đoạn và dấu cảnh báo
+  const gdNames = {gd1: 'Giai đoạn 1', gd2: 'Giai đoạn 2', gd3: 'Giai đoạn 3'};
+  const alertText = txt ? `ℹ️ ${gdNames[gd]}: ${txt}` : '';
+  
+  // Cập nhật cảnh báo trong từng giai đoạn
+  const el = document.getElementById('alert-'+gd); 
+  if(el){
+    el.textContent = alertText; 
+    el.style.display = txt ? 'block' : 'none';
+  }
+  
+  // Cập nhật cảnh báo trong phần tổng hợp
+  const elSummary = document.getElementById('alert-'+gd+'-summary');
+  if(elSummary){
+    elSummary.textContent = alertText;
+    elSummary.style.display = txt ? 'block' : 'none';
+  }
 }
 function updateTongHop(){
   const geti=id=>parseInt((document.getElementById(id).value||'').replace(/[^\d]/g,''),10)||0;
@@ -908,14 +964,16 @@ function calculateThuongMDRT(){
   };
 
   // 1. CHUYỂN ĐỔI DỮ LIỆU VỀ SỐ TRƯỚC KHI TÍNH
-  const m = parseInt(document.getElementById("month-select").value, 10) || 0;
+  const m = parseInt(document.getElementById("month-select").value, 10) || 0; // Tháng người dùng chọn
+  const currentMonth = new Date().getMonth() + 1; // Tháng thực tế hiện tại
   const activeMonths = parseInt((document.getElementById("active-months").value || '').replace(/[^\d]/g, ''), 10) || 0;
   const currentCC = parseInt((document.getElementById("tong-cc").value || '').replace(/[^\d]/g, ''), 10) || 0;
   const toDate = parseMoney3(document.getElementById("mdrt-fyp").value) || 0;
   const thisM = parseMoney3(document.getElementById("tong-fyp").value) || 0;
   
   console.log('calculateThuongMDRT - INPUT VALUES:', {
-    month: m,
+    selectedMonth: m,
+    currentMonth: currentMonth,
     activeMonths: activeMonths,
     currentCC: currentCC,
     toDateFYP: toDate,
@@ -930,14 +988,125 @@ function calculateThuongMDRT(){
     return; 
   }
 
-  // 3. KIỂM TRA ĐIỀU KIỆN TIÊU CHUẨN
-  if(activeMonths < 2){ 
-    console.log('calculateThuongMDRT - not enough active months');
-    document.getElementById("thuong-mdrt").value = formatMoney3(0); 
-    setAlert('Không đủ tiêu chuẩn nhận thưởng tiến độ'); 
-    return; 
+  // 3. LOGIC CẢNH BÁO THÔNG MINH DỰA TRÊN THÁNG THỰC TẾ
+  let alertMessage = '';
+  
+  // Xác định quý và vị trí tháng trong quý
+  let quarter, monthPosition;
+  if (currentMonth >= 1 && currentMonth <= 3) {
+    quarter = 1; monthPosition = currentMonth;
+  } else if (currentMonth >= 4 && currentMonth <= 6) {
+    quarter = 2; monthPosition = currentMonth - 3;
+  } else if (currentMonth >= 7 && currentMonth <= 9) {
+    quarter = 3; monthPosition = currentMonth - 6;
+  } else {
+    quarter = 4; monthPosition = currentMonth - 9;
   }
   
+  console.log('calculateThuongMDRT - QUARTER ANALYSIS:', {
+    quarter: quarter,
+    monthPosition: monthPosition,
+    isQuarterEnd: monthPosition === 3,
+    isQuarterStart: monthPosition === 1,
+    isQuarterMiddle: monthPosition === 2
+  });
+  
+  // Trường hợp 1: Tháng thực tế là tháng cuối quý, trùng với tháng chọn
+  if (monthPosition === 3 && m === currentMonth) {
+    if (activeMonths >= 2) {
+      // Tính thưởng bình thường
+      alertMessage = '';
+    } else {
+      alertMessage = 'Không đủ tiêu chuẩn nhận thưởng tiến độ';
+    }
+  }
+  // Trường hợp 2: Tháng thực tế là tháng đầu quý, không trùng với tháng chọn
+  else if (monthPosition === 1 && m !== currentMonth) {
+    const monthsNeeded = 3 - activeMonths;
+    alertMessage = `Bạn cần thêm ${monthsNeeded} tháng có hoạt động để nhận thưởng (bao gồm tháng hiện tại)`;
+  }
+  // Trường hợp 3: Tháng thực tế là tháng thứ 2 của quý
+  else if (monthPosition === 2) {
+    // Cần kiểm tra tháng thứ 1 có hoạt động không
+    // Lấy dữ liệu từ income.json để kiểm tra
+    const found = data.find(r => eqAgent(getByKeyLoose(r,"Mã Đại lý"), document.getElementById("agent-id").value));
+    if (found) {
+      const currentMonthReal = new Date().getMonth() + 1;
+      let month1, month2, month3;
+      
+      if (currentMonthReal >= 1 && currentMonthReal <= 3) {
+        month1 = 1; month2 = 2; month3 = 3;
+      } else if (currentMonthReal >= 4 && currentMonthReal <= 6) {
+        month1 = 4; month2 = 5; month3 = 6;
+      } else if (currentMonthReal >= 7 && currentMonthReal <= 9) {
+        month1 = 7; month2 = 8; month3 = 9;
+      } else {
+        month1 = 10; month2 = 11; month3 = 12;
+      }
+      
+      const activeMonth1 = parseActiveValue(getByKeyLoose(found, "Active T-1"));
+      
+      if (activeMonth1 > 0) {
+        const monthsNeeded = 3 - activeMonths;
+        alertMessage = `Bạn cần thêm ${monthsNeeded} tháng có hoạt động để nhận thưởng`;
+      } else {
+        alertMessage = 'Không đạt chuẩn';
+      }
+    }
+  }
+  
+    // 4. LOGIC TÍNH THƯỞNG DỰA TRÊN ĐIỀU KIỆN THÔNG MINH
+  let canCalculateReward = false;
+  let finalAlertMessage = '';
+  
+  // Trường hợp 1: Tháng thực tế là tháng cuối quý, trùng với tháng chọn
+  if (monthPosition === 3 && m === currentMonth) {
+    if (activeMonths >= 2) {
+      canCalculateReward = true;
+      finalAlertMessage = '';
+    } else {
+      canCalculateReward = false;
+      finalAlertMessage = 'Không đủ tiêu chuẩn nhận thưởng tiến độ';
+    }
+  }
+  // Trường hợp 2: Tháng thực tế là tháng đầu quý, không trùng với tháng chọn
+  else if (monthPosition === 1 && m !== currentMonth) {
+    canCalculateReward = false;
+    const monthsNeeded = 3 - activeMonths;
+    finalAlertMessage = `Bạn cần thêm ${monthsNeeded} tháng có hoạt động để nhận thưởng (bao gồm tháng hiện tại)`;
+  }
+  // Trường hợp 3: Tháng thực tế là tháng thứ 2 của quý
+  else if (monthPosition === 2) {
+    // Cần kiểm tra tháng thứ 1 có hoạt động không
+    const found = data.find(r => eqAgent(getByKeyLoose(r,"Mã Đại lý"), document.getElementById("agent-id").value));
+    if (found) {
+      const currentMonthReal = new Date().getMonth() + 1;
+      let month1, month2, month3;
+      
+      if (currentMonthReal >= 1 && currentMonthReal <= 3) {
+        month1 = 1; month2 = 2; month3 = 3;
+      } else if (currentMonthReal >= 4 && currentMonthReal <= 6) {
+        month1 = 4; month2 = 5; month3 = 6;
+      } else if (currentMonthReal >= 7 && currentMonthReal <= 9) {
+        month1 = 7; month2 = 8; month3 = 9;
+      } else {
+        month1 = 10; month2 = 11; month3 = 12;
+      }
+      
+      const activeMonth1 = parseActiveValue(getByKeyLoose(found, "Active T-1"));
+      
+      if (activeMonth1 > 0) {
+        canCalculateReward = false;
+        const monthsNeeded = 3 - activeMonths;
+        finalAlertMessage = `Bạn cần thêm ${monthsNeeded} tháng có hoạt động để nhận thưởng`;
+      } else {
+        canCalculateReward = false;
+        finalAlertMessage = 'Không đạt chuẩn';
+      }
+    }
+  }
+  
+  // Kiểm tra điều kiện cơ bản
   if(currentCC < 1){ 
     console.log('calculateThuongMDRT - no contracts this month');
     document.getElementById("thuong-mdrt").value = formatMoney3(0); 
@@ -945,9 +1114,18 @@ function calculateThuongMDRT(){
     return; 
   }
   
-  setAlert('');
-
-  // 4. THỰC HIỆN LOGIC TÍNH TOÁN VỚI SỐ
+  // Nếu không thể tính thưởng theo logic thông minh
+  if (!canCalculateReward) {
+    console.log('calculateThuongMDRT - cannot calculate reward based on smart logic');
+    document.getElementById("thuong-mdrt").value = formatMoney3(0); 
+    setAlert(finalAlertMessage); 
+    return; 
+  }
+  
+  // Nếu có thể tính thưởng, tiếp tục logic cũ
+  setAlert(finalAlertMessage || '');
+  
+  // 5. THỰC HIỆN LOGIC TÍNH TOÁN VỚI SỐ
   const progress = toDate + thisM;
   
   console.log('calculateThuongMDRT - CALCULATION SETUP:', {
@@ -978,7 +1156,7 @@ function calculateThuongMDRT(){
     level2Reward: muc2
   });
   
-  // 5. TÍNH KẾT QUẢ CUỐI CÙNG
+  // 6. TÍNH KẾT QUẢ CUỐI CÙNG
   let thuong = 0; 
   if(need > 0 && progress > 0){
     const tl = progress / need; 
@@ -993,7 +1171,7 @@ function calculateThuongMDRT(){
     finalReward: thuong
   });
   
-  // 6. HIỂN THỊ THEO ĐỊNH DẠNG YÊU CẦU
+  // 7. HIỂN THỊ THEO ĐỊNH DẠNG YÊU CẦU
   document.getElementById("thuong-mdrt").value = formatMoney3(thuong);
 }
 
@@ -1097,16 +1275,16 @@ function searchAgent(){
 
   document.getElementById("ho-ten").value=getByKeyLoose(found,"Tên Đại lý")||'';
   document.getElementById("khu-vuc").value=getByKeyLoose(found,"Khu vực")||'';
-  document.getElementById("thang-lam-viec").value=Number(getByKeyLoose(found,"Số tháng làm việc")||0);
+  document.getElementById("thang-lam-viec").value=parseActiveValue(getByKeyLoose(found,"Số tháng làm việc"));
   document.getElementById("nhom-dai-ly").value=getByKeyLoose(found,"Nhóm Đại lý")||'';
-  const p13=parseMoney3(getByKeyLoose(found,"TLDTHD cá nhân") ?? getByKeyLoose(found,"P13 cá nhân"));
+  const p13=parseActiveValue(getByKeyLoose(found,"TLDTHD cá nhân") ?? getByKeyLoose(found,"P13 cá nhân"));
   document.getElementById("p13-ca-nhan").value=Number.isFinite(p13)&&p13!==0?p13:'';
   document.getElementById("he-so-thuong").value=getHeSoThuong(p13);
-  document.getElementById("mdrt-fyp").value=formatMoney3(parseMoney3(getByKeyLoose(found,"MDRT-FYP tới hiện tại")));
-  const fycT1=parseMoney3(getByKeyLoose(found,"FYC tháng T-1"));
-  const fycT2=parseMoney3(getByKeyLoose(found,"FYC tháng T-2"));
+  document.getElementById("mdrt-fyp").value=formatMoney3(parseActiveValue(getByKeyLoose(found,"MDRT-FYP tới hiện tại")));
+  const fycT1=parseActiveValue(getByKeyLoose(found,"FYC tháng T-1"));
+  const fycT2=parseActiveValue(getByKeyLoose(found,"FYC tháng T-2"));
   document.getElementById("tong-fyc").value=formatMoney3(fycT1+fycT2);
-  document.getElementById("tong-fyc-quy").value=formatMoney3(parseMoney3(getByKeyLoose(found,"Tổng FYC trong Qúy hiện tại")));
+  document.getElementById("tong-fyc-quy").value=formatMoney3(parseActiveValue(getByKeyLoose(found,"Tổng FYC trong Qúy hiện tại")));
   // Tính số tháng có hoạt động trong quý dựa trên tháng hiện tại
   // Logic: T là tháng hiện tại, suy ra T-1 và T-2 theo quý
   const currentMonth = new Date().getMonth() + 1; // Tháng hiện tại (1-12)
@@ -1133,32 +1311,21 @@ function searchAgent(){
   
   if (currentMonth === month1) {
     // Tháng đầu quý: chỉ xét tháng hiện tại
-    activeT = getByKeyLoose(found, `Active_Thang${month1}`);
+    activeT = getByKeyLoose(found, "Active T");
     activeT1 = 0; activeT2 = 0;
   } else if (currentMonth === month2) {
     // Tháng giữa quý: xét 2 tháng đầu quý
-    activeT = getByKeyLoose(found, `Active_Thang${month2}`);
-    activeT1 = getByKeyLoose(found, `Active_Thang${month1}`);
+    activeT = getByKeyLoose(found, "Active T");
+    activeT1 = getByKeyLoose(found, "Active T-1");
     activeT2 = 0;
   } else {
     // Tháng cuối quý: xét cả 3 tháng của quý
-    activeT = getByKeyLoose(found, `Active_Thang${month3}`);
-    activeT1 = getByKeyLoose(found, `Active_Thang${month2}`);
-    activeT2 = getByKeyLoose(found, `Active_Thang${month1}`);
+    activeT = getByKeyLoose(found, "Active T");
+    activeT1 = getByKeyLoose(found, "Active T-1");
+    activeT2 = getByKeyLoose(found, "Active T-2");
   }
   
-  // Chuyển đổi dữ liệu từ text sang số trước khi tính toán
-  const parseActiveValue = (value) => {
-    if (value === null || value === undefined || value === "") return 0;
-    if (typeof value === "number") return value;
-    if (typeof value === "string") {
-      const trimmed = value.trim();
-      if (trimmed === "" || trimmed === "0" || trimmed === "null" || trimmed === "undefined") return 0;
-      const num = parseFloat(trimmed);
-      return isNaN(num) ? 0 : num;
-    }
-    return 0;
-  };
+
   
   const activeTNum = parseActiveValue(activeT);
   const activeT1Num = parseActiveValue(activeT1);
