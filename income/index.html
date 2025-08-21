@@ -3,7 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <title>DỰ TÍNH THU NHẬP – Vùng Hằng Lâm</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit-cover" />
+  
+  <!-- Logo và Favicon -->
+  <link rel="icon" type="image/webp" href="../logo.webp" />
+  <link rel="apple-touch-icon" href="../logo.webp" />
+  <meta name="msapplication-TileImage" content="../logo.webp" />
+  <meta property="og:image" content="../logo.webp" />
+  <meta name="twitter:image" content="../logo.webp" />
 
   <!-- Font của dự án -->
   <link rel="stylesheet" href="fonts/fonts.css" />
@@ -18,6 +25,27 @@
       --toc-h: 0px;          /* chiều cao dropdown mobile (tự tính bằng JS) */
       --brand:#059669; 
       --accent:#00a758;
+      
+      /* Tùy biến responsive cho tất cả thiết bị */
+      --mobile-breakpoint: 1023px;
+      --tablet-breakpoint: 768px;
+      --small-mobile: 480px;
+      --large-desktop: 1440px;
+      
+      /* Tùy biến spacing */
+      --safe-area-top: env(safe-area-inset-top, 0px);
+      --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-area-left: env(safe-area-inset-left, 0px);
+      --safe-area-right: env(safe-area-inset-right, 0px);
+      
+      /* Tùy biến z-index */
+      --z-header: 1000;
+      --z-banner: 999;
+      --z-toc: 996;
+      --z-content: 1;
+      --z-footer: 950;
+      --z-support: 940;
+      --z-loading: 10000;
     }
     /* đảm bảo không tràn ngang trên mọi thiết bị */
     html,body{height:100%;margin:0;background:#f3f4f6;overflow-x:hidden}
@@ -25,9 +53,9 @@
 
     /* ===== HEADER (FIXED) ===== */
     .app-header{
-      position:fixed; top:0; left:0; right:0; z-index:1000;
+      position:fixed; top:0; left:0; right:0; z-index:var(--z-header);
       background:#e8fff3; border-bottom:1px solid #d9f7e6;
-      padding-top:env(safe-area-inset-top,0px);
+      padding-top:var(--safe-area-top);
     }
     /* header chia 2 khu: brand (logo+tên) và login */
     .header-grid{
@@ -93,6 +121,12 @@
       cursor: pointer; 
       touch-action: manipulation;
       min-width: 140px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
     }
     
     .login-btn:hover{ background: #066a42; }
@@ -152,27 +186,216 @@
     .submenu{ margin:.25rem 0 .5rem .75rem; }
     .submenu .menu-item{ padding:.45rem .6rem; }
 
+    /* ===== SIDEBAR UPDATE INFO ===== */
+    .sidebar-update-info {
+      background: #f0f9ff;
+      color: #0b3d2c;
+      padding: 8px 12px;
+      margin: 0 0 12px 0;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      border-left: 4px solid #0ea35b;
+      line-height: 1.3;
+    }
+
+    /* ===== DESKTOP UPDATE DATE ===== */
+    .desktop-update-date {
+      background: #fef3c7;
+      color: #92400e;
+      padding: 6px 12px;
+      margin: 0 0 12px 0;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      border-left: 4px solid #f59e0b;
+      line-height: 1.3;
+      text-align: center;
+    }
+
+    /* ===== WELCOME BANNER ===== */
+    .welcome-banner {
+      position: fixed;
+      top: var(--header-h);
+      left: var(--sidebar-width);
+      right: 0;
+      z-index: var(--z-banner);
+      margin-bottom: 0px;
+      background: linear-gradient(135deg, #059669 0%, #00a758 100%);
+      color: white;
+      padding: 8px 20px;
+      text-align: center;
+      font-weight: 700;
+      font-size: 16px;
+      display: none;
+      box-shadow: 0 1px 4px rgba(5, 150, 105, 0.2);
+      line-height: 1.2;
+      pointer-events: none; /* Không chặn click events */
+    }
+
+    /* ===== MOBILE UPDATE DATE ===== */
+    .mobile-update-date {
+      position: fixed;
+      top: calc(var(--header-h) + 40px);
+      left: 0;
+      right: 0;
+      z-index: var(--z-toc);
+      background: #fff;
+      color: #0b3d2c;
+      padding: 8px 20px;
+      text-align: center;
+      font-weight: 700;
+      font-size: 14px;
+      border-bottom: 1px solid #e5e7eb;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      display: none;
+    }
+
+    /* ===== LOADING SCREEN ===== */
+    .loading-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.95);
+      z-index: var(--z-loading); /* Cao hơn header và banner */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(5px);
+    }
+
+    .loading-content {
+      text-align: center;
+      background: white;
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+    }
+
+    .loading-spinner {
+      width: 48px;
+      height: 48px;
+      border: 4px solid #e5e7eb;
+      border-top: 4px solid var(--brand);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+
+    .loading-text {
+      font-size: 18px;
+      font-weight: 600;
+      color: #374151;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
     /* ===== MOBILE TOC (DANH MỤC DROPDOWN) =====
        Luôn treo dưới header -> fixed + top = --header-h */
     #tocMobile{
-      position:fixed; top:var(--header-h); left:0; right:0; z-index:880;
+      position:fixed; top:calc(var(--header-h) + 40px + 40px); left:0; right:0; z-index:var(--z-toc);
       background:#fff; padding:10px 10px 6px;
       border-bottom:1px solid #e5e7eb; display:none;
       will-change:top;
     }
     #tocMobile .row{ display:flex; gap:8px; }
-    #tocSelect{
-      flex:1 1 auto; height:44px; border:1px solid #c7d5e6; border-radius:10px; padding:0 10px; font-weight:800; color:#00519c; background:#eff5ff;
-      font-size:16px;
+    
+    /* Nút danh mục mobile */
+    .mobile-menu-btn {
+      flex: 1;
+      height: 44px;
+      border: 1px solid #c7d5e6;
+      border-radius: 10px;
+      padding: 0 15px;
+      font-weight: 800;
+      color: #00519c;
+      background: #eff5ff;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
     }
-    #supportMobile{ flex:0 0 auto; display:inline-flex; align-items:center; justify-content:center; height:44px;
-      padding:0 14px; background:#00a758; color:#fff; border-radius:10px; text-decoration:none; font-weight:900; white-space:nowrap; }
+    
+    .mobile-menu-btn:hover {
+      background: #e0f2fe;
+      border-color: #0ea5e9;
+    }
+    
+    /* Nút đăng xuất mobile */
+    .mobile-logout-btn {
+      height: 44px;
+      border: 1px solid #dc2626;
+      border-radius: 10px;
+      padding: 0 15px;
+      font-weight: 800;
+      color: #fff;
+      background: #dc2626;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      white-space: nowrap;
+    }
+    
+    .mobile-logout-btn:hover {
+      background: #b91c1c;
+      border-color: #b91c1c;
+    }
+    
+    /* Mobile menu dropdown */
+    .mobile-menu-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      z-index: 1000;
+      margin-top: 5px;
+    }
+    
+    .mobile-menu-content {
+      padding: 8px 0;
+    }
+    
+    .mobile-menu-item {
+      display: block;
+      padding: 12px 16px;
+      color: #0b3d2c;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 14px;
+      border-bottom: 1px solid #f3f4f6;
+      transition: background-color 0.2s;
+    }
+    
+    .mobile-menu-item:last-child {
+      border-bottom: none;
+    }
+    
+    .mobile-menu-item:hover {
+      background-color: #f9fafb;
+    }
 
     /* ===== CONTENT ===== */
     /* chừa chỗ dưới header + dropdown mobile (nếu có) */
     body{ padding-top: calc(var(--header-h) + var(--toc-h) + 8px); }
+    
+    /* Chừa chỗ cho banner khi đã đăng nhập */
+    body.logged-in{ padding-top: calc(var(--header-h) + 40px + var(--toc-h) + 8px); }
+    
+    /* Chừa chỗ cho update date trên mobile */
+    body.logged-in.mobile{ padding-top: calc(var(--header-h) + 40px + 40px + var(--toc-h) + 8px); }
+    
+    /* Chừa chỗ cho TOC mobile khi đã đăng nhập */
+    body.logged-in{ padding-top: calc(var(--header-h) + 40px + 40px + var(--toc-h) + 8px); }
     /* chừa chỗ cho footer */
-    body{ padding-bottom: calc(2.25 * var(--footer-h) + env(safe-area-inset-bottom,0px)); }
+    body{ padding-bottom: calc(2.25 * var(--footer-h) + var(--safe-area-bottom)); }
 
     #contentWrap{ margin-left:0; }
     body.sidebar-open #contentWrap{ margin-left:var(--sidebar-width); }
@@ -184,9 +407,8 @@
     body.logged-out #contentWrap,
     body.logged-out #supportDesk { display:none !important; }
     
-    /* Ẩn dropdown TOC khi chưa login nhưng giữ nút hỗ trợ */
-    body.logged-out #tocMobile .row { display:none !important; }
-    body.logged-out #tocMobile { display:block !important; }
+    /* Ẩn TOC khi chưa đăng nhập trên cả desktop và mobile */
+    body.logged-out #tocMobile { display:none !important; }
     
     /* Hiển thị nút hỗ trợ mobile khi chưa đăng nhập - nằm trên footer */
     body.logged-out #tocMobile::after {
@@ -205,7 +427,12 @@
       position: fixed;
       right: 10px;
       bottom: calc(var(--footer-h) + 14px);
-      z-index: 940;
+      z-index: var(--z-support);
+    }
+    
+    /* Ẩn nút hỗ trợ cũ khi đã đăng nhập */
+    body.logged-in #tocMobile::after {
+      display: none !important;
     }
 
     .section-title{
@@ -232,8 +459,60 @@
     #calc-btn{background:#059669;color:#fff;border:none;border-radius:12px;padding:14px 24px;font-size:18px;font-weight:800;box-shadow:0 6px 18px rgba(0,81,193,.25);white-space:nowrap;cursor:pointer;touch-action:manipulation}
 #calc-btn:hover{background:#00a758}
 
+    /* ===== SMALL MOBILE ===== */
+    @media (max-width: 480px){
+      .header-grid{ padding: 8px 8px; }
+      .logo-d{ height: 40px; }
+      .title-top{ font-size: 12px; }
+      .title-main{ font-size: 16px; }
+      .login-cluster input{ width: 100%; }
+      .login-btn{ min-width: 120px; font-size: 14px; }
+      .top-fields,.top-fields-2{grid-template-columns:1fr;gap:8px}
+      .field{grid-column:1/-1}
+      .summary-row{grid-template-columns:1fr}
+      .summary-block{grid-column:1/-1}
+      
+      /* Banner trên small mobile - chiếm toàn bộ chiều rộng */
+      body.logged-in .welcome-banner {
+        left: 0;
+        right: 0;
+      }
+      
+      /* Ẩn TOC khi chưa đăng nhập trên small mobile */
+      body.logged-out #tocMobile {
+        display: none !important;
+      }
+      
+      /* Sau khi đăng nhập trên small mobile */
+      body.logged-in .header-grid {
+        grid-template-columns: 1fr;
+        justify-items: center;
+      }
+      
+      /* Logo và tiêu đề căn giữa header theo chiều ngang và dọc */
+      body.logged-in .brand-row {
+        justify-content: center;
+        align-items: center;
+        margin-top: 8px;
+      }
+      
+      /* Ẩn cột form đăng nhập sau khi đăng nhập */
+      body.logged-in .login-cluster {
+        display: none !important;
+      }
+      
+      /* Footer trên small mobile */
+      #pageFooter {
+        padding: 5px 12px 6px;
+      }
+      
+      .footer-left {
+        gap: 4px;
+      }
+    }
+
     /* ===== MOBILE: MỖI DÒNG 1 TRƯỜNG ===== */
-    @media (max-width:1023px){
+    @media (max-width: 1023px){
       /* BRAND & LOGIN: brand (logo + tên) cùng 1 dòng; login mỗi thành phần 1 dòng */
       .header-grid{ grid-template-columns:1fr; }
       .brand-row{ justify-content:flex-start; }
@@ -262,19 +541,253 @@
 
       body.sidebar-open #contentWrap{ margin-left:0 } /* mobile không chừa chỗ sidebar */
       body.logged-in #tocMobile{ display:block; }     /* dropdown luôn hiện khi đã đăng nhập */
+      
+      /* Hiển thị banner và update date trên mobile */
+      body.logged-in #welcomeBanner{ display:block; }
+      body.logged-in #mobileUpdateDate{ display:block; }
+      
+      /* Ẩn desktop update date trên mobile */
+      .desktop-update-date {
+        display: none !important;
+      }
+      
+      .sidebar-update-info {
+        display: none !important;
+      }
+      
+      /* Điều chỉnh vị trí update date mobile */
+      body.logged-in #mobileUpdateDate {
+        top: calc(var(--header-h) + 40px);
+      }
+      
+      /* Banner trên mobile - chiếm toàn bộ chiều rộng */
+      body.logged-in .welcome-banner {
+        left: 0;
+        right: 0;
+      }
+      
+      /* Dời TOC mobile lên sát update date */
+      body.logged-in #tocMobile {
+        top: calc(var(--header-h) + 40px + 40px);
+      }
+      
+      /* Ẩn TOC khi chưa đăng nhập trên mobile */
+      body.logged-out #tocMobile {
+        display: none !important;
+      }
+      
+      /* Ẩn nút hỗ trợ cũ khi đã đăng nhập */
+      body.logged-in #tocMobile::after {
+        display: none !important;
+      }
+      
+      /* Sau khi đăng nhập trên mobile */
+      body.logged-in .header-grid {
+        grid-template-columns: 1fr;
+        justify-items: center;
+      }
+      
+      /* Logo và tiêu đề căn giữa header theo chiều ngang và dọc */
+      body.logged-in .brand-row {
+        justify-content: center;
+        align-items: center;
+        margin-top: 10px;
+      }
+      
+      /* Ẩn cột form đăng nhập sau khi đăng nhập */
+      body.logged-in .login-cluster {
+        display: none !important;
+      }
+      
+      /* Ẩn nút đăng xuất màu xanh lá trên mobile */
+      body.logged-in .logout-only {
+        display: none !important;
+      }
+      
+      /* Ẩn nút hỗ trợ desktop trên mobile sau khi đăng nhập */
+      body.logged-in #supportDesk {
+        display: none !important;
+      }
+      
+      /* Footer trên mobile */
+      #pageFooter {
+        flex-direction: column;
+        gap: 6px;
+        padding: 6px 15px 8px;
+      }
+      
+      .footer-left {
+        align-items: center;
+        text-align: center;
+        gap: 6px;
+      }
+      
+      .footer-right {
+        justify-content: center;
+      }
     }
-    @media (min-width:1024px){
+    /* ===== TABLET ===== */
+    @media (min-width: 768px) and (max-width: 1023px){
+      .header-grid{ padding: 12px 16px; }
+      .logo-d{ height: 50px; }
+      .title-top{ font-size: 16px; }
+      .title-main{ font-size: 20px; }
+      .top-fields,.top-fields-2{grid-template-columns:repeat(6,1fr);gap:14px}
+      .field{grid-column:span 3}
+      .summary-row{grid-template-columns:repeat(2,1fr);gap:16px}
+      .summary-block{grid-column:span 1}
+      
+      /* Banner trên tablet - chiếm toàn bộ chiều rộng */
+      body.logged-in .welcome-banner {
+        left: 0;
+        right: 0;
+      }
+      
+      /* Ẩn TOC khi chưa đăng nhập trên tablet */
+      body.logged-out #tocMobile {
+        display: none !important;
+      }
+      
+      /* Sau khi đăng nhập trên tablet */
+      body.logged-in .header-grid {
+        grid-template-columns: 1fr;
+        justify-items: center;
+      }
+      
+      /* Logo và tiêu đề căn giữa header theo chiều ngang và dọc */
+      body.logged-in .brand-row {
+        justify-content: center;
+        align-items: center;
+        margin-top: 12px;
+      }
+      
+      /* Ẩn cột form đăng nhập sau khi đăng nhập */
+      body.logged-in .login-cluster {
+        display: none !important;
+      }
+      
+      /* Footer trên tablet */
+      #pageFooter {
+        padding: 6px 18px 8px;
+      }
+      
+      #supportFooter {
+        padding: 8px 16px;
+        font-size: 14px;
+      }
+      
+      /* Footer trên tablet */
+      .footer-left {
+        gap: 5px;
+      }
+      
+      /* Ẩn nút hỗ trợ desktop trên tablet sau khi đăng nhập */
+      body.logged-in #supportDesk {
+        display: none !important;
+      }
+    }
+
+    @media (min-width: 1024px){
       body.logged-in #sidebar{ display:block; }
       body.logged-in.sidebar-open #supportDesk{ display:inline-flex; }
+      
+      /* Hiển thị banner trên desktop */
+      body.logged-in #welcomeBanner{ display:block; }
+      
+      /* Banner trên desktop - căn theo sidebar */
+      body.logged-in .welcome-banner {
+        left: var(--sidebar-width);
+        right: 0;
+      }
+      
+      /* Banner khi sidebar đóng */
+      body.logged-in:not(.sidebar-open) .welcome-banner {
+        left: 0;
+        right: 0;
+      }
+      
+      /* Ẩn mobile update date trên desktop */
+      .mobile-update-date {
+        display: none !important;
+      }
+      
+      /* Ẩn TOC khi chưa đăng nhập trên desktop */
+      body.logged-out #tocMobile {
+        display: none !important;
+      }
+      
+      /* Ẩn nút đăng xuất màu xanh lá trên desktop */
+      body.logged-in .logout-only {
+        display: none !important;
+      }
+      
+      /* Ẩn nút hỗ trợ desktop sau khi đăng nhập */
+      body.logged-in #supportDesk {
+        display: none !important;
+      }
+      
+      /* Footer trên desktop */
+      #pageFooter {
+        padding: 6px 20px 8px;
+      }
+      
+      #supportFooter {
+        padding: 8px 16px;
+        font-size: 14px;
+      }
+    }
+
+    /* ===== LARGE DESKTOP ===== */
+    @media (min-width: 1440px){
+      .header-grid{ padding: 16px 24px; }
+      .logo-d{ height: 80px; }
+      .title-top{ font-size: 22px; }
+      .title-main{ font-size: 30px; }
+      .top-fields,.top-fields-2{grid-template-columns:repeat(12,1fr);gap:20px}
+      .field{grid-column:span 4}
+      .summary-row{grid-template-columns:repeat(2,1fr);gap:20px}
+      .summary-block{grid-column:span 1}
+      main{ max-width: 1400px; }
     }
 
     /* ===== FOOTER ===== */
     #pageFooter{
       position:fixed; left:0; right:0; bottom:0;
       min-height:var(--footer-h);
-      display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;
-      background:#f4f6f8; color:#0b3a2a; border-top:1px solid #e3e7eb; z-index:950;
-      padding:8px 10px 10px; text-align:center; font-weight:800;
+      display:flex; flex-direction:row; align-items:center; justify-content:space-between;
+      background:#f4f6f8; color:#0b3a2a; border-top:1px solid #e3e7eb; z-index:var(--z-footer);
+      padding:6px 20px 8px; font-weight:800;
+    }
+    
+    .footer-left {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      text-align: center;
+    }
+    
+    .footer-right {
+      display: flex;
+      align-items: center;
+    }
+    
+    #supportFooter {
+      background: #00a758;
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 20px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 14px;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+    
+    #supportFooter:hover {
+      background: #059669;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(0, 167, 88, 0.3);
     }
     #pageFooter img{ height:22px; width:auto; display:block; }
     #contentWrap::after{ content:""; display:block; height: calc(0.75 * var(--footer-h) + 24px); }
@@ -282,7 +795,7 @@
     /* Hỗ trợ desktop - luôn nằm góc dưới phía trên footer */
     #supportDesk{
       position:fixed; right:18px; bottom:calc(var(--footer-h) + 14px);
-      background:#00a758;color:#fff;padding:12px 16px;border-radius:28px;font-weight:900;text-decoration:none;box-shadow:0 4px 12px rgba(0,0,0,.18); z-index:940; display:inline-flex !important;
+      background:#00a758;color:#fff;padding:12px 16px;border-radius:28px;font-weight:900;text-decoration:none;box-shadow:0 4px 12px rgba(0,0,0,.18); z-index:var(--z-support); display:inline-flex !important;
     }
   </style>
 </head>
@@ -290,43 +803,78 @@
   <!-- ===== HEADER ===== -->
   <header id="pageHeader" class="app-header">
     <div class="header-grid">
-      <!-- Hàng brand: logo & tên trang cùng 1 dòng -->
       <div class="brand-row">
-        <img src="../logo.webp" alt="logo" class="logo-d" />
+         &#160;&#160;<img src="../logo.webp" alt="logo" class="logo-d" />
         <div class="title-wrap">
           <div class="title-top">CỔNG THÔNG TIN VÙNG HẰNG LÂM</div>
           <div class="title-main">DỰ TÍNH THU NHẬP</div>
         </div>
       </div>
-      <!-- Cụm đăng nhập: LUÔN theo từng dòng trên mobile; desktop gọn gàng bên phải -->
-      <div class="login-cluster">
+
+      <!-- Cụm đăng nhập / đăng xuất -->
+      <form id="loginForm" class="login-cluster">
         <div class="input-group">
-          <input class="login-only" type="text" id="agent-id" placeholder="Nhập MSDL" />
+          <input class="login-only" type="text" id="agent-id" placeholder="Nhập MSDL" required />
           <div class="password-input-wrapper">
-            <input class="login-only" type="password" id="ngay-gia-nhap" placeholder="Ngày gia nhập" />
+            <input class="login-only" type="password" id="ngay-gia-nhap" placeholder="Ngày gia nhập" required />
             <button type="button" class="toggle-password" onclick="togglePassword()">
               <span class="eye-icon">👁️</span>
             </button>
           </div>
         </div>
-        <button class="login-btn login-only" type="button" onclick="searchAgent()">Đăng nhập</button>
+        <button id="loginBtn" class="login-btn login-only" type="submit">Đăng nhập</button>
         <button id="logoutBtn" class="login-btn logout-only" type="button" onclick="location.reload()">Đăng xuất</button>
-      </div>
+      </form>
     </div>
+    <div id="errorTop"></div>
   </header>
+
+  <!-- ===== WELCOME BANNER ===== -->
+  <div id="welcomeBanner" class="welcome-banner">
+    Xin chào <span id="welcomeName"></span>
+  </div>
+
+  <!-- ===== UPDATE DATE MOBILE ===== -->
+  <div id="mobileUpdateDate" class="mobile-update-date" style="display: none;">
+    Dữ liệu được chốt đến: <span id="mobileUpdateDateText"></span>
+  </div>
+
+  <!-- ===== LOADING SCREEN ===== -->
+  <div id="loadingScreen" class="loading-screen" style="display: none;">
+    <div class="loading-content">
+      <div class="loading-spinner"></div>
+      <div class="loading-text">Đang tải dữ liệu...</div>
+    </div>
+  </div>
 
   <!-- ===== MOBILE TOC (treo dưới header) ===== -->
   <div id="tocMobile">
     <div class="row">
-      <select id="tocSelect" aria-label="Chọn mục"></select>
-      <a id="supportMobile" href="http://zalo.me/0376763390" target="_blank" rel="noopener">Hỗ trợ</a>
+      <button id="mobileMenuBtn" class="mobile-menu-btn">Danh mục</button>
+      <button id="mobileLogoutBtn" class="mobile-logout-btn">Đăng xuất</button>
+    </div>
+    <!-- Mobile menu dropdown -->
+    <div id="mobileMenuDropdown" class="mobile-menu-dropdown" style="display: none;">
+      <div class="mobile-menu-content">
+        <a href="#" class="mobile-menu-item" data-target="sec-daily">Thông tin đại lý</a>
+        <a href="#" class="mobile-menu-item" data-target="sec-muctieu">A.1 Mục tiêu tháng</a>
+        <a href="#" class="mobile-menu-item" data-target="sec-khoanthu">A.2 Các khoản thu nhập</a>
+        <a href="#" class="mobile-menu-item" data-target="sec-ban-hang">A.3 Thu nhập bán hàng</a>
+        <a href="#" class="mobile-menu-item" data-target="sec-tuyendung">B. Thu nhập tuyển dụng</a>
+        <a href="#" class="mobile-menu-item" data-target="sec-quan-ly">C. Thu nhập quản lý</a>
+        <a href="#" class="mobile-menu-item" data-target="sec-tong">D. Tổng thu nhập</a>
+      </div>
     </div>
   </div>
 
   <!-- ===== SIDEBAR (desktop) ===== -->
   <aside id="sidebar">
     <div class="sidebar-inner">
+      <div class="sidebar-update-info" id="sidebarUpdateInfo" style="display: none;">
+        Dữ liệu được chốt đến ngày: <span id="sidebarUpdateDateText"></span>
+      </div>
       <div class="menu-title">Danh mục</div>
+      <div class="desktop-update-date" id="sidebarUpdateDate" style="display: none;"></div>
 
       <a href="#" class="menu-item active" data-target="sec-daily">THÔNG TIN ĐẠI LÝ</a>
 
@@ -354,7 +902,6 @@
     <main>
       <!-- 1) THÔNG TIN ĐẠI LÝ -->
       <section id="sec-daily" class="app-section">
-        <div class="section-title">THÔNG TIN ĐẠI LÝ</div>
         <div class="top-fields">
           <div class="field" style="flex:6">
             <label for="ho-ten"><b>Họ và tên</b></label>
@@ -409,7 +956,6 @@
 
       <!-- 2) A.1 MỤC TIÊU THÁNG -->
       <section id="sec-muctieu" class="app-section" style="display:none">
-        <div class="section-title">A.1 MỤC TIÊU THÁNG</div>
         <div class="top-fields" style="margin-bottom:10px">
           <div class="field">
             <label for="month-select"><b>Tháng dự tính</b></label>
@@ -495,7 +1041,6 @@
 
       <!-- 3) A.2 CÁC KHOẢN THU NHẬP -->
       <section id="sec-khoanthu" class="app-section" style="display:none">
-        <div class="section-title">A.2 CÁC KHOẢN THU NHẬP</div>
         <div class="top-fields">
           <div class="field"><label><b>FYC SP chính (30%)</b></label><input type="text" id="fyc-chinh" readonly/></div>
           <div class="field"><label><b>FYC SP gắn kèm (20%)</b></label><input type="text" id="fyc-kem" readonly/></div>
@@ -532,17 +1077,15 @@
 
       <!-- 4) A.3 THU NHẬP BÁN HÀNG -->
       <section id="sec-ban-hang" class="app-section" style="display:none">
-        <div class="section-title">A.3 THU NHẬP BÁN HÀNG</div>
         <div class="summary-row">
           <div class="summary-block"><label for="tong-thu-nhap">Tổng thu nhập bán hàng (A)</label><input type="text" id="tong-thu-nhap" readonly/></div>
           <div class="summary-block"><label for="ty-le-thu-nhap">Tỷ lệ thu nhập/doanh thu</label><input type="text" id="ty-le-thu-nhap" readonly/></div>
         </div>
-        <hr><div class="section-title" style="position:static;border-left-color:#0d72b5">CHÚC BẠN SỞ HỮU TỐI ĐA THU NHẬP</div>
+        <hr><div style="text-align:center;font-weight:900;color:#0d72b5;font-size:18px;padding:20px 0;border-left:6px solid #0d72b5;background:#f0f9ff;margin:20px 0;border-radius:8px">CHÚC BẠN SỞ HỮU TỐI ĐA THU NHẬP</div>
       </section>
 
       <!-- 5) B. TUYỂN DỤNG -->
       <section id="sec-tuyendung" class="app-section" style="display:none">
-        <div class="section-title">B. THU NHẬP TỪ HOẠT ĐỘNG TUYỂN DỤNG</div>
         <div class="top-fields">
           <div class="field">
             <label><b>Thu nhập tuyển dụng (B)</b></label>
@@ -554,7 +1097,6 @@
 
       <!-- 6) C. QUẢN LÝ -->
       <section id="sec-quan-ly" class="app-section" style="display:none">
-        <div class="section-title">C. THU NHẬP TỪ HOẠT ĐỘNG QUẢN LÝ</div>
         <div class="top-fields">
           <div class="field">
             <label><b>Thu nhập quản lý (C)</b></label>
@@ -566,7 +1108,6 @@
 
       <!-- 7) D. TỔNG THU NHẬP -->
       <section id="sec-tong" class="app-section" style="display:none">
-        <div class="section-title">D. TỔNG THU NHẬP (A + B + C)</div>
         <div class="summary-row">
           <div class="summary-block"><label for="tong-A">A — Thu nhập bán hàng</label><input type="text" id="tong-A" readonly/></div>
           <div class="summary-block"><label for="tong-B">B — Thu nhập tuyển dụng</label><input type="text" id="tong-B" readonly/></div>
@@ -581,8 +1122,13 @@
 
   <!-- ===== FOOTER ===== -->
   <footer id="pageFooter">
-    <div>Bản quyền trang web thuộc về</div>
-    <img src="../logo_textr.webp" alt="Logo" />
+    <div class="footer-left">
+      <div>Bản quyền trang web thuộc về</div>
+      <img src="../logo_textr.webp" alt="Logo" />
+    </div>
+    <div class="footer-right">
+      <a id="supportFooter" href="http://zalo.me/0376763390" target="_blank" rel="noopener">Hỗ trợ</a>
+    </div>
   </footer>
 
   <!-- ===== LOGIC (GIỮ NGUYÊN, CHỈ CHỈNH HÀNH VI CUỘN TRÊN MOBILE) ===== -->
@@ -1273,6 +1819,102 @@ function searchAgent(){
   const found=same.find(r=>datesEqual(getByKeyLoose(r,"Ngày gia nhập"), ngayRaw));
   if(!found){alert("Đại lý không thuộc hệ thống");return}
 
+  // Hiển thị loading screen
+  showLoadingScreen();
+  
+  // Hiển thị banner chào mừng sau 1 giây
+  setTimeout(() => {
+    hideLoadingScreen();
+    
+    // Cập nhật tên trong banner
+    const welcomeName = document.getElementById('welcomeName');
+    if (welcomeName) {
+      const hoTen = getByKeyLoose(found, "Tên Đại lý") || '';
+      welcomeName.textContent = `${idRaw}_${hoTen}`;
+    }
+    
+    // Hiển thị banner
+    const welcomeBanner = document.getElementById('welcomeBanner');
+    if (welcomeBanner) {
+      welcomeBanner.style.display = 'block';
+    }
+    
+    // Hiển thị update date mobile
+    const mobileUpdateDate = document.getElementById('mobileUpdateDate');
+    if (mobileUpdateDate) {
+      mobileUpdateDate.style.display = 'block';
+      const mobileUpdateDateText = document.getElementById('mobileUpdateDateText');
+      if (mobileUpdateDateText) {
+        // Tìm kiếm ngày chốt từ dữ liệu thực tế (income.json không có cột này)
+        // Sẽ sử dụng fallback: ngày cuối cùng của tháng liền trước
+        const ngayChot = getByKeyLoose(found, "NGAY CHOT DATA") || 
+                         getByKeyLoose(found, "NGAY CHOT") || 
+                         getByKeyLoose(found, "NGAY CAP NHAT") ||
+                         getByKeyLoose(found, "NGAY CẬP NHẬT");
+        
+        if (ngayChot) {
+          // Hiển thị ngày chốt từ dữ liệu thực tế
+          mobileUpdateDateText.textContent = ngayChot;
+        } else {
+          // Fallback: Lấy ngày cuối cùng của tháng liền trước (thực tế)
+          const now = new Date();
+          // Tính tháng liền trước (tháng hiện tại - 1)
+          let lastMonthYear = now.getFullYear();
+          let lastMonthMonth = now.getMonth() - 1;
+          
+          // Xử lý trường hợp tháng 1 (tháng 0)
+          if (lastMonthMonth < 0) {
+            lastMonthMonth = 11; // Tháng 12
+            lastMonthYear = now.getFullYear() - 1; // Năm trước
+          }
+          
+          // Lấy ngày cuối cùng của tháng liền trước
+          const lastDayOfLastMonth = new Date(lastMonthYear, lastMonthMonth + 1, 0);
+          mobileUpdateDateText.textContent = lastDayOfLastMonth.toLocaleDateString('vi-VN');
+        }
+      }
+    }
+    
+    // Hiển thị update date desktop
+    const sidebarUpdateInfo = document.getElementById('sidebarUpdateInfo');
+    const sidebarUpdateDate = document.getElementById('sidebarUpdateDate');
+    if (sidebarUpdateInfo && sidebarUpdateDate) {
+      sidebarUpdateInfo.style.display = 'block';
+      sidebarUpdateDate.style.display = 'block';
+      
+      const sidebarUpdateDateText = document.getElementById('sidebarUpdateDateText');
+      if (sidebarUpdateDateText) {
+        // Tìm kiếm ngày chốt từ dữ liệu thực tế (income.json không có cột này)
+        // Sẽ sử dụng fallback: ngày cuối cùng của tháng liền trước
+        const ngayChot = getByKeyLoose(found, "NGAY CHOT DATA") || 
+                         getByKeyLoose(found, "NGAY CHOT") || 
+                         getByKeyLoose(found, "NGAY CAP NHAT") ||
+                         getByKeyLoose(found, "NGAY CẬP NHẬT");
+        
+        if (ngayChot) {
+          // Hiển thị ngày chốt từ dữ liệu thực tế
+          sidebarUpdateDateText.textContent = ngayChot;
+        } else {
+          // Fallback: Lấy ngày cuối cùng của tháng liền trước (thực tế)
+          const now = new Date();
+          // Tính tháng liền trước (tháng hiện tại - 1)
+          let lastMonthYear = now.getFullYear();
+          let lastMonthMonth = now.getMonth() - 1;
+          
+          // Xử lý trường hợp tháng 1 (tháng 0)
+          if (lastMonthMonth < 0) {
+            lastMonthMonth = 11; // Tháng 12
+            lastMonthYear = now.getFullYear() - 1; // Năm trước
+          }
+          
+          // Lấy ngày cuối cùng của tháng liền trước
+          const lastDayOfLastMonth = new Date(lastMonthYear, lastMonthMonth + 1, 0);
+          sidebarUpdateDateText.textContent = lastDayOfLastMonth.toLocaleDateString('vi-VN');
+        }
+      }
+    }
+  }, 1000);
+
   document.getElementById("ho-ten").value=getByKeyLoose(found,"Tên Đại lý")||'';
   document.getElementById("khu-vuc").value=getByKeyLoose(found,"Khu vực")||'';
   document.getElementById("thang-lam-viec").value=parseActiveValue(getByKeyLoose(found,"Số tháng làm việc"));
@@ -1445,6 +2087,21 @@ function calculateIncome(){
   console.log('=== calculateIncome END ===');
 }
 
+/* ===== LOADING SCREEN FUNCTIONS ===== */
+function showLoadingScreen() {
+  const loadingScreen = document.getElementById('loadingScreen');
+  if (loadingScreen) {
+    loadingScreen.style.display = 'flex';
+  }
+}
+
+function hideLoadingScreen() {
+  const loadingScreen = document.getElementById('loadingScreen');
+  if (loadingScreen) {
+    loadingScreen.style.display = 'none';
+  }
+}
+
 /* ===== TEST FUNCTIONS ===== */
 function testCalculations() {
   console.log('=== TESTING CALCULATIONS ===');
@@ -1520,6 +2177,60 @@ window.addEventListener('load', async ()=>{
     document.getElementById("agent-id").addEventListener("keydown",e=>{if(e.key==="Enter")searchAgent()});
     ngay.addEventListener("keydown",e=>{if(e.key==="Enter")searchAgent()});
   }
+
+  // Form submit event
+  const loginForm = document.getElementById('loginForm');
+  if (loginForm) {
+    loginForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      searchAgent();
+    });
+  }
+  
+  // Thêm class mobile cho body nếu cần
+  if (window.matchMedia('(max-width: 1023px)').matches) {
+    document.body.classList.add('mobile');
+  }
+  
+  // Mobile menu event listeners
+  const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+  const mobileLogoutBtn = document.getElementById('mobileLogoutBtn');
+  const mobileMenuDropdown = document.getElementById('mobileMenuDropdown');
+  
+  if (mobileMenuBtn) {
+    mobileMenuBtn.addEventListener('click', () => {
+      mobileMenuDropdown.style.display = mobileMenuDropdown.style.display === 'none' ? 'block' : 'none';
+    });
+  }
+  
+  if (mobileLogoutBtn) {
+    mobileLogoutBtn.addEventListener('click', () => {
+      location.reload();
+    });
+  }
+  
+  // Close dropdown when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!mobileMenuBtn?.contains(e.target) && !mobileMenuDropdown?.contains(e.target)) {
+      if (mobileMenuDropdown) {
+        mobileMenuDropdown.style.display = 'none';
+      }
+    }
+  });
+  
+  // Mobile menu item click handlers
+  document.querySelectorAll('.mobile-menu-item').forEach(item => {
+    item.addEventListener('click', (e) => {
+      e.preventDefault();
+      const target = item.getAttribute('data-target');
+      if (target) {
+        showSection(target);
+        if (mobileMenuDropdown) {
+          mobileMenuDropdown.style.display = 'none';
+        }
+      }
+    });
+  });
 
   // Sidebar click
   bindSidebar();
