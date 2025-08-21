@@ -6,11 +6,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   
   <!-- Logo và Favicon -->
-  <link rel="icon" type="image/webp" href="/logo.webp" />
-  <link rel="apple-touch-icon" href="/logo.webp" />
-  <meta name="msapplication-TileImage" content="/logo.webp" />
-  <meta property="og:image" content="/logo.webp" />
-  <meta name="twitter:image" content="/logo.webp" />
+  <link rel="icon" type="image/webp" href="logo.webp" />
+  <link rel="icon" type="image/png" href="logo.webp" />
+  <link rel="shortcut icon" href="logo.webp" />
+  <link rel="apple-touch-icon" href="logo.webp" />
+  <link rel="apple-touch-icon" sizes="180x180" href="logo.webp" />
+  <meta name="msapplication-TileImage" content="logo.webp" />
+  <meta name="msapplication-TileColor" content="#059669" />
+  <meta property="og:image" content="logo.webp" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:image" content="logo.webp" />
+  <meta name="theme-color" content="#059669" />
 
   <!-- Font của dự án -->
   <link rel="stylesheet" href="fonts/fonts.css" />
@@ -468,6 +475,11 @@
       .brand-row{ justify-content:flex-start; }
       body.logged-in .brand-row{ justify-content:center; align-items:center; margin-top:10px; }
       body.logged-in .login-cluster{ display:none; }
+      
+      /* Ẩn hoàn toàn nút hỗ trợ desktop trên mobile */
+      #supportDesk {
+        display: none !important;
+      }
       .login-cluster{ width:100%; justify-self:stretch; grid-template-columns:1fr; }
       .logo-d{ height:44px; }
       body.sidebar-open #contentWrap{ margin-left:0 }
@@ -508,6 +520,23 @@
       .sidebar-update-info {
         display: none !important;
       }
+      
+      /* Footer trên mobile */
+      #pageFooter {
+        flex-direction: column;
+        gap: 6px;
+        padding: 6px 15px 8px;
+      }
+      
+      .footer-left {
+        align-items: center;
+        text-align: center;
+        gap: 6px;
+      }
+      
+      .footer-right {
+        justify-content: center;
+      }
     }
     /* ===== TABLET ===== */
     @media (min-width: 768px) and (max-width: 1023px){
@@ -518,11 +547,24 @@
       .section-container{ padding: 18px 18px 18px 12px; }
       .sub-content{ padding: 14px 14px 14px 0px; }
       .info-grid{ padding: 14px; }
+      
+      /* Footer trên tablet */
+      #pageFooter {
+        padding: 6px 18px 8px;
+      }
+      
+      #supportFooter {
+        padding: 8px 16px;
+        font-size: 14px;
+      }
     }
 
     @media (min-width: 1024px){
       body.logged-in #sidebar{ display:block; }
-      body.logged-in.sidebar-open #supportDesk{ display:inline-flex; }
+      /* Ẩn hoàn toàn nút hỗ trợ desktop */
+      #supportDesk {
+        display: none !important;
+      }
       
       .section-header-fixed {
         left: var(--sidebar-width);
@@ -543,6 +585,16 @@
       .mobile-update-date {
         display: none !important;
       }
+      
+      /* Footer trên desktop */
+      #pageFooter {
+        padding: 6px 20px 8px;
+      }
+      
+      #supportFooter {
+        padding: 8px 16px;
+        font-size: 14px;
+      }
     }
 
     /* ===== LARGE DESKTOP ===== */
@@ -555,14 +607,62 @@
       .sub-content{ padding: 20px 20px 20px 0px; }
       .info-grid{ padding: 20px; }
       main{ max-width: 1400px; }
+      
+      /* Footer trên large desktop */
+      #pageFooter {
+        padding: 6px 24px 8px;
+      }
+      
+      #supportFooter {
+        padding: 8px 16px;
+        font-size: 14px;
+      }
     }
 
     /* ===== FOOTER ===== */
-    #pageFooter{ position:fixed; left:0; right:0; bottom:0; min-height:var(--footer-h); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; background:#f4f6f8; color:#0b3a2a; border-top:1px solid #e3e7eb; z-index:var(--z-footer); padding:6px 10px 8px; text-align:center; font-weight:800; }
-    #pageFooter img{ height:18px; width:auto; display:block; }
+    #pageFooter{ 
+      position:fixed; left:0; right:0; bottom:0; 
+      min-height:var(--footer-h); 
+      display:flex; flex-direction:row; align-items:center; justify-content:space-between; 
+      background:#f4f6f8; color:#0b3a2a; border-top:1px solid #e3e7eb; z-index:var(--z-footer); 
+      padding:6px 20px 8px; font-weight:800; 
+    }
+    
+    .footer-left {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      text-align: center;
+    }
+    
+    .footer-right {
+      display: flex;
+      align-items: center;
+    }
+    
+    #supportFooter {
+      background: #00a758;
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 20px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 14px;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+    
+    #supportFooter:hover {
+      background: #059669;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(0, 167, 88, 0.3);
+    }
+    
+    #pageFooter img{ height:22px; width:auto; display:block; }
     #contentWrap::after{ content:""; display:block; height: calc(0.75 * var(--footer-h) + 20px); }
 
-    /* Hỗ trợ desktop - luôn nằm góc dưới phía trên footer */
+    /* Hỗ trợ desktop - chỉ hiển thị khi chưa đăng nhập */
     #supportDesk{ 
       position:fixed; 
       right:18px; 
@@ -575,7 +675,12 @@
       text-decoration:none;
       box-shadow:0 4px 12px rgba(0,0,0,.18); 
       z-index:var(--z-support); 
-      display:inline-flex !important; 
+      display:none; 
+    }
+    
+    /* Ẩn hoàn toàn nút hỗ trợ desktop */
+    #supportDesk {
+      display: none !important;
     }
 
     /* Thông báo lỗi dưới header */
@@ -757,8 +862,13 @@
 
   <!-- ===== FOOTER ===== -->
   <footer id="pageFooter">
-    <div>Bản quyền trang web thuộc về</div>
-    <img src="/logo_textr.webp" alt="Logo" />
+    <div class="footer-left">
+      <div>Bản quyền trang web thuộc về</div>
+      <img src="logo_textr.webp" alt="Logo" />
+    </div>
+    <div class="footer-right">
+      <a id="supportFooter" href="http://zalo.me/0376763390" target="_blank" rel="noopener">Hỗ trợ</a>
+    </div>
   </footer>
 
   <!-- ===== LOGIC ===== -->
